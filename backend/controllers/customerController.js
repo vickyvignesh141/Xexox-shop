@@ -32,7 +32,7 @@ const createCustomer = async (req, res) => {
             department,
             year,
             section,
-            registerNumber,
+            // registerNumber,
             email
         });
 
@@ -50,6 +50,28 @@ const createCustomer = async (req, res) => {
         });
     }
 
+
+}
+const getCustomerByMobile = async (req, res) => {
+    try {
+        const { mobile } = req.params;
+        const customer = await Customer.findOne({ mobile });
+        if (!customer) {
+            return res.status(404).json({
+                message: "Customer not found"
+            });
+        }
+        return res.status(200).json({
+            customer
+        });
+    }
+    catch (error) {
+        console.error("Get customer error:", error);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
 }
 
-module.exports = { createCustomer };
+
+module.exports = { createCustomer, getCustomerByMobile};
