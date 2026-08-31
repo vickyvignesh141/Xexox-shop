@@ -7,6 +7,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const customerRoutes = require("./routes/customerRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/customers", customerRoutes);
+app.use("/api/orders", orderRoutes);
 
 // MongoDB + Server
 mongoose
