@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+console.log("OWNER AUTH HIT");
 
 const ownerAuth = (req, res, next) => {
     try {

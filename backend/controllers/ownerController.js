@@ -3,8 +3,10 @@ const Order = require("../models/Order");
 // Verify or reject payment
 const verifyPayment = async (req, res) => {
     try {
+        console.log("BODY:", req.body);
+        console.log("CONTENT TYPE:", req.headers["content-type"]);
         const { orderNumber } = req.params;
-        const { status } = req.body;
+        const { status } = req.body || {};
 
         if (!["VERIFIED", "REJECTED"].includes(status)) {
             return res.status(400).json({
@@ -59,7 +61,7 @@ const verifyPayment = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
     try {
         const { orderNumber } = req.params;
-        const { status } = req.body;
+        const { status } = req.body || {};
 
         if (!["COMPLETED", "NOT_COMPLETED"].includes(status)) {
             return res.status(400).json({
