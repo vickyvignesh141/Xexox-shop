@@ -60,6 +60,7 @@ const verifyPayment = async (req, res) => {
 // Update Xerox status
 const updateOrderStatus = async (req, res) => {
     try {
+        console.log("STATUS BODY:", req.body);
         const { orderNumber } = req.params;
         const { status } = req.body || {};
 
@@ -108,8 +109,26 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
+const getAllOrders = async (req, res) => {
+    try {
+        const orders = await Order.find()
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            orders
+        });
+
+    } catch (error) {
+        console.error("Get all orders error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};
 
 module.exports = {
     verifyPayment,
-    updateOrderStatus
+    updateOrderStatus,
+    getAllOrders
 };

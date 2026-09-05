@@ -6,7 +6,8 @@ const ownerAuth = require("../middleware/ownerAuth");
 
 const {
     verifyPayment,
-    updateOrderStatus
+    updateOrderStatus,
+    getAllOrders
 } = require("../controllers/ownerController");
 router.use((req, res, next) => {
     console.log("OWNER ROUTE HIT:", req.method, req.originalUrl);
@@ -24,5 +25,7 @@ router.patch(
     ownerAuth,
     updateOrderStatus
 );
+
+router.get("/orders", ownerAuth, getAllOrders);
 
 module.exports = router;
