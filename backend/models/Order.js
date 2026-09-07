@@ -61,6 +61,12 @@ const orderSchema = new mongoose.Schema(
                     type: String,
                     required: true,
                     enum: ["SINGLE", "DOUBLE"]
+                },
+                
+                amount: {
+                    type: Number,
+                    required: true,
+                    min: 0
                 }
             }
         ],
@@ -85,12 +91,12 @@ const orderSchema = new mongoose.Schema(
             default: "PENDING"
         },
 
-      orderStatus: {
-    type: String,
-    required: true,
-    enum: ["PENDING", "COMPLETED", "NOT_COMPLETED"],
-    default: "PENDING"
-},
+        orderStatus: {
+            type: String,
+            required: true,
+            enum: ["PENDING", "COMPLETED", "NOT_COMPLETED"],
+            default: "PENDING"
+        },
     },
     {
         collection: "orders",
