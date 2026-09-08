@@ -1,6 +1,9 @@
 const Order = require("../models/Order");
+const Customer = require("../models/Customer");
 const generateOrderNumber = require("../services/orderNumberService");
 const calculateFilePrice = require("../services/priceService");
+const fs = require("fs");
+const path = require("path");
 
 const createOrder = async (req, res) => {
     try {
@@ -9,6 +12,14 @@ const createOrder = async (req, res) => {
             files,
             transactionId
         } = req.body;
+
+        const customer = await Customer.findById(customerId);
+
+        if (!customer) {
+            return res.status(404).json({
+                message: "Customer not found"
+            });
+        }
 
         // Check transaction ID
         const existingOrder = await Order.findOne({ transactionId });
@@ -33,6 +44,24 @@ const createOrder = async (req, res) => {
         }
 
         let totalAmount = 0;
+
+        for (const file of files) {
+
+            const filename = path.basename(file.fileUrl);
+
+            const filePath = path.join("uploads", filename);
+
+            if (!fs.existsSync(filePath)) {
+                return res.status(400).json({
+                    message: "Uploaded file not found"
+                });
+            }
+            if (!file.fileUrl || !file.pageCount) {
+                return res.status(400).json({
+                    message: "File URL and page count are required"
+                });
+            }
+        }
 
         // Calculate amount for each file
         const updatedFiles = files.map((file) => {
@@ -80,6 +109,12 @@ const createOrder = async (req, res) => {
         ) {
             return res.status(409).json({
                 message: "Transaction ID already used"
+            });
+        }
+
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                message: error.message
             });
         }
 

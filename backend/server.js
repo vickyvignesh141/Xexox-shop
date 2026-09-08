@@ -10,6 +10,7 @@ const customerRoutes = require("./routes/customerRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const ownerRoutes = require("./routes/ownerRoutes");
 const ownerAuthRoutes = require("./routes/ownerAuthRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 
 
 
@@ -49,6 +50,16 @@ app.use("/api/owner", ownerAuthRoutes);
 app.use((err, req, res, next) => {
     console.log("SERVER ERROR:", err.message);
     res.status(400).json({
+        message: err.message
+    });
+});
+app.use("/uploads", express.static("uploads"));
+
+app.use("/api/upload", uploadRoutes);
+app.use((err, req, res, next) => {
+    console.error("SERVER ERROR:", err.message);
+
+    return res.status(400).json({
         message: err.message
     });
 });
