@@ -27,14 +27,13 @@ const uploadFile = async (req,res) =>{
         })
 
         
-    }
-    catch (error) {
-        console.error("File upload error:", error);
+    } catch (error) {
+    console.error("File upload error:", error.message);
 
-        return res.status(500).json({
-            message: "Internal server error"
-        });
-    }
+    return res.status(400).json({
+        message: "Invalid or corrupted PDF file"
+    });
+}
 };
 
 module.exports ={uploadFile};

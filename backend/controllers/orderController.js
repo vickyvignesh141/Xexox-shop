@@ -4,6 +4,7 @@ const generateOrderNumber = require("../services/orderNumberService");
 const calculateFilePrice = require("../services/priceService");
 const fs = require("fs");
 const path = require("path");
+const { PDFDocument } = require("pdf-lib");
 
 const createOrder = async (req, res) => {
     try {
@@ -47,6 +48,12 @@ const createOrder = async (req, res) => {
 
         for (const file of files) {
 
+            if (!file.fileUrl || !file.pageCount) {
+                return res.status(400).json({
+                    message: "File URL and page count are required"
+                });
+            }
+
             const filename = path.basename(file.fileUrl);
 
             const filePath = path.join("uploads", filename);
@@ -56,11 +63,17 @@ const createOrder = async (req, res) => {
                     message: "Uploaded file not found"
                 });
             }
-            if (!file.fileUrl || !file.pageCount) {
-                return res.status(400).json({
-                    message: "File URL and page count are required"
+            const pdfBytes = fs.readFileSync(filePath);
+            const pdfDoc = await PDFDocument.load(pdfBytes);
+
+            const actualPageCount = pdfDoc.getPageCount();
+
+            if (actualPageCount !== file.pageCount) {
+                return res.status(400).json({ 
+                    message: `Page count mismatch for ${file.fileUrl}`
                 });
             }
+
         }
 
         // Calculate amount for each file
