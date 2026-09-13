@@ -7,6 +7,7 @@ const path = require("path");
 const { PDFDocument } = require("pdf-lib");
 
 const createOrder = async (req, res) => {
+    console.log("CREATE ORDER CONTROLLER HIT");
     try {
         const {
             customerId,
