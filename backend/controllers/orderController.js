@@ -6,6 +6,108 @@ const fs = require("fs");
 const path = require("path");
 const { PDFDocument } = require("pdf-lib");
 
+
+
+
+
+const calculatePrice = async (req, res) => {
+    try {
+
+        const { files } = req.body;
+
+        // --------------------------------
+        // 1. Validate files array
+        // --------------------------------
+        if (
+            !Array.isArray(files) ||
+            files.length === 0
+        ) {
+            return res.status(400).json({
+                message: "At least one file is required"
+            });
+        }
+
+
+        // --------------------------------
+        // 2. Calculate each file price
+        // --------------------------------
+        const calculatedFiles = [];
+
+        let totalAmount = 0;
+
+
+        for (const file of files) {
+
+            const {
+                pageCount,
+                copies,
+                colorMode,
+                side
+            } = file;
+
+
+            // Validate individual file
+            if (
+                !Number.isInteger(pageCount) ||
+                pageCount < 1 ||
+
+                !Number.isInteger(copies) ||
+                copies < 1 ||
+
+                !["BW", "COLOR"].includes(colorMode) ||
+
+                !["SINGLE", "DOUBLE"].includes(side)
+            ) {
+                return res.status(400).json({
+                    message: "Invalid price details"
+                });
+            }
+
+
+            // Backend price calculation
+            const amount = calculateFilePrice(
+                pageCount,
+                copies,
+                colorMode,
+                side
+            );
+
+
+            // Store individual file amount
+            calculatedFiles.push({
+                amount
+            });
+
+
+            // Add to grand total
+            totalAmount += amount;
+        }
+
+
+        // --------------------------------
+        // 3. Send response
+        // --------------------------------
+        return res.status(200).json({
+
+            files: calculatedFiles,
+
+            totalAmount
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Calculate price error:",
+            error
+        );
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};
+
 const createOrder = async (req, res) => {
     console.log("CREATE ORDER CONTROLLER HIT");
     try {
@@ -189,5 +291,6 @@ const getMyOrders = async (req, res) => {
 module.exports = {
     createOrder,
     getOrderByNumber,
-    getMyOrders
+    getMyOrders,
+    calculatePrice
 };

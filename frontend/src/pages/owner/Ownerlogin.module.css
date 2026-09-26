@@ -1,0 +1,236 @@
+/* ===========================
+   Fonts (optional — remove if already loaded elsewhere)
+=========================== */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+
+/* ===========================
+   Layout / Background (admin palette: gold + indigo)
+=========================== */
+
+.container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+
+  background: radial-gradient(circle at 15% 20%, #241a3d 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, #1d1810 0%, transparent 45%),
+    linear-gradient(160deg, #0b0e1f 0%, #14121f 55%, #1a1512 100%);
+}
+
+.container::before,
+.container::after {
+  content: "";
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  animation: drift 8s ease-in-out infinite;
+}
+
+.container::before {
+  top: -80px;
+  left: -80px;
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.container::after {
+  bottom: -100px;
+  right: -100px;
+  background: rgba(99, 102, 241, 0.22);
+  animation-delay: 2.5s;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, -20px) scale(1.08); }
+}
+
+/* ===========================
+   Card
+=========================== */
+
+.form {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  padding: 58px 34px 36px;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  background: rgba(24, 21, 38, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  backdrop-filter: blur(20px);
+
+  transform: perspective(1000px) rotateX(0deg) translateY(0);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  animation: fadeInUp 0.6s ease;
+}
+
+.form:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(-1.5deg) translateY(-4px);
+  box-shadow: 0 40px 70px rgba(0, 0, 0, 0.65);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* glow behind the floating icon */
+.form::after {
+  content: "";
+  position: absolute;
+  top: -78px;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.3), transparent 70%);
+  filter: blur(18px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* floating 3D padlock icon — pure SVG, no image file needed */
+.form::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  width: 90px;
+  height: 92px;
+  transform: translateX(-50%);
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.55));
+  z-index: 1;
+  animation: floatIcon 4.5s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 100'%3E%3Cpath d='M27 34 V22 A14 14 0 0 1 55 22 V34' fill='none' stroke='%23fcd9a0' stroke-width='7' stroke-linecap='round'/%3E%3Crect x='22' y='42' width='54' height='44' rx='8' fill='%234338ca'/%3E%3Crect x='18' y='38' width='54' height='44' rx='8' fill='%236366f1'/%3E%3Crect x='14' y='34' width='54' height='44' rx='8' fill='%23a5b4fc'/%3E%3Ccircle cx='41' cy='58' r='9' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-opacity='0.7'/%3E%3Ccircle cx='41' cy='58' r='6' fill='%230f172a'/%3E%3Crect x='38' y='61' width='6' height='11' rx='2' fill='%230f172a'/%3E%3C/svg%3E");
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+/* ===========================
+   Heading
+=========================== */
+
+.form h1 {
+  text-align: center;
+  margin-bottom: 4px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  background: linear-gradient(135deg, #f59e0b, #a78bfa 60%, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ===========================
+   Inputs
+=========================== */
+
+.form input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #ede9fe;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 3px 3px 6px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.03);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.form input::placeholder {
+  color: #7c7a8c;
+}
+
+.form input:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.form input:focus {
+  outline: none;
+  border-color: #f59e0b;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.35),
+    0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+
+/* ===========================
+   Button
+=========================== */
+
+.form button {
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #ffffff;
+  margin-top: 6px;
+  background: linear-gradient(135deg, #4f46e5, #f59e0b);
+  box-shadow: 0 10px 20px rgba(79, 70, 229, 0.35), 0 4px 10px rgba(245, 158, 11, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.form button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 26px rgba(79, 70, 229, 0.45), 0 6px 14px rgba(245, 158, 11, 0.3);
+  filter: brightness(1.06);
+}
+
+.form button:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35) inset;
+}
+
+.form button:focus-visible {
+  outline: 3px solid rgba(245, 158, 11, 0.4);
+  outline-offset: 2px;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width: 480px) {
+  .container { padding: 16px; }
+
+  .form {
+    padding: 52px 22px 30px;
+    border-radius: 18px;
+  }
+
+  .form h1 { font-size: 19px; }
+
+  .form::before {
+    width: 76px;
+    height: 78px;
+    top: -50px;
+  }
+}
