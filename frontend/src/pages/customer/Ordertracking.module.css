@@ -1,0 +1,263 @@
+/* ===========================
+   Fonts (optional — remove if already loaded elsewhere)
+=========================== */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+
+/* ===========================
+   Layout / Background
+=========================== */
+
+.container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+
+  background: radial-gradient(circle at 15% 20%, #1a1443 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, #0e2340 0%, transparent 45%),
+    linear-gradient(160deg, #0a0e27 0%, #121736 55%, #1a1440 100%);
+}
+
+.container::before,
+.container::after {
+  content: "";
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  animation: drift 8s ease-in-out infinite;
+}
+
+.container::before {
+  top: -80px;
+  left: -80px;
+  background: rgba(34, 211, 238, 0.22);
+}
+
+.container::after {
+  bottom: -100px;
+  right: -100px;
+  background: rgba(236, 72, 153, 0.2);
+  animation-delay: 2.5s;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, -20px) scale(1.08); }
+}
+
+/* ===========================
+   Card
+=========================== */
+
+.card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 440px;
+  padding: 58px 34px 36px;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  background: rgba(19, 23, 46, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  backdrop-filter: blur(20px);
+
+  transform: perspective(1000px) rotateX(0deg) translateY(0);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  animation: fadeInUp 0.6s ease;
+}
+
+.card:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(-1.5deg) translateY(-4px);
+  box-shadow: 0 40px 70px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* glow behind the floating icon */
+.card::after {
+  content: "";
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.35), transparent 70%);
+  filter: blur(18px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* floating 3D "document + magnifying glass" icon — pure SVG, no image file needed */
+.card::before {
+  content: "";
+  position: absolute;
+  top: -62px;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  transform: translateX(-50%);
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.5));
+  z-index: 1;
+  animation: floatIcon 4.5s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'%3E%3Crect x='22' y='14' width='54' height='74' rx='6' fill='%234338ca'/%3E%3Crect x='16' y='8' width='54' height='74' rx='6' fill='%236366f1'/%3E%3Crect x='10' y='2' width='54' height='74' rx='6' fill='%23f8fafc' stroke='%23cbd5e1' stroke-width='1.5'/%3E%3Cpolygon points='50,2 64,2 64,16' fill='%23e2e8f0'/%3E%3Crect x='18' y='24' width='30' height='4' rx='2' fill='%23cbd5e1'/%3E%3Crect x='18' y='34' width='36' height='4' rx='2' fill='%23cbd5e1'/%3E%3Crect x='18' y='44' width='24' height='4' rx='2' fill='%23cbd5e1'/%3E%3Crect x='18' y='54' width='32' height='4' rx='2' fill='%23cbd5e1'/%3E%3Ccircle cx='62' cy='70' r='13' fill='%2322d3ee' fill-opacity='0.12' stroke='%2322d3ee' stroke-width='5'/%3E%3Cline x1='71' y1='79' x2='82' y2='90' stroke='%2322d3ee' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+/* ===========================
+   Heading
+=========================== */
+
+.card h1 {
+  text-align: center;
+  margin-bottom: 4px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  background: linear-gradient(135deg, #22d3ee, #a855f7 55%, #f472b6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ===========================
+   Input & Button
+=========================== */
+
+.input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 3px 3px 6px rgba(0, 0, 0, 0.35),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.03);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.input::placeholder {
+  color: #64748b;
+}
+
+.input:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.input:focus {
+  outline: none;
+  border-color: #818cf8;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.3),
+    0 0 0 4px rgba(129, 140, 248, 0.22);
+}
+
+.trackButton {
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35), 0 4px 10px rgba(236, 72, 153, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.trackButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 26px rgba(99, 102, 241, 0.45), 0 6px 14px rgba(236, 72, 153, 0.35);
+  filter: brightness(1.06);
+}
+
+.trackButton:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35) inset;
+}
+
+/* ===========================
+   Result card
+=========================== */
+
+.resultCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 20px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  animation: fadeInUp 0.4s ease;
+}
+
+.resultCard h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.statusPill {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border-left: 3px solid #22d3ee;
+  background: rgba(255, 255, 255, 0.04);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+  color: #e2e8f0;
+}
+
+.resultCard .statusPill:last-of-type {
+  border-left-color: #a855f7;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width: 480px) {
+  .container { padding: 16px; }
+
+  .card {
+    padding: 52px 22px 30px;
+    border-radius: 18px;
+  }
+
+  .card h1 { font-size: 19px; }
+
+  .card::before {
+    width: 82px;
+    height: 82px;
+    top: -52px;
+  }
+}

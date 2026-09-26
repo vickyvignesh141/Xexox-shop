@@ -1,0 +1,35 @@
+.container {
+    min-height: 100vh;
+    padding: 30px;
+    background: #f5f7fb;
+}
+
+.card {
+    max-width: 800px;
+    margin: auto;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.orderCard {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.orderCard h2 {
+    margin-bottom: 15px;
+}
+
+.orderCard p {
+    margin: 8px 0;
+}
+
+.empty {
+    text-align: center;
+}
