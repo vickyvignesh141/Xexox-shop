@@ -114,6 +114,7 @@ const createOrder = async (req, res) => {
         const {
             customerId,
             files,
+            paymentMethod,
             transactionId
         } = req.body;
 
@@ -125,13 +126,32 @@ const createOrder = async (req, res) => {
             });
         }
 
-        // Check transaction ID
-        const existingOrder = await Order.findOne({ transactionId });
-
-        if (existingOrder) {
-            return res.status(409).json({
-                message: "Transaction ID already used"
+        if (!["COD", "GPay"].includes(paymentMethod)) {
+            return res.status(400).json({
+                message: "Invalid payment method"
             });
+        }
+
+        if (
+            paymentMethod === "GPay" &&
+            (!transactionId || !transactionId.trim())
+        ) {
+            return res.status(400).json({
+                message: "Transaction ID is required for GPay payment"
+            });
+        }
+
+        // Check transaction ID
+        if (paymentMethod === "GPay") {
+            const existingOrder = await Order.findOne({
+                transactionId: transactionId.trim()
+            });
+
+            if (existingOrder) {
+                return res.status(409).json({
+                    message: "Transaction ID already used"
+                });
+            }
         }
 
         // Validate files
@@ -172,7 +192,7 @@ const createOrder = async (req, res) => {
             const actualPageCount = pdfDoc.getPageCount();
 
             if (actualPageCount !== file.pageCount) {
-                return res.status(400).json({ 
+                return res.status(400).json({
                     message: `Page count mismatch for ${file.fileUrl}`
                 });
             }
@@ -205,7 +225,11 @@ const createOrder = async (req, res) => {
             orderNumber,
             files: updatedFiles,
             totalAmount,
-            transactionId
+            paymentMethod,
+            transactionId:
+                paymentMethod === "GPay"
+                    ? transactionId.trim()
+                    : undefined
         });
 
         await order.save();

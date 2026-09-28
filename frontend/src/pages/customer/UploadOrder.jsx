@@ -236,12 +236,14 @@ function UploadOrder() {
 
                 {/* Select PDF */}
 
-                <input
-                    type="file"
-                    accept=".pdf,application/pdf"
-                    onChange={handleFileSelect}
-                    className={styles.fileInput}
-                />
+                {files.length === 0 && selectedFiles.length === 0 && (
+                    <input
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handleFileSelect}
+                        className={styles.fileInput}
+                    />
+                )}
 
                 {/* Selected files */}
 
@@ -395,12 +397,10 @@ function UploadOrder() {
 
                         {/* Add More */}
 
-                        {files.length < 2 && (
+                        {files.length > 0 && files.length < 2 && (
                             <>
                                 <label className={styles.addMoreLabel}>
-                                    <strong>
-                                        + Add Another PDF
-                                    </strong>
+                                    <strong>+ Add Another PDF</strong>
                                 </label>
 
                                 <input

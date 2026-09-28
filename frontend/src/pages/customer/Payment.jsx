@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// import styles from "./Payment.module.css";
+import styles from "./Payment.module.css";
 import shopQR from "../../assets/QR.jpeg";
 
 function Payment() {
