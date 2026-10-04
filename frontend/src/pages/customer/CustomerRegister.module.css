@@ -1,280 +1,310 @@
 /* ===========================
-   Fonts (optional — remove if you already load one)
+   Font
 =========================== */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 /* ===========================
-   Layout / Background
+   Page
 =========================== */
-
 .container {
-  position: relative;
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --blue-soft: #eff6ff;
+  --green: #10b981;
+  --green-dark: #059669;
+  --line: #e2e8f0;
+  --text: #1e293b;
+  --muted: #94a3b8;
+
   min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 30px;
-  overflow: hidden;
-  font-family: "Poppins", sans-serif;
-
-  background: radial-gradient(circle at 15% 20%, #1a1443 0%, transparent 45%),
-    radial-gradient(circle at 85% 80%, #0e2340 0%, transparent 45%),
-    linear-gradient(160deg, #0a0e27 0%, #121736 55%, #1a1440 100%);
+  box-sizing: border-box;
+  padding: 24px 16px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
 }
 
-/* floating glow orbs for depth */
-.container::before,
-.container::after {
-  content: "";
-  position: absolute;
-  width: 340px;
-  height: 340px;
-  border-radius: 50%;
-  filter: blur(70px);
-  pointer-events: none;
-  animation: drift 8s ease-in-out infinite;
-}
-
-.container::before {
-  top: -80px;
-  left: -80px;
-  background: rgba(34, 211, 238, 0.22);
-}
-
-.container::after {
-  bottom: -100px;
-  right: -100px;
-  background: rgba(236, 72, 153, 0.2);
-  animation-delay: 2.5s;
-}
-
-@keyframes drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(20px, -20px) scale(1.08); }
+.container *,
+.container *::before,
+.container *::after {
+  box-sizing: border-box;
 }
 
 /* ===========================
-   Card
+   Card (wider, 2-column grid)
 =========================== */
-
 .form {
-  position: relative;
-  z-index: 2;
   width: 100%;
-  max-width: 500px;
-  padding: 56px 36px 40px;
-  border-radius: 22px;
-  display: flex;
-  flex-direction: column;
+  max-width: 560px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--blue);
+  border-radius: 18px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
-
-  background: rgba(19, 23, 46, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 30px 60px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
-    0 1px 0 rgba(255, 255, 255, 0.06) inset;
-  backdrop-filter: blur(20px);
-
-  transform: perspective(1000px) rotateX(0deg) translateY(0);
-  transition: transform 0.5s ease, box-shadow 0.5s ease;
-  animation: fadeInUp 0.6s ease;
 }
 
-.form:hover {
-  transform: perspective(1000px) rotateX(2deg) rotateY(-1.5deg) translateY(-4px);
-  box-shadow:
-    0 40px 70px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+.form > * {
+  grid-column: 1 / -1;
+  min-width: 0;
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* glow behind the floating icon */
-.form::after {
-  content: "";
-  position: absolute;
-  top: -86px;
-  left: 50%;
-  width: 150px;
-  height: 150px;
-  transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.4), transparent 70%);
-  filter: blur(18px);
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* floating 3D isometric printer/copier icon (pure SVG, no image file needed) */
-.form::before {
-  content: "";
-  position: absolute;
-  top: -66px;
-  left: 50%;
-  width: 112px;
-  height: 96px;
-  transform: translateX(-50%);
-  background-repeat: no-repeat;
-  background-size: contain;
-  filter: drop-shadow(0 14px 16px rgba(0, 0, 0, 0.5));
-  z-index: 1;
-  animation: floatIcon 4.5s ease-in-out infinite;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'%3E%3Crect x='42' y='2' width='36' height='28' rx='3' fill='%23f8fafc' stroke='%23cbd5e1' stroke-width='1.5' transform='rotate(-6 60 16)'/%3E%3Cpolygon points='60,20 100,40 60,60 20,40' fill='%2393a4fb'/%3E%3Cpolygon points='20,40 60,60 60,95 20,75' fill='%236366f1'/%3E%3Cpolygon points='60,60 100,40 100,75 60,95' fill='%234338ca'/%3E%3Ccircle cx='70' cy='72' r='3.4' fill='%2322d3ee'/%3E%3Ccircle cx='80' cy='67' r='3.4' fill='%23f472b6'/%3E%3Ccircle cx='90' cy='62' r='3.4' fill='%23fbbf24'/%3E%3Ccircle cx='98' cy='58' r='3.4' fill='%23111827'/%3E%3C/svg%3E");
-}
-
-@keyframes floatIcon {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-8px); }
+.form > select:nth-of-type(2),
+.form > select:nth-of-type(3) {
+  grid-column: span 1;
 }
 
 /* ===========================
    Heading
 =========================== */
-
 .form h1 {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  margin-bottom: 8px;
-  font-size: 23px;
+  margin: 0 0 6px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+  font-size: 22px;
   font-weight: 700;
-  letter-spacing: -0.2px;
-  background: linear-gradient(135deg, #22d3ee, #a855f7 55%, #f472b6);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  letter-spacing: -0.01em;
+  text-align: left;
 }
 
 /* ===========================
-   Inputs & Selects (neumorphic dark style)
+   Mobile number row
 =========================== */
+.form > div {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
 
+.form > div input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===========================
+   Inputs & selects
+=========================== */
 .form input,
 .form select {
-  position: relative;
-  z-index: 2;
   width: 100%;
-  padding: 13px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line);
   border-radius: 12px;
-  font-size: 15px;
+  background-color: #f8fafc;
+  color: var(--text);
   font-family: inherit;
-  color: #e2e8f0;
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow:
-    inset 3px 3px 6px rgba(0, 0, 0, 0.35),
-    inset -2px -2px 5px rgba(255, 255, 255, 0.03);
-  box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  font-size: 16px;
+  font-weight: 500;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
 .form input::placeholder {
-  color: #64748b;
+  color: #a3aebd;
+  font-weight: 400;
 }
 
 .form input:hover,
 .form select:hover {
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: #cbd5e1;
+  background-color: #ffffff;
 }
 
 .form input:focus,
 .form select:focus {
   outline: none;
-  border-color: #818cf8;
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow:
-    inset 2px 2px 5px rgba(0, 0, 0, 0.3),
-    0 0 0 4px rgba(129, 140, 248, 0.22);
+  border-color: var(--blue);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
 }
 
-/* custom dropdown arrow (light, for dark background) */
+/* ===========================
+   Dropdown (select) theme
+=========================== */
 .form select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 40px;
+  padding-right: 44px;
   cursor: pointer;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
 }
 
 .form select:invalid {
-  color: #64748b;
+  color: #a3aebd;
+  font-weight: 400;
 }
 
+/* fallback list styling (older browsers) */
 .form select option {
+  padding: 12px 14px;
   color: #0f172a;
   background: #ffffff;
 }
 
-/* ===========================
-   Button (raised 3D, press effect)
-=========================== */
+/* Fully styled dropdown list in Chrome / Edge / Android Chrome */
+@supports (appearance: base-select) {
+  .form select,
+  .form select::picker(select) {
+    appearance: base-select;
+  }
 
+  .form select {
+    background-image: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .form select::picker-icon {
+    color: var(--blue);
+    transition: transform 0.2s ease;
+  }
+
+  .form select:open::picker-icon {
+    transform: rotate(180deg);
+  }
+
+  .form select::picker(select) {
+    margin-top: 6px;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15);
+    max-height: 320px;
+  }
+
+  .form select option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: normal;
+    cursor: pointer;
+  }
+
+  .form select option::checkmark {
+    order: 2;
+    margin-left: auto;
+    color: var(--blue);
+  }
+
+  .form select option:hover,
+  .form select option:focus-visible {
+    background: var(--blue-soft);
+    color: var(--blue-dark);
+    outline: none;
+  }
+
+  .form select option:checked {
+    background: var(--blue-soft);
+    color: var(--blue-dark);
+    font-weight: 600;
+  }
+
+  .form select option:disabled {
+    display: none;
+  }
+}
+
+/* ===========================
+   Buttons
+=========================== */
 .form button {
-  position: relative;
-  z-index: 2;
-  padding: 14px;
+  min-height: 52px;
   border: none;
   border-radius: 12px;
   cursor: pointer;
+  font-family: inherit;
   font-size: 16px;
   font-weight: 600;
-  letter-spacing: 0.3px;
   color: #ffffff;
-  margin-top: 8px;
-  background: linear-gradient(135deg, #6366f1, #ec4899);
-  box-shadow:
-    0 10px 20px rgba(99, 102, 241, 0.35),
-    0 4px 10px rgba(236, 72, 153, 0.3);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.form button:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    0 16px 26px rgba(99, 102, 241, 0.45),
-    0 6px 14px rgba(236, 72, 153, 0.35);
-  filter: brightness(1.06);
+.form > div button {
+  flex: 0 0 auto;
+  padding: 0 24px;
+  background: var(--blue);
+}
+
+.form > div button:hover {
+  background: var(--blue-dark);
+}
+
+.form > button {
+  width: 100%;
+  margin-top: 8px;
+  background: var(--green);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
+}
+
+.form > button:hover {
+  background: var(--green-dark);
 }
 
 .form button:active {
-  transform: translateY(1px);
-  box-shadow:
-    0 4px 10px rgba(99, 102, 241, 0.35) inset,
-    0 2px 6px rgba(0, 0, 0, 0.25);
+  transform: scale(0.98);
 }
 
 .form button:focus-visible {
-  outline: 3px solid rgba(129, 140, 248, 0.4);
+  outline: 2px solid var(--blue);
   outline-offset: 2px;
 }
 
 /* ===========================
    Responsive
 =========================== */
+@media (max-width: 360px) {
+  .container { padding: 16px 12px; }
+  .form { padding: 24px 16px 20px; gap: 12px; border-radius: 14px; }
+  .form > div button { padding: 0 16px; }
+  .form input, .form select { padding: 0 12px; min-height: 48px; }
+  .form select { padding-right: 36px; }
+}
 
-@media (max-width: 480px) {
-  .container {
-    padding: 16px;
-  }
+@media (max-width: 599px) {
+  .container { align-items: flex-start; }
+  .form { margin: 0 auto; }
+  .form h1 { font-size: 20px; }
+}
 
-  .form {
-    padding: 52px 22px 30px;
-    border-radius: 18px;
-  }
+@media (min-width: 600px) and (max-width: 1024px) {
+  .form { max-width: 600px; padding: 40px 36px 34px; gap: 18px; }
+}
 
-  .form h1 {
-    font-size: 20px;
-  }
+@media (min-width: 1025px) {
+  .form { max-width: 580px; padding: 40px 36px 34px; gap: 18px; }
+}
 
-  .form::before {
-    width: 92px;
-    height: 78px;
-    top: -54px;
-  }
+@media (max-height: 500px) and (orientation: landscape) {
+  .container { align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form input, .form select, .form button, .form select::picker-icon { transition: none; }
 }

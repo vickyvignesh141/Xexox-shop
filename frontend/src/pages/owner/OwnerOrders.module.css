@@ -1,21 +1,14 @@
-/* ===========================
-   Fonts (optional — remove if already loaded elsewhere)
-=========================== */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 /* ===========================
-   Page background (admin palette: gold + indigo)
+   Root & Base Styles
 =========================== */
 
 .container {
-  position: relative;
   min-height: 100vh;
-  padding: 60px 24px 60px;
-  font-family: "Poppins", sans-serif;
-
-  background: radial-gradient(circle at 10% 0%, #241a3d 0%, transparent 40%),
-    radial-gradient(circle at 90% 100%, #1d1810 0%, transparent 40%),
-    linear-gradient(160deg, #0b0e1f 0%, #14121f 55%, #1a1512 100%);
+  padding: 24px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 /* ===========================
@@ -23,161 +16,289 @@
 =========================== */
 
 .title {
-  position: relative;
-  text-align: center;
-  margin: 0 auto 48px;
-  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 32px;
   font-weight: 700;
-  letter-spacing: -0.2px;
-  width: fit-content;
-  background: linear-gradient(135deg, #f59e0b, #a78bfa 60%, #818cf8);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* floating 3D clipboard icon above the title */
-.title::before {
-  content: "";
-  position: absolute;
-  top: -84px;
-  left: 50%;
-  width: 88px;
-  height: 88px;
-  transform: translateX(-50%);
-  background-repeat: no-repeat;
-  background-size: contain;
-  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.5));
-  animation: floatIcon 4.5s ease-in-out infinite;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='22' y='22' width='54' height='72' rx='6' fill='%234338ca'/%3E%3Crect x='16' y='16' width='54' height='72' rx='6' fill='%236366f1'/%3E%3Crect x='10' y='10' width='54' height='72' rx='6' fill='%23f8fafc' stroke='%23cbd5e1' stroke-width='1.5'/%3E%3Crect x='27' y='2' width='20' height='14' rx='5' fill='%23f59e0b' stroke='%23d97706' stroke-width='1'/%3E%3Crect x='18' y='34' width='30' height='4' rx='2' fill='%23cbd5e1'/%3E%3Crect x='18' y='44' width='24' height='4' rx='2' fill='%23cbd5e1'/%3E%3Crect x='18' y='54' width='32' height='4' rx='2' fill='%23cbd5e1'/%3E%3Ccircle cx='52' cy='72' r='14' fill='%2322c55e'/%3E%3Cpath d='M45 72 L50 77 L59 66' stroke='%23ffffff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
-}
-
-@keyframes floatIcon {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-8px); }
-}
-
-/* empty state */
-.container > p {
+  color: #1e293b;
+  margin: 0 auto 40px;
   text-align: center;
-  color: #9ca3af;
-  font-size: 15px;
+  letter-spacing: -0.5px;
+}
+
+.titleIcon {
+  color: #2563eb;
+  flex-shrink: 0;
 }
 
 /* ===========================
-   Order card
+   Empty State
+=========================== */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 24px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.emptyState svg {
+  color: #cbd5e1;
+}
+
+.emptyState p {
+  font-size: 16px;
+  color: #94a3b8;
+}
+
+/* ===========================
+   Order Card
 =========================== */
 
 .orderCard {
-  position: relative;
-  max-width: 900px;
-  margin: 0 auto 26px;
-  padding: 26px 28px;
-  border-radius: 18px;
-
-  background: rgba(24, 21, 38, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 20px 45px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
-  backdrop-filter: blur(16px);
-
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  max-width: 1200px;
+  margin: 0 auto 24px;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
 }
 
 .orderCard:hover {
-  transform: translateY(-3px);
-  border-color: rgba(245, 158, 11, 0.3);
-  box-shadow: 0 26px 55px rgba(0, 0, 0, 0.5);
-}
-
-.orderTitle {
-  margin: 0 0 16px;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.1px;
-  background: linear-gradient(135deg, #f59e0b, #818cf8);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.orderInfo {
-  margin: 8px 0;
-  font-size: 14px;
-  color: #d1d5db;
-}
-
-.orderInfo::before {
-  margin-right: 8px;
-}
-
-.orderInfo:nth-of-type(1)::before { content: "🧾"; }
-.orderInfo:nth-of-type(2)::before { content: "📅"; }
-.orderInfo:nth-of-type(3)::before { content: "💳"; }
-.orderInfo:nth-of-type(4)::before { content: "📦"; }
-.orderInfo:nth-of-type(5)::before { content: "💰"; }
-
-.status {
-  font-weight: 700;
-  color: #fbbf24;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* ===========================
-   Files section
+   Order Header
 =========================== */
 
-.filesTitle {
-  position: relative;
-  margin: 26px 0 14px;
-  padding-bottom: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: #9ca3af;
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f1f5f9;
 }
 
-.filesTitle::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 36px;
-  height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(135deg, #f59e0b, #818cf8);
+.orderTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.status_PENDING {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status_COMPLETED {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status_NOT_COMPLETED {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ===========================
+   Main Grid Layout
+=========================== */
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.section {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #2563eb;
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #2563eb;
+  letter-spacing: 0.3px;
+}
+
+.sectionTitle svg {
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+/* ===========================
+   Info Rows
+=========================== */
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.infoRow:last-child {
+  border-bottom: none;
+}
+
+.icon {
+  color: #2563eb;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  letter-spacing: 0.2px;
+}
+
+.value {
+  font-size: 14px;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.paymentStatus_PENDING {
+  color: #b45309;
+}
+
+.paymentStatus_VERIFIED {
+  color: #059669;
+}
+
+.paymentStatus_REJECTED {
+  color: #dc2626;
+}
+
+.orderStatus_PENDING {
+  color: #ea580c;
+}
+
+.orderStatus_COMPLETED {
+  color: #0891b2;
+}
+
+.orderStatus_NOT_COMPLETED {
+  color: #dc2626;
+}
+
+/* ===========================
+   Files Section
+=========================== */
+
+.filesSection {
+  margin-bottom: 24px;
 }
 
 .fileCard {
-  background: rgba(255, 255, 255, 0.035);
-  padding: 18px 20px;
-  margin-top: 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  background: #f8fafc;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
 }
 
 .fileCard:hover {
-  border-color: rgba(129, 140, 248, 0.35);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.fileCard p {
-  margin: 4px 0;
-  font-size: 13.5px;
-  color: #b6bcc8;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
 .fileName {
-  font-weight: 700 !important;
-  margin-bottom: 10px !important;
-  font-size: 15px !important;
-  color: #f1f5f9 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 12px;
 }
 
-.fileName::before {
-  content: "📄 ";
+.fileName svg {
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.fileSpecs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.spec {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.specLabel {
+  font-size: 9px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  letter-spacing: 0.2px;
+}
+
+.specValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.fileButtons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* ===========================
@@ -185,84 +306,369 @@
 =========================== */
 
 .buttonGroup {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
   border: none;
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 13.5px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 600;
-  color: #ffffff;
-  letter-spacing: 0.1px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
-}
-
-.button:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .button:active {
-  transform: translateY(1px);
-  filter: brightness(0.98);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35) inset;
+  transform: scale(0.98);
 }
 
 .viewButton {
-  background: linear-gradient(135deg, #3b82f6, #6366f1);
-  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.35);
+  background: #2563eb;
+  color: white;
+}
+
+.viewButton:hover {
+  background: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 .printButton {
-  background: linear-gradient(135deg, #22c55e, #0ea5e9);
-  box-shadow: 0 8px 16px rgba(34, 197, 94, 0.3);
+  background: #10b981;
+  color: white;
+  width: 200px;
+  max-width: 100%;
+  
+}
+
+.printButton:hover {
+  background: #059669;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .verifyButton {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  box-shadow: 0 8px 16px rgba(34, 197, 94, 0.3);
+  background: #10b981;
+  color: white;
+}
+
+.verifyButton:hover {
+  background: #059669;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .rejectButton {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+  background: #ef4444;
+  color: white;
+}
+
+.rejectButton:hover {
+  background: #dc2626;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
 .completeButton {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+  background: #2563eb;
+  color: white;
+}
+
+.completeButton:hover {
+  background: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 .notCompleteButton {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  box-shadow: 0 8px 16px rgba(245, 158, 11, 0.3);
+  background: #f59e0b;
+  color: white;
+}
+
+.notCompleteButton:hover {
+  background: #d97706;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
 
 /* ===========================
-   Responsive
+   Tablet View (768px - 1024px)
 =========================== */
 
-@media (max-width: 600px) {
-  .container { padding: 70px 14px 40px; }
-
-  .orderCard { padding: 20px 18px; }
-
-  .title { font-size: 21px; }
-
-  .title::before {
-    width: 72px;
-    height: 72px;
-    top: -68px;
+@media (max-width: 1024px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
-  .buttonGroup { gap: 8px; }
+  .title {
+    font-size: 28px;
+  }
 
-  .button { padding: 9px 14px; font-size: 13px; }
+  .orderCard {
+    padding: 20px;
+  }
+
+  .fileSpecs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===========================
+   Mobile View (320px - 767px)
+=========================== */
+
+@media (max-width: 767px) {
+  .container {
+    padding: 16px 12px;
+  }
+
+  .title {
+    font-size: 24px;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .titleIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .orderCard {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .orderHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .orderTitle {
+    font-size: 18px;
+  }
+
+  .statusBadge {
+    width: 100%;
+    text-align: center;
+  }
+
+  .mainGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .sectionTitle {
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .infoRow {
+    gap: 10px;
+    padding: 10px 0;
+  }
+
+  .icon {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+  }
+
+  .label {
+    font-size: 10px;
+  }
+
+  .value {
+    font-size: 13px;
+  }
+
+  .fileCard {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .fileName {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .fileSpecs {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .spec {
+    padding: 6px;
+  }
+
+  .specLabel {
+    font-size: 8px;
+    margin-bottom: 3px;
+  }
+
+  .specValue {
+    font-size: 12px;
+  }
+
+  .fileButtons {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .button {
+    padding: 8px 12px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .button svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .buttonGroup {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .filesSection .sectionTitle {
+    margin-bottom: 12px;
+  }
+
+  .emptyState {
+    padding: 40px 20px;
+  }
+
+  .emptyState svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .emptyState p {
+    font-size: 14px;
+  }
+}
+
+/* ===========================
+   Small Mobile (320px - 480px)
+=========================== */
+
+@media (max-width: 480px) {
+  .container {
+    padding: 12px 10px;
+  }
+
+  .title {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .orderCard {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .orderHeader {
+    gap: 8px;
+  }
+
+  .orderTitle {
+    font-size: 16px;
+  }
+
+  .mainGrid {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .section {
+    padding: 12px;
+  }
+
+  .sectionTitle {
+    font-size: 12px;
+  }
+
+  .infoRow {
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+  }
+
+  .label {
+    font-size: 9px;
+  }
+
+  .value {
+    font-size: 12px;
+  }
+
+  .fileCard {
+    padding: 10px;
+  }
+
+  .fileName {
+    font-size: 12px;
+  }
+
+  .fileSpecs {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+
+  .spec {
+    padding: 4px;
+  }
+
+  .specLabel {
+    font-size: 8px;
+  }
+
+  .specValue {
+    font-size: 11px;
+  }
+
+  .button {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .buttonGroup {
+    padding: 12px;
+    margin-top: 12px;
+  }
+}
+
+/* ===========================
+   Utility Classes
+=========================== */
+
+.container > p {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 16px;
+  padding: 40px 20px;
 }

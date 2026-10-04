@@ -1,6 +1,19 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+    UploadCloud,
+    FileText,
+    Trash2,
+    Plus,
+    Calculator,
+    ArrowLeft,
+    Wallet,
+    ArrowRight,
+    Loader2,
+    IndianRupee
+} from "lucide-react";
 import styles from "./UploadOrder.module.css";
 
 function UploadOrder() {
@@ -25,12 +38,12 @@ function UploadOrder() {
         if (!selectedFile) return;
 
         if (selectedFile.type !== "application/pdf") {
-            alert("Please select a PDF file");
+            toast.error("Please select a PDF file");
             return;
         }
 
         if (selectedFiles.length + files.length >= 2) {
-            alert("Maximum 2 files are allowed");
+            toast.warning("Maximum 2 files are allowed");
             e.target.value = "";
             return;
         }
@@ -48,7 +61,7 @@ function UploadOrder() {
     // -----------------------------------------
     const handleUpload = async () => {
         if (selectedFiles.length === 0) {
-            alert("Please select a PDF");
+            toast.warning("Please select a PDF");
             return;
         }
 
@@ -86,10 +99,10 @@ function UploadOrder() {
 
             setSelectedFiles([]);
 
-            alert("PDF uploaded successfully!");
+            toast.success("PDF uploaded successfully!");
 
         } catch (error) {
-            alert(
+            toast.error(
                 error.response?.data?.message ||
                 "Upload failed"
             );
@@ -120,7 +133,7 @@ function UploadOrder() {
     // -----------------------------------------
     const handleCalculatePrice = async () => {
         if (files.length === 0) {
-            alert("Please upload at least one PDF");
+            toast.warning("Please upload at least one PDF");
             return;
         }
 
@@ -150,7 +163,7 @@ function UploadOrder() {
             setPaymentType("");
 
         } catch (error) {
-            alert(
+            toast.error(
                 error.response?.data?.message ||
                 "Price calculation failed"
             );
@@ -171,17 +184,17 @@ function UploadOrder() {
     // -----------------------------------------
     const handlePaymentContinue = () => {
         if (files.length === 0) {
-            alert("Please upload at least one PDF");
+            toast.warning("Please upload at least one PDF");
             return;
         }
 
         if (totalAmount <= 0) {
-            alert("Please calculate the amount first");
+            toast.warning("Please calculate the amount first");
             return;
         }
 
         if (!paymentType) {
-            alert("Please select a payment type");
+            toast.warning("Please select a payment type");
             return;
         }
 
@@ -191,7 +204,8 @@ function UploadOrder() {
 
             files: files.map((file) => ({
                 filename: file.originalFilename,
-s3Key: file.s3Key,                fileSize: file.fileSize,
+s3Key: file.s3Key,
+                fileSize: file.fileSize,
                 pageCount: file.pageCount,
                 copies: file.copies,
                 colorMode: file.colorMode,
@@ -231,7 +245,10 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
 
             <div className={styles.form}>
 
-                <h1>Upload PDF</h1>
+                <h1 className={styles.title}>
+                    <UploadCloud size={20} />
+                    Upload PDF
+                </h1>
 
                 {/* Select PDF */}
 
@@ -249,11 +266,14 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
                 {selectedFiles.length > 0 && (
                     <div className={styles.selectedFilesBox}>
 
-                        <h3>Files Selected</h3>
+                        <h3 className={styles.smallHeading}>
+                            Files Selected
+                        </h3>
 
                         {selectedFiles.map((file, index) => (
-                            <p key={index}>
-                                📄 {file.name}
+                            <p key={index} className={styles.selectedName}>
+                                <FileText size={16} />
+                                <span>{file.name}</span>
                             </p>
                         ))}
 
@@ -266,9 +286,17 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
                     disabled={uploading}
                     className={styles.uploadButton}
                 >
-                    {uploading
-                        ? "Uploading..."
-                        : "Upload PDF"}
+                    {uploading ? (
+                        <>
+                            <Loader2 size={18} className={styles.spin} />
+                            Uploading...
+                        </>
+                    ) : (
+                        <>
+                            <UploadCloud size={18} />
+                            Upload PDF
+                        </>
+                    )}
                 </button>
 
 
@@ -279,6 +307,9 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
 
                         <h2 className={styles.sectionHeading}>
                             Uploaded Files
+                            <span className={styles.count}>
+                                {files.length}
+                            </span>
                         </h2>
 
                         {files.map((file, index) => (
@@ -288,91 +319,111 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
                                 className={styles.fileCard}
                             >
 
-                                <h3 className={styles.fileCardTitle}>
-                                    📄 {file.originalFilename}
-                                </h3>
+                                <div className={styles.fileTop}>
+                                    <FileText
+                                        size={20}
+                                        className={styles.fileIcon}
+                                    />
 
-                                <p>
-                                    Pages: {file.pageCount}
-                                </p>
+                                    <div className={styles.fileInfo}>
+                                        <h3 className={styles.fileCardTitle}>
+                                            {file.originalFilename}
+                                        </h3>
 
-
-                                {/* Copies */}
-
-                                <label>
-                                    Copies
-                                </label>
-
-                                <input
-                                    type="number"
-                                    min="1"
-                                    value={file.copies}
-                                    onChange={(e) =>
-                                        updateFile(
-                                            index,
-                                            "copies",
-                                            Number(e.target.value)
-                                        )
-                                    }
-                                />
+                                        <p className={styles.pages}>
+                                            Pages: {file.pageCount}
+                                        </p>
+                                    </div>
+                                </div>
 
 
-                                {/* Color */}
+                                <div className={styles.fieldGrid}>
 
-                                <label>
-                                    Color
-                                </label>
+                                    {/* Copies */}
 
-                                <select
-                                    value={file.colorMode}
-                                    onChange={(e) =>
-                                        updateFile(
-                                            index,
-                                            "colorMode",
-                                            e.target.value
-                                        )
-                                    }
-                                >
-                                    <option value="BW">
-                                        Black & White
-                                    </option>
+                                    <div className={styles.field}>
+                                        <label>
+                                            Copies
+                                        </label>
 
-                                    <option value="COLOR">
-                                        Color
-                                    </option>
-                                </select>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={file.copies}
+                                            onChange={(e) =>
+                                                updateFile(
+                                                    index,
+                                                    "copies",
+                                                    Number(e.target.value)
+                                                )
+                                            }
+                                        />
+                                    </div>
 
 
-                                {/* Side */}
+                                    {/* Color */}
 
-                                <label>
-                                    Side
-                                </label>
+                                    <div className={styles.field}>
+                                        <label>
+                                            Color
+                                        </label>
 
-                                <select
-                                    value={file.side}
-                                    onChange={(e) =>
-                                        updateFile(
-                                            index,
-                                            "side",
-                                            e.target.value
-                                        )
-                                    }
-                                >
-                                    <option value="SINGLE">
-                                        Single Side
-                                    </option>
+                                        <select
+                                            value={file.colorMode}
+                                            onChange={(e) =>
+                                                updateFile(
+                                                    index,
+                                                    "colorMode",
+                                                    e.target.value
+                                                )
+                                            }
+                                        >
+                                            <option value="BW">
+                                                Black & White
+                                            </option>
 
-                                    <option value="DOUBLE">
-                                        Double Side
-                                    </option>
-                                </select>
+                                            <option value="COLOR">
+                                                Color
+                                            </option>
+                                        </select>
+                                    </div>
+
+
+                                    {/* Side */}
+
+                                    <div className={`${styles.field} ${styles.fullRow}`}>
+                                        <label>
+                                            Side
+                                        </label>
+
+                                        <select
+                                            value={file.side}
+                                            onChange={(e) =>
+                                                updateFile(
+                                                    index,
+                                                    "side",
+                                                    e.target.value
+                                                )
+                                            }
+                                        >
+                                            <option value="SINGLE">
+                                                Single Side
+                                            </option>
+
+                                            <option value="DOUBLE">
+                                                Double Side
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                </div>
 
 
                                 {/* Amount */}
 
                                 {file.amount > 0 && (
                                     <h3 className={styles.amountBadge}>
+                                        <IndianRupee size={14} />
                                         Amount: ₹{file.amount}
                                     </h3>
                                 )}
@@ -387,6 +438,7 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
                                     }
                                     className={styles.removeButton}
                                 >
+                                    <Trash2 size={16} />
                                     Remove
                                 </button>
 
@@ -399,7 +451,10 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
                         {files.length > 0 && files.length < 2 && (
                             <>
                                 <label className={styles.addMoreLabel}>
-                                    <strong>+ Add Another PDF</strong>
+                                    <strong>
+                                        <Plus size={16} />
+                                        Add Another PDF
+                                    </strong>
                                 </label>
 
                                 <input
@@ -419,6 +474,7 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
                             onClick={handleCalculatePrice}
                             className={styles.calculateButton}
                         >
+                            <Calculator size={18} />
                             Calculate Amount
                         </button>
 
@@ -435,7 +491,8 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
 
                                 <div className={styles.paymentSection}>
 
-                                    <h3>
+                                    <h3 className={styles.paymentHeading}>
+                                        <Wallet size={16} />
                                         Select Payment Type
                                     </h3>
 
@@ -462,13 +519,13 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
 
 
                                     {paymentType === "COD" && (
-                                        <p>
+                                        <p className={styles.paymentText}>
                                             Pay cash at the shop.
                                         </p>
                                     )}
 
                                     {paymentType === "UPI" && (
-                                        <p>
+                                        <p className={styles.paymentText}>
                                             You will be taken to the
                                             payment page.
                                         </p>
@@ -485,6 +542,7 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
                                         }
                                     >
                                         Continue to Payment
+                                        <ArrowRight size={18} />
                                     </button>
 
                                 </div>
@@ -504,6 +562,7 @@ s3Key: file.s3Key,                fileSize: file.fileSize,
                     }
                     className={styles.backButton}
                 >
+                    <ArrowLeft size={16} />
                     Back to Register
                 </button>
 

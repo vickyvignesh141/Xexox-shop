@@ -18,8 +18,7 @@ const customerSchema = new mongoose.Schema({
         required: true,
         trim: true,
         enum: [
-            "Aeronautical Engineering",
-            "Automobile Engineering",
+"Artificial Intelligence & Data Science Engineering",            "Automobile Engineering",
             "Civil Engineering",
             "Electrical and Electronics Engineering",
             "Electronics and Communication Engineering",

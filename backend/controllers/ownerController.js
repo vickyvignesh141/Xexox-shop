@@ -88,11 +88,14 @@ const updateOrderStatus = async (req, res) => {
         }
 
         // Payment must be verified before Xerox can be completed
-        if (order.paymentVerificationStatus !== "VERIFIED") {
-            return res.status(400).json({
-                message: "Payment must be verified before updating Xerox status"
-            });
-        }
+        if (
+    order.paymentMethod === "GPay" &&
+    order.paymentVerificationStatus !== "VERIFIED"
+) {
+    return res.status(400).json({
+        message: "GPay payment must be verified before updating Xerox status"
+    });
+}
 
         if (order.orderStatus !== "PENDING") {
             return res.status(400).json({
@@ -121,6 +124,10 @@ const updateOrderStatus = async (req, res) => {
 const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find()
+            .populate(
+                "customerId",
+                "name mobile department year section email"
+            )
             .sort({ createdAt: -1 });
 
         return res.status(200).json({
