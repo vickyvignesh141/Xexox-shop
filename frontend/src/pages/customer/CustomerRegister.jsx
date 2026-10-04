@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { Toaster, toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import styles from "./CustomerRegister.module.css";
 
@@ -23,7 +24,7 @@ function CustomerRegister() {
   };
   const handleVerify = async () => {
     if (!form.mobile || form.mobile.length !== 10) {
-      alert("Enter a valid 10 digit mobile number");
+      toast.error("Enter a valid 10 digit mobile number");
       return;
     }
 
@@ -50,14 +51,14 @@ function CustomerRegister() {
       );
       setExistingCustomer(true);
 
-      alert("Customer found!");
+      toast.success("Customer found!");
 
     } catch (error) {
       if (error.response?.status === 404) {
         setExistingCustomer(false);
-        alert("Customer not found. Please register.");
+        toast.error("Customer not found. Please register.");
       } else {
-        alert("Verification failed");
+        toast.error("Verification failed");
       }
     }
   };
@@ -87,7 +88,7 @@ function CustomerRegister() {
       );
 
 
-      alert("Registration successful!");
+      toast.success("Registration successful!");
       navigate("/upload");
 
       setForm({
@@ -100,13 +101,14 @@ function CustomerRegister() {
       });
 
     } catch (error) {
-      alert(
+      toast.error(
         error.response?.data?.message || "Registration failed"
       );
     }
   };
   return (
     <div className={styles.container}>
+      <Toaster position="top-right" richColors />
       <form className={styles.form} onSubmit={handleSubmit}>
         <h1>Registration</h1>
 

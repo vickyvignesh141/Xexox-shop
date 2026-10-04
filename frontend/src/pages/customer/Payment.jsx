@@ -1,13 +1,16 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Toaster, toast } from "sonner";
 import styles from "./Payment.module.css";
 import shopQR from "../../assets/QR.jpeg";
+
 
 function Payment() {
     const navigate = useNavigate();
 
     const [transactionId, setTransactionId] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const pendingOrder = JSON.parse(
         localStorage.getItem("pendingOrder")
@@ -42,43 +45,52 @@ function Payment() {
     // Create COD order
     // -----------------------------------------
 
-   const handleCODOrder = async () => {
-    try {
-        const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/orders`,
-            {
-                customerId: pendingOrder.customerId,
-                files: pendingOrder.files,
-                paymentMethod: "COD"
-            }
-        );
+    const handleCODOrder = async () => {
+        if (isLoading) return;
 
-        alert(
-            `Order created: ${response.data.order.orderNumber}`
-        );
+        setIsLoading(true);
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/orders`,
+                {
+                    customerId: pendingOrder.customerId,
+                    files: pendingOrder.files,
+                    paymentMethod: "COD"
+                }
+            );
 
-        localStorage.removeItem("pendingOrder");
+            toast.success(
+                `Order created: ${response.data.order.orderNumber}`
+            );
 
-        navigate("/tracking");
+            localStorage.removeItem("pendingOrder");
 
-    } catch (error) {
-        alert(
-            error.response?.data?.message ||
-            "Order creation failed"
-        );
-    }
-};
+            navigate("/tracking");
+
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                "Order creation failed"
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 
     // -----------------------------------------
     // Create UPI order
     // -----------------------------------------
 
-    const handleUPIOrder = async () => {
+ const handleUPIOrder = async () => {
+    if (isLoading) return;
+
     if (!transactionId.trim()) {
-        alert("Please enter transaction ID");
+        toast.error("Please enter transaction ID");
         return;
     }
+
+    setIsLoading(true);
 
     try {
         const response = await axios.post(
@@ -91,7 +103,7 @@ function Payment() {
             }
         );
 
-        alert(
+        toast.success(
             `Order created: ${response.data.order.orderNumber}`
         );
 
@@ -100,16 +112,20 @@ function Payment() {
         navigate("/tracking");
 
     } catch (error) {
-        alert(
+        toast.error(
             error.response?.data?.message ||
             "Order creation failed"
         );
+    } finally {
+        setIsLoading(false);
     }
 };
 
 
     return (
         <div className={styles.container}>
+            <Toaster position="top-right" richColors />
+
 
             <div className={styles.form}>
 
@@ -139,8 +155,9 @@ function Payment() {
                         <button
                             type="button"
                             onClick={handleCODOrder}
+                            disabled={isLoading}
                         >
-                            Confirm Order
+                            {isLoading ? "Creating Order..." : "Confirm Order"}
                         </button>
 
                     </div>
@@ -187,22 +204,26 @@ function Payment() {
                         <button
                             type="button"
                             onClick={handleUPIOrder}
+                            disabled={isLoading}
                         >
-                            Confirm Payment & Create Order
+                            {isLoading
+                                ? "Creating Order..."
+                                : "Confirm Payment & Create Order"
+                            }
                         </button>
 
                     </div>
                 )}
 
 
-                <button
+                {/* <button
                     type="button"
                     onClick={() =>
                         navigate("/upload")
                     }
                 >
                     Back to Upload
-                </button>
+                </button> */}
 
             </div>
 

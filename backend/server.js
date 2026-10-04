@@ -12,6 +12,8 @@ const ownerRoutes = require("./routes/ownerRoutes");
 const ownerAuthRoutes = require("./routes/ownerAuthRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 
+const feedbackRoutes = require("./routes/feedbackRoutes");
+
 const app = express();
 
 // Middleware
@@ -37,6 +39,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/owner", ownerRoutes);
 app.use("/api/owner", ownerAuthRoutes);
 app.use("/api/upload", uploadRoutes);
+
+app.use("/api/feedback", feedbackRoutes);
 
 // Error handling - MUST be last
 app.use((err, req, res, next) => {

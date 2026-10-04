@@ -1,6 +1,16 @@
 import { useState } from 'react';
+import axios from "axios";
 import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  MessageSquare,
+  MessageSquarePlus,
+  Send,
+  Check,
+  Loader2,
+  AlertCircle,
+} from 'lucide-react';
 import styles from './feedback.module.css';
+
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_DESCRIPTION_LENGTH = 500;
@@ -8,7 +18,7 @@ const MAX_DESCRIPTION_LENGTH = 500;
 /* ============================================
    Feedback form — render this on the /feedback route
 ============================================ */
-export default function FeedbackForm({ onSubmit }) {
+export default function FeedbackForm({}) {
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState({});
@@ -36,19 +46,32 @@ export default function FeedbackForm({ onSubmit }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (!validate()) return;
 
     setIsSubmitting(true);
-    try {
-      if (onSubmit) {
-        await onSubmit({ email: email.trim(), description: description.trim() });
-      }
-      setIsSubmitted(true);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
+    try {
+        await axios.post(
+            `${import.meta.env.VITE_API_URL}/api/feedback`,
+            {
+                email: email.trim(),
+                description: description.trim()
+            }
+        );
+
+        setIsSubmitted(true);
+
+    } catch (error) {
+        console.error("Feedback submit error:", error);
+        alert(
+            error.response?.data?.message ||
+            "Unable to send feedback"
+        );
+    } finally {
+        setIsSubmitting(false);
+    }
+};
   const handleReset = () => {
     setEmail('');
     setDescription('');
@@ -61,25 +84,13 @@ export default function FeedbackForm({ onSubmit }) {
       {isSubmitted ? (
         <div className={styles.form}>
           <div className={styles.successState}>
-            <svg
-              className={styles.successIcon}
-              viewBox="0 0 48 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="24" cy="24" r="22" stroke="currentColor" strokeWidth="2" />
-              <path
-                d="M15 24.5L21 30.5L33 17.5"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <div className={styles.successIcon}>
+              <Check size={30} strokeWidth={2.5} />
+            </div>
             <h2 className={styles.successTitle}>Thanks for the note</h2>
             <p className={styles.successText}>
               Your feedback is on its way to the team. We'll reach out at{' '}
-              {email || 'your email'} if we need anything else.
+              <strong>{email || 'your email'}</strong> if we need anything else.
             </p>
             {/* <button type="button" className={styles.resetLink} onClick={handleReset}>
               Send more feedback
@@ -88,11 +99,14 @@ export default function FeedbackForm({ onSubmit }) {
         </div>
       ) : (
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <h1> Built by PathFinders</h1>
+          <h1>
+            <MessageSquare size={22} />
+            Built by PathFinders
+          </h1>
           <p className={styles.subtitle}>Built by the team — tell us what's working.</p>
 
           <div className={styles.field}>
-            <label htmlFor="feedback-email" className={styles.visuallyHidden}>
+            <label htmlFor="feedback-email" className={styles.fieldLabel}>
               Email
             </label>
             <input
@@ -107,13 +121,14 @@ export default function FeedbackForm({ onSubmit }) {
             />
             {errors.email && (
               <span id="feedback-email-error" className={styles.errorText}>
+                <AlertCircle size={14} />
                 {errors.email}
               </span>
             )}
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="feedback-description" className={styles.visuallyHidden}>
+            <label htmlFor="feedback-description" className={styles.fieldLabel}>
               Feedback
             </label>
             <textarea
@@ -128,6 +143,7 @@ export default function FeedbackForm({ onSubmit }) {
             />
             {errors.description ? (
               <span id="feedback-description-error" className={styles.errorText}>
+                <AlertCircle size={14} />
                 {errors.description}
               </span>
             ) : (
@@ -138,7 +154,17 @@ export default function FeedbackForm({ onSubmit }) {
           </div>
 
           <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Sending…' : 'Send feedback'}
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className={styles.spin} />
+                Sending…
+              </>
+            ) : (
+              <>
+                <Send size={18} />
+                Send feedback
+              </>
+            )}
           </button>
         </form>
       )}
@@ -165,6 +191,7 @@ export function FeedbackButton() {
       onClick={() => navigate('/feedback')}
       aria-label="Give feedback"
     >
+      <MessageSquarePlus size={16} />
       Feedback
     </button>
   );

@@ -1,18 +1,25 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 /* ===========================
-   Variables
+   Root Variables
 =========================== */
 :root {
-  --white: #ffffff;
-  --black: #000000;
-  --text-dark: #000000;
-  --border: #d0d0d0;
-  --error: #dc2626;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #dbeafe;
+  --text-dark: #1e293b;
+  --text-light: #64748b;
+  --text-muted: #94a3b8;
+  --border: #e2e8f0;
+  --bg-light: #f8fafc;
+  --bg-white: #ffffff;
+  --error: #ef4444;
+  --error-light: #fee2e2;
+  --success: #10b981;
 }
 
 /* ===========================
-   Global
+   Global Styles
 =========================== */
 * {
   margin: 0;
@@ -21,8 +28,8 @@
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--white);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   color: var(--text-dark);
   line-height: 1.6;
 }
@@ -36,15 +43,23 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: var(--white);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .wrapper {
   width: 100%;
-  max-width: 400px;
-  background: var(--white);
-  padding: 50px 40px;
+  max-width: 420px;
+  background: var(--bg-white);
+  padding: 48px 40px;
+  border-radius: 12px;
   border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.wrapper:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* ===========================
@@ -52,33 +67,56 @@ body {
 =========================== */
 .header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
+}
+
+.headerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  background: var(--primary-light);
+  border-radius: 12px;
+  color: var(--primary);
 }
 
 .header h1 {
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-dark);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
 }
 
 .header p {
   font-size: 14px;
-  color: #555;
+  color: var(--text-light);
+  margin: 0;
 }
 
 /* ===========================
-   Error
+   Error Box
 =========================== */
-.error {
-  background: #ffe6e6;
-  border: 1px solid #ffcccc;
-  color: var(--error);
+.errorBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 12px 14px;
-  border-radius: 4px;
+  background: var(--error-light);
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: var(--error);
   font-size: 13px;
+  font-weight: 500;
   margin-bottom: 24px;
-  text-align: center;
+}
+
+.errorBox svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
 }
 
 /* ===========================
@@ -90,75 +128,116 @@ body {
   gap: 20px;
 }
 
-.group {
+.formGroup {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.group label {
+.formGroup label {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
-.group input {
-  padding: 12px 14px;
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.inputWrapper input {
+  width: 100%;
+  padding: 12px 14px 12px 44px;
   border: 1px solid var(--border);
-  background: var(--white);
+  background: var(--bg-white);
   font-size: 14px;
   font-family: inherit;
   color: var(--text-dark);
+  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
-.group input::placeholder {
-  color: #999;
+.inputWrapper input::placeholder {
+  color: var(--text-muted);
 }
 
-.group input:hover {
-  border-color: #999;
+.inputWrapper input:hover:not(:disabled) {
+  border-color: #cbd5e1;
+  background: var(--bg-light);
 }
 
-.group input:focus {
+.inputWrapper input:focus {
   outline: none;
-  border-color: var(--text-dark);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+  border-color: var(--primary);
+  background: var(--bg-white);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.group input:disabled {
-  background: #f5f5f5;
+.inputWrapper input:focus ~ svg {
+  color: var(--primary);
+}
+
+.inputWrapper input:disabled {
+  background: var(--bg-light);
   opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* ===========================
    Button
 =========================== */
-.btn {
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 12px 20px;
-  margin-top: 10px;
-  border: 1px solid var(--text-dark);
-  background: var(--text-dark);
-  color: var(--white);
+  margin-top: 8px;
+  border: none;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--bg-white);
   font-size: 14px;
   font-weight: 600;
+  font-family: inherit;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
-.btn:hover:not(:disabled) {
-  background: #333;
-  border-color: #333;
+.button:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #1366d9 100%);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  transform: translateY(-2px);
 }
 
-.btn:active:not(:disabled) {
-  opacity: 0.9;
+.button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 }
 
-.btn:disabled {
-  opacity: 0.6;
+.button:disabled {
+  opacity: 0.7;
   cursor: not-allowed;
+}
+
+.button svg {
+  width: 18px;
+  height: 18px;
 }
 
 /* ===========================
@@ -166,29 +245,36 @@ body {
 =========================== */
 .footer {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid var(--border);
 }
 
-.footer a {
+.footer p {
   font-size: 13px;
-  color: #555;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.footer a {
+  color: var(--primary);
   text-decoration: none;
+  font-weight: 600;
   transition: color 0.2s ease;
 }
 
 .footer a:hover {
-  color: var(--text-dark);
+  color: var(--primary-dark);
+  text-decoration: underline;
 }
 
 /* ===========================
-   Tablet (481px - 768px)
+   Tablet (481px - 1024px)
 =========================== */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .wrapper {
     max-width: 100%;
-    padding: 40px 30px;
+    padding: 40px 32px;
   }
 
   .header h1 {
@@ -196,25 +282,25 @@ body {
   }
 
   .header {
-    margin-bottom: 35px;
+    margin-bottom: 28px;
   }
 }
 
 /* ===========================
-   Mobile (max-width: 480px)
+   Mobile (480px - 767px)
 =========================== */
-@media (max-width: 480px) {
+@media (max-width: 767px) {
   .container {
     padding: 16px;
   }
 
   .wrapper {
-    padding: 35px 24px;
+    padding: 32px 24px;
   }
 
   .header h1 {
     font-size: 24px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .header p {
@@ -222,158 +308,348 @@ body {
   }
 
   .header {
-    margin-bottom: 30px;
+    margin-bottom: 24px;
   }
 
-  .form {
-    gap: 18px;
+  .headerIcon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
   }
 
-  .group label {
-    font-size: 12px;
-  }
-
-  .group input {
-    padding: 11px 12px;
-    font-size: 13px;
-  }
-
-  .btn {
-    padding: 11px 18px;
-    font-size: 13px;
-    margin-top: 8px;
-  }
-
-  .error {
-    padding: 10px 12px;
-    font-size: 12px;
-    margin-bottom: 20px;
-  }
-
-  .footer {
-    margin-top: 18px;
-    padding-top: 18px;
-  }
-
-  .footer a {
-    font-size: 12px;
-  }
-}
-
-/* ===========================
-   Small Phone (max-width: 375px)
-=========================== */
-@media (max-width: 375px) {
-  .wrapper {
-    padding: 30px 20px;
-  }
-
-  .header h1 {
-    font-size: 22px;
-  }
-
-  .header p {
-    font-size: 12px;
-  }
-
-  .header {
-    margin-bottom: 25px;
+  .headerIcon svg {
+    width: 24px;
+    height: 24px;
   }
 
   .form {
     gap: 16px;
   }
 
-  .group input {
-    padding: 10px 11px;
+  .formGroup label {
+    font-size: 12px;
+  }
+
+  .inputWrapper input {
+    padding: 11px 12px 11px 40px;
     font-size: 13px;
   }
 
-  .btn {
-    padding: 10px 16px;
+  .inputIcon {
+    width: 16px;
+    height: 16px;
+    left: 11px;
+  }
+
+  .button {
+    padding: 11px 18px;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+
+  .button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .errorBox {
+    padding: 10px 12px;
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+
+  .errorBox svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .footer {
+    margin-top: 20px;
+    padding-top: 16px;
+  }
+
+  .footer p {
     font-size: 12px;
   }
 }
 
 /* ===========================
-   Large Desktop (1024px+)
+   Small Phone (max-width: 480px)
 =========================== */
-@media (min-width: 1024px) {
-  .wrapper {
-    padding: 60px 50px;
-  }
-
-  .header h1 {
-    font-size: 32px;
-    margin-bottom: 12px;
-  }
-
-  .form {
-    gap: 22px;
-  }
-
-  .group input {
-    padding: 13px 15px;
-    font-size: 15px;
-  }
-
-  .btn {
-    padding: 13px 22px;
-    font-size: 15px;
-  }
-}
-
-/* ===========================
-   Landscape
-=========================== */
-@media (max-height: 600px) and (orientation: landscape) {
+@media (max-width: 480px) {
   .container {
     padding: 12px;
+    min-height: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
   }
 
   .wrapper {
-    padding: 25px 20px;
-  }
-
-  .header {
-    margin-bottom: 20px;
+    padding: 28px 20px;
   }
 
   .header h1 {
     font-size: 22px;
-    margin-bottom: 6px;
   }
 
   .header p {
     font-size: 12px;
   }
 
+  .header {
+    margin-bottom: 20px;
+  }
+
+  .headerIcon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 10px;
+  }
+
+  .headerIcon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .form {
+    gap: 15px;
+  }
+
+  .formGroup label {
+    font-size: 11px;
+  }
+
+  .inputWrapper input {
+    padding: 10px 11px 10px 38px;
+    font-size: 13px;
+  }
+
+  .inputIcon {
+    width: 15px;
+    height: 15px;
+    left: 10px;
+  }
+
+  .button {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+
+  .button svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .errorBox {
+    padding: 9px 11px;
+    font-size: 11px;
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+
+  .errorBox svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .footer {
+    margin-top: 16px;
+    padding-top: 14px;
+  }
+
+  .footer p {
+    font-size: 11px;
+  }
+}
+
+/* ===========================
+   Extra Small Phone (max-width: 375px)
+=========================== */
+@media (max-width: 375px) {
+  .wrapper {
+    padding: 24px 16px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .header {
+    margin-bottom: 18px;
+  }
+
+  .headerIcon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+  }
+
+  .headerIcon svg {
+    width: 20px;
+    height: 20px;
+  }
+
   .form {
     gap: 14px;
   }
 
-  .group label {
+  .inputWrapper input {
+    padding: 9px 10px 9px 36px;
+    font-size: 12px;
+  }
+
+  .inputIcon {
+    width: 14px;
+    height: 14px;
+    left: 9px;
+  }
+
+  .button {
+    padding: 9px 14px;
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .button svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* ===========================
+   Landscape (Orientation)
+=========================== */
+@media (max-height: 600px) and (orientation: landscape) {
+  .container {
+    padding: 10px;
+  }
+
+  .wrapper {
+    padding: 20px 24px;
+  }
+
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .header p {
     font-size: 11px;
   }
 
-  .group input {
-    padding: 10px 12px;
+  .headerIcon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+  }
+
+  .headerIcon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .form {
+    gap: 12px;
+  }
+
+  .formGroup label {
+    font-size: 11px;
+  }
+
+  .inputWrapper input {
+    padding: 9px 11px 9px 36px;
     font-size: 12px;
   }
 
-  .btn {
-    padding: 10px 16px;
-    font-size: 12px;
-    margin-top: 5px;
+  .button {
+    padding: 9px 14px;
+    font-size: 11px;
+    margin-top: 4px;
   }
 
   .footer {
-    margin-top: 14px;
-    padding-top: 12px;
+    margin-top: 12px;
+    padding-top: 10px;
   }
 
-  .footer a {
-    font-size: 11px;
+  .footer p {
+    font-size: 10px;
+  }
+}
+
+/* ===========================
+   Large Desktop (1200px+)
+=========================== */
+@media (min-width: 1200px) {
+  .wrapper {
+    padding: 56px 48px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  .header p {
+    font-size: 15px;
+  }
+
+  .header {
+    margin-bottom: 36px;
+  }
+
+  .headerIcon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 20px;
+  }
+
+  .headerIcon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .form {
+    gap: 24px;
+  }
+
+  .formGroup label {
+    font-size: 14px;
+  }
+
+  .inputWrapper input {
+    padding: 13px 15px 13px 46px;
+    font-size: 15px;
+  }
+
+  .inputIcon {
+    width: 20px;
+    height: 20px;
+    left: 13px;
+  }
+
+  .button {
+    padding: 13px 22px;
+    font-size: 15px;
+    margin-top: 10px;
+  }
+
+  .button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .footer {
+    margin-top: 28px;
+    padding-top: 24px;
+  }
+
+  .footer p {
+    font-size: 14px;
   }
 }
 
@@ -384,5 +660,15 @@ body {
   * {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-white: #1e293b;
+    --bg-light: #0f172a;
+    --text-dark: #f1f5f9;
+    --text-light: #cbd5e1;
+    --border: #334155;
   }
 }
