@@ -8,6 +8,7 @@ const createPaymentOrder = async (req, res) => {
         const {
             customerId,
             files,
+            paymentMethod,
             transactionId
         } = req.body;
 
@@ -18,13 +19,18 @@ const createPaymentOrder = async (req, res) => {
             !customerId ||
             !Array.isArray(files) ||
             files.length === 0 ||
-            !transactionId?.trim()
+            !["COD", "GPay"].includes(paymentMethod)
         ) {
             return res.status(400).json({
                 message: "Valid order and payment details are required"
             });
         }
 
+        if (paymentMethod === "GPay" && !transactionId?.trim()) {
+            return res.status(400).json({
+                message: "GPay transaction ID is required"
+            });
+        }
         // --------------------------------
         // 2. Check customer
         // --------------------------------
@@ -39,15 +45,17 @@ const createPaymentOrder = async (req, res) => {
         // --------------------------------
         // 3. Check duplicate transaction ID
         // --------------------------------
-        const existingOrder = await Order.findOne({
-            transactionId: transactionId.trim()
-        });
+        if (paymentMethod === "GPay") {
+    const existingOrder = await Order.findOne({
+        transactionId: transactionId.trim()
+    });
 
-        if (existingOrder) {
-            return res.status(409).json({
-                message: "Transaction ID already used"
-            });
-        }
+    if (existingOrder) {
+        return res.status(409).json({
+            message: "Transaction ID already used"
+        });
+    }
+}
 
         // --------------------------------
         // 4. Validate and calculate each file
@@ -88,7 +96,7 @@ const createPaymentOrder = async (req, res) => {
             // Store calculated amount with the file
             processedFiles.push({
                 filename: file.filename,
-                fileUrl: file.fileUrl,
+                s3Key: file.s3Key,
                 fileSize: file.fileSize,
                 pageCount: file.pageCount,
                 copies: file.copies,
@@ -107,12 +115,16 @@ const createPaymentOrder = async (req, res) => {
         // 6. Create order
         // --------------------------------
         const order = new Order({
-            customerId,
-            orderNumber,
-            files: processedFiles,
-            totalAmount,
-            transactionId: transactionId.trim()
-        });
+    customerId,
+    orderNumber,
+    files: processedFiles,
+    totalAmount,
+    paymentMethod,
+    transactionId:
+        paymentMethod === "GPay"
+            ? transactionId.trim()
+            : null
+});
 
         await order.save();
 

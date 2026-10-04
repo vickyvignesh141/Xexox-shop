@@ -2,6 +2,7 @@ const Customer = require("../models/Customer")
 
 
 const createCustomer = async (req, res) => {
+    
     try {
         const {
             mobile,
@@ -9,7 +10,6 @@ const createCustomer = async (req, res) => {
             department,
             year,
             section,
-            registerNumber,
             email
         } = req.body;
 
@@ -32,11 +32,13 @@ const createCustomer = async (req, res) => {
             department,
             year,
             section,
-            // registerNumber,
+            
             email
         });
 
         await customer.save();
+        console.log("REGISTER BODY:", req.body);
+
         return res.status(201).json({
             message: "Customer created successfully",
             customer

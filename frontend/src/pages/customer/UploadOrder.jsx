@@ -1,24 +1,25 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import styles from "./UploadOrder.module.css";
-import shopQR from "../../assets/QR.jpeg";
 
 function UploadOrder() {
+    const navigate = useNavigate();
 
     // Selected local files waiting to be uploaded
     const [selectedFiles, setSelectedFiles] = useState([]);
 
-    // Uploaded files with their print settings
+    // Uploaded files with print settings
     const [files, setFiles] = useState([]);
 
     const [uploading, setUploading] = useState(false);
-    const [transactionId, setTransactionId] = useState("");
+
+    const [paymentType, setPaymentType] = useState("");
 
     // -----------------------------------------
     // Select PDF
     // -----------------------------------------
     const handleFileSelect = (e) => {
-
         const selectedFile = e.target.files[0];
 
         if (!selectedFile) return;
@@ -28,34 +29,35 @@ function UploadOrder() {
             return;
         }
 
+        if (selectedFiles.length + files.length >= 2) {
+            alert("Maximum 2 files are allowed");
+            e.target.value = "";
+            return;
+        }
+
         setSelectedFiles((prev) => [
             ...prev,
             selectedFile
         ]);
 
-        // Clear input so same file can be selected again
         e.target.value = "";
     };
-
 
     // -----------------------------------------
     // Upload selected PDF
     // -----------------------------------------
     const handleUpload = async () => {
-
         if (selectedFiles.length === 0) {
             alert("Please select a PDF");
             return;
         }
 
         try {
-
             setUploading(true);
 
             const uploadedResults = [];
 
             for (const file of selectedFiles) {
-
                 const formData = new FormData();
 
                 formData.append("file", file);
@@ -68,7 +70,6 @@ function UploadOrder() {
                 uploadedResults.push({
                     ...response.data.file,
 
-                    // Print settings
                     copies: 1,
                     colorMode: "BW",
                     side: "SINGLE",
@@ -88,24 +89,19 @@ function UploadOrder() {
             alert("PDF uploaded successfully!");
 
         } catch (error) {
-
             alert(
                 error.response?.data?.message ||
                 "Upload failed"
             );
-
         } finally {
-
             setUploading(false);
         }
     };
-
 
     // -----------------------------------------
     // Update file settings
     // -----------------------------------------
     const updateFile = (index, field, value) => {
-
         setFiles((prev) =>
             prev.map((file, i) =>
                 i === index
@@ -119,20 +115,16 @@ function UploadOrder() {
         );
     };
 
-
     // -----------------------------------------
-    // Calculate price for ALL files
+    // Calculate price
     // -----------------------------------------
     const handleCalculatePrice = async () => {
-
         if (files.length === 0) {
             alert("Please upload at least one PDF");
             return;
         }
 
         try {
-
-            // Send all files to backend
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}/api/orders/calculate-price`,
                 {
@@ -147,7 +139,6 @@ function UploadOrder() {
 
             const calculatedFiles = response.data.files;
 
-            // Put backend calculated amounts into frontend
             setFiles((prev) =>
                 prev.map((file, index) => ({
                     ...file,
@@ -155,8 +146,10 @@ function UploadOrder() {
                 }))
             );
 
-        } catch (error) {
+            // Reset payment selection
+            setPaymentType("");
 
+        } catch (error) {
             alert(
                 error.response?.data?.message ||
                 "Price calculation failed"
@@ -164,374 +157,360 @@ function UploadOrder() {
         }
     };
 
-
     // -----------------------------------------
     // Total amount
     // -----------------------------------------
     const totalAmount = files.reduce(
-        (total, file) => total + Number(file.amount || 0),
+        (total, file) =>
+            total + Number(file.amount || 0),
         0
     );
 
-
     // -----------------------------------------
-    // Create order
+    // Continue based on payment type
     // -----------------------------------------
-    const handleCreateOrder = async () => {
-
+    const handlePaymentContinue = () => {
         if (files.length === 0) {
             alert("Please upload at least one PDF");
             return;
         }
 
-        if (files.some((file) => file.amount <= 0)) {
-            alert("Please calculate the amount before creating the order");
+        if (totalAmount <= 0) {
+            alert("Please calculate the amount first");
             return;
         }
 
-        if (!transactionId.trim()) {
-            alert("Please enter transaction ID");
+        if (!paymentType) {
+            alert("Please select a payment type");
             return;
         }
 
-        try {
+        const orderData = {
+            customerId:
+                localStorage.getItem("xeroxCustomerId"),
 
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/orders`,
-                {
-                    customerId:
-                        localStorage.getItem("xeroxCustomerId"),
+            files: files.map((file) => ({
+                filename: file.originalFilename,
+s3Key: file.s3Key,                fileSize: file.fileSize,
+                pageCount: file.pageCount,
+                copies: file.copies,
+                colorMode: file.colorMode,
+                side: file.side
+            })),
 
-                    files: files.map((file) => ({
-                        filename: file.originalFilename,
-                        fileUrl: file.fileUrl,
-                        fileSize: file.fileSize,
-                        pageCount: file.pageCount,
-                        copies: file.copies,
-                        colorMode: file.colorMode,
-                        side: file.side
-                    })),
+            totalAmount,
+            paymentType
+        };
 
-                    transactionId: transactionId.trim()
-                }
-            );
+        // Save temporarily for Payment page
+        localStorage.setItem(
+            "pendingOrder",
+            JSON.stringify(orderData)
+        );
 
-            alert(
-                `Order created: ${response.data.order.orderNumber}`
-            );
-
-            // Clear order after successful creation
-            setFiles([]);
-            setTransactionId("");
-
-        } catch (error) {
-
-            alert(
-                error.response?.data?.message ||
-                "Order creation failed"
-            );
+        if (paymentType === "COD") {
+            navigate("/payment");
+        } else if (paymentType === "UPI") {
+            navigate("/payment");
         }
     };
-
 
     // -----------------------------------------
     // Remove uploaded file
     // -----------------------------------------
     const removeFile = (index) => {
-
         setFiles((prev) =>
             prev.filter((_, i) => i !== index)
         );
+
+        setPaymentType("");
     };
 
+    return (
+        <div className={styles.container}>
 
-   return (
-    <div className={styles.container}>
+            <div className={styles.form}>
 
-        <div className={styles.form}>
+                <h1>Upload PDF</h1>
 
-            <h1>Upload PDF</h1>
+                {/* Select PDF */}
 
-
-            {/* -------------------------------- */}
-            {/* Select PDF */}
-            {/* -------------------------------- */}
-
-            <input
-                type="file"
-                accept=".pdf,application/pdf"
-                onChange={handleFileSelect}
-                className={styles.fileInput}
-            />
-
-
-            {/* Files waiting to upload */}
-            {selectedFiles.length > 0 && (
-                <div className={styles.selectedFilesBox}>
-
-                    <h3>Files Selected</h3>
-
-                    {selectedFiles.map((file, index) => (
-                        <p key={index}>
-                            📄 {file.name}
-                        </p>
-                    ))}
-
-                </div>
-            )}
-
-
-            <button
-                type="button"
-                onClick={handleUpload}
-                disabled={uploading}
-                className={styles.uploadButton}
-            >
-                {uploading
-                    ? "Uploading..."
-                    : "Upload PDF"}
-            </button>
-
-
-            {/* -------------------------------- */}
-            {/* Uploaded Files */}
-            {/* -------------------------------- */}
-
-            {files.length > 0 && (
-                <div className={styles.uploadedSection}>
-
-                    <h2 className={styles.sectionHeading}>Uploaded Files</h2>
-
-
-                    {files.map((file, index) => (
-
-                        <div
-                            key={index}
-                            className={styles.fileCard}
-                        >
-
-                            <h3 className={styles.fileCardTitle}>
-                                📄 {file.originalFilename}
-                            </h3>
-
-                            <p>
-                                Pages: {file.pageCount}
-                            </p>
-
-
-                            {/* Copies */}
-                            <label>
-                                Copies
-                            </label>
-
-                            <input
-                                type="number"
-                                min="1"
-                                value={file.copies}
-                                onChange={(e) =>
-                                    updateFile(
-                                        index,
-                                        "copies",
-                                        Number(e.target.value)
-                                    )
-                                }
-                            />
-
-
-                            {/* Color */}
-                            <label>
-                                Color
-                            </label>
-
-                            <select
-                                value={file.colorMode}
-                                onChange={(e) =>
-                                    updateFile(
-                                        index,
-                                        "colorMode",
-                                        e.target.value
-                                    )
-                                }
-                            >
-
-                                <option value="BW">
-                                    Black & White
-                                </option>
-
-                                <option value="COLOR">
-                                    Color
-                                </option>
-
-                            </select>
-
-
-                            {/* Side */}
-                            <label>
-                                Side
-                            </label>
-
-                            <select
-                                value={file.side}
-                                onChange={(e) =>
-                                    updateFile(
-                                        index,
-                                        "side",
-                                        e.target.value
-                                    )
-                                }
-                            >
-
-                                <option value="SINGLE">
-                                    Single Side
-                                </option>
-
-                                <option value="DOUBLE">
-                                    Double Side
-                                </option>
-
-                            </select>
-
-
-                            {/* File Amount */}
-                            {file.amount > 0 && (
-                                <h3 className={styles.amountBadge}>
-                                    Amount: ₹{file.amount}
-                                </h3>
-                            )}
-
-
-                            {/* Remove */}
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    removeFile(index)
-                                }
-                                className={styles.removeButton}
-                            >
-                                Remove
-                            </button>
-
-                        </div>
-
-                    ))}
-
-
-                    {/* -------------------------------- */}
-                    {/* Add More File */}
-                    {/* -------------------------------- */}
-
-                    <label className={styles.addMoreLabel}>
-                        <strong>
-                            + Add Another PDF
-                        </strong>
-                    </label>
-
+                {files.length === 0 && selectedFiles.length === 0 && (
                     <input
                         type="file"
                         accept=".pdf,application/pdf"
                         onChange={handleFileSelect}
                         className={styles.fileInput}
                     />
+                )}
 
+                {/* Selected files */}
 
-                    {/* -------------------------------- */}
-                    {/* Calculate */}
-                    {/* -------------------------------- */}
+                {selectedFiles.length > 0 && (
+                    <div className={styles.selectedFilesBox}>
 
-                    <button
-                        type="button"
-                        onClick={handleCalculatePrice}
-                        className={styles.calculateButton}
-                    >
-                        Calculate Amount
-                    </button>
+                        <h3>Files Selected</h3>
 
-
-                    {/* -------------------------------- */}
-                    {/* Grand Total */}
-                    {/* -------------------------------- */}
-
-                    {totalAmount > 0 && (
-                        <h2 className={styles.totalAmount}>
-                            Total Amount: ₹{totalAmount}
-                        </h2>
-                    )}
-
-
-                    {/* -------------------------------- */}
-                    {/* Payment */}
-                    {/* -------------------------------- */}
-
-                    {totalAmount > 0 && (
-                        <div className={styles.paymentSection}>
-                            <h3 className={styles.paymentHeading}>
-                                Scan & Pay
-                            </h3>
-
-                            <div className={styles.qrWrapper}>
-                                <img
-                                    src={shopQR}
-                                    alt="Shop UPI QR Code"
-                                    width="200"
-                                    className={styles.qrImage}
-                                />
-                            </div>
-
-                            <p className={styles.paymentText}>
-                                Scan this QR code and
-                                complete payment.
+                        {selectedFiles.map((file, index) => (
+                            <p key={index}>
+                                📄 {file.name}
                             </p>
+                        ))}
+
+                    </div>
+                )}
+
+                <button
+                    type="button"
+                    onClick={handleUpload}
+                    disabled={uploading}
+                    className={styles.uploadButton}
+                >
+                    {uploading
+                        ? "Uploading..."
+                        : "Upload PDF"}
+                </button>
 
 
-                            <label>
-                                Transaction ID
-                            </label>
+                {/* Uploaded Files */}
 
-                            <input
-                                type="text"
-                                placeholder="Enter transaction ID"
-                                value={transactionId}
-                                onChange={(e) =>
-                                    setTransactionId(
-                                        e.target.value
-                                    )
-                                }
-                            />
+                {files.length > 0 && (
+                    <div className={styles.uploadedSection}>
 
+                        <h2 className={styles.sectionHeading}>
+                            Uploaded Files
+                        </h2>
 
-                            <button
-                                type="button"
-                                onClick={handleCreateOrder}
-                                className={styles.createOrderButton}
+                        {files.map((file, index) => (
+
+                            <div
+                                key={index}
+                                className={styles.fileCard}
                             >
-                                Create Order
-                            </button>
 
-                        </div>
-                    )}
+                                <h3 className={styles.fileCardTitle}>
+                                    📄 {file.originalFilename}
+                                </h3>
 
-                </div>
-            )}
+                                <p>
+                                    Pages: {file.pageCount}
+                                </p>
 
 
-            {/* -------------------------------- */}
-            {/* Back */}
-            {/* -------------------------------- */}
+                                {/* Copies */}
 
-            <button
-                type="button"
-                onClick={() =>
-                    window.location.href = "/"
-                }
-                className={styles.backButton}
-            >
-                Back to Register
-            </button>
+                                <label>
+                                    Copies
+                                </label>
+
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={file.copies}
+                                    onChange={(e) =>
+                                        updateFile(
+                                            index,
+                                            "copies",
+                                            Number(e.target.value)
+                                        )
+                                    }
+                                />
+
+
+                                {/* Color */}
+
+                                <label>
+                                    Color
+                                </label>
+
+                                <select
+                                    value={file.colorMode}
+                                    onChange={(e) =>
+                                        updateFile(
+                                            index,
+                                            "colorMode",
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option value="BW">
+                                        Black & White
+                                    </option>
+
+                                    <option value="COLOR">
+                                        Color
+                                    </option>
+                                </select>
+
+
+                                {/* Side */}
+
+                                <label>
+                                    Side
+                                </label>
+
+                                <select
+                                    value={file.side}
+                                    onChange={(e) =>
+                                        updateFile(
+                                            index,
+                                            "side",
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option value="SINGLE">
+                                        Single Side
+                                    </option>
+
+                                    <option value="DOUBLE">
+                                        Double Side
+                                    </option>
+                                </select>
+
+
+                                {/* Amount */}
+
+                                {file.amount > 0 && (
+                                    <h3 className={styles.amountBadge}>
+                                        Amount: ₹{file.amount}
+                                    </h3>
+                                )}
+
+
+                                {/* Remove */}
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        removeFile(index)
+                                    }
+                                    className={styles.removeButton}
+                                >
+                                    Remove
+                                </button>
+
+                            </div>
+                        ))}
+
+
+                        {/* Add More */}
+
+                        {files.length > 0 && files.length < 2 && (
+                            <>
+                                <label className={styles.addMoreLabel}>
+                                    <strong>+ Add Another PDF</strong>
+                                </label>
+
+                                <input
+                                    type="file"
+                                    accept=".pdf,application/pdf"
+                                    onChange={handleFileSelect}
+                                    className={styles.fileInput}
+                                />
+                            </>
+                        )}
+
+
+                        {/* Calculate */}
+
+                        <button
+                            type="button"
+                            onClick={handleCalculatePrice}
+                            className={styles.calculateButton}
+                        >
+                            Calculate Amount
+                        </button>
+
+
+                        {/* Grand Total */}
+
+                        {totalAmount > 0 && (
+                            <>
+                                <h2 className={styles.totalAmount}>
+                                    Total Amount: ₹{totalAmount}
+                                </h2>
+
+                                {/* Payment Type */}
+
+                                <div className={styles.paymentSection}>
+
+                                    <h3>
+                                        Select Payment Type
+                                    </h3>
+
+                                    <select
+                                        value={paymentType}
+                                        onChange={(e) =>
+                                            setPaymentType(
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+                                        <option value="">
+                                            Select Payment Type
+                                        </option>
+
+                                        <option value="COD">
+                                            Cash on Delivery
+                                        </option>
+
+                                        <option value="UPI">
+                                            UPI / QR Payment
+                                        </option>
+                                    </select>
+
+
+                                    {paymentType === "COD" && (
+                                        <p>
+                                            Pay cash at the shop.
+                                        </p>
+                                    )}
+
+                                    {paymentType === "UPI" && (
+                                        <p>
+                                            You will be taken to the
+                                            payment page.
+                                        </p>
+                                    )}
+
+
+                                    <button
+                                        type="button"
+                                        onClick={
+                                            handlePaymentContinue
+                                        }
+                                        className={
+                                            styles.createOrderButton
+                                        }
+                                    >
+                                        Continue to Payment
+                                    </button>
+
+                                </div>
+                            </>
+                        )}
+
+                    </div>
+                )}
+
+
+                {/* Back */}
+
+                <button
+                    type="button"
+                    onClick={() =>
+                        window.location.href = "/"
+                    }
+                    className={styles.backButton}
+                >
+                    Back to Register
+                </button>
+
+            </div>
 
         </div>
-
-    </div>
-);
+    );
 }
 
 export default UploadOrder;

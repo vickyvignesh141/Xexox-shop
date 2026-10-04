@@ -21,7 +21,7 @@ const orderSchema = new mongoose.Schema(
                     required: true
                 },
 
-                fileUrl: {
+                s3Key: {
                     type: String,
                     required: true
                 },
@@ -62,7 +62,7 @@ const orderSchema = new mongoose.Schema(
                     required: true,
                     enum: ["SINGLE", "DOUBLE"]
                 },
-                
+
                 amount: {
                     type: Number,
                     required: true,
@@ -77,10 +77,17 @@ const orderSchema = new mongoose.Schema(
             min: 0
         },
 
-        transactionId: {
+        paymentMethod: {
             type: String,
             required: true,
+            enum: ["COD", "GPay"]
+        },
+
+        transactionId: {
+            type: String,
+            required: false,
             unique: true,
+            sparse: true,
             trim: true
         },
 

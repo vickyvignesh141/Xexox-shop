@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./OwnerLogin.module.css";
 
 
 function OwnerLogin() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -25,6 +27,7 @@ function OwnerLogin() {
             );
 
             alert("Owner login successful!");
+            navigate("/owner-orders");
 
         } catch (error) {
             alert(

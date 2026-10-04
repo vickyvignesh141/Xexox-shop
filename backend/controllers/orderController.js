@@ -2,39 +2,38 @@ const Order = require("../models/Order");
 const Customer = require("../models/Customer");
 const generateOrderNumber = require("../services/orderNumberService");
 const calculateFilePrice = require("../services/priceService");
-const fs = require("fs");
-const path = require("path");
+
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+
 const { PDFDocument } = require("pdf-lib");
 
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
+});
 
 
-
+// ======================================================
+// CALCULATE PRICE
+// ======================================================
 
 const calculatePrice = async (req, res) => {
     try {
 
         const { files } = req.body;
 
-        // --------------------------------
-        // 1. Validate files array
-        // --------------------------------
-        if (
-            !Array.isArray(files) ||
-            files.length === 0
-        ) {
+        if (!Array.isArray(files) || files.length === 0) {
             return res.status(400).json({
                 message: "At least one file is required"
             });
         }
 
-
-        // --------------------------------
-        // 2. Calculate each file price
-        // --------------------------------
         const calculatedFiles = [];
 
         let totalAmount = 0;
-
 
         for (const file of files) {
 
@@ -45,8 +44,6 @@ const calculatePrice = async (req, res) => {
                 side
             } = file;
 
-
-            // Validate individual file
             if (
                 !Number.isInteger(pageCount) ||
                 pageCount < 1 ||
@@ -63,8 +60,6 @@ const calculatePrice = async (req, res) => {
                 });
             }
 
-
-            // Backend price calculation
             const amount = calculateFilePrice(
                 pageCount,
                 copies,
@@ -72,27 +67,16 @@ const calculatePrice = async (req, res) => {
                 side
             );
 
-
-            // Store individual file amount
             calculatedFiles.push({
                 amount
             });
 
-
-            // Add to grand total
             totalAmount += amount;
         }
 
-
-        // --------------------------------
-        // 3. Send response
-        // --------------------------------
         return res.status(200).json({
-
             files: calculatedFiles,
-
             totalAmount
-
         });
 
     } catch (error) {
@@ -108,14 +92,28 @@ const calculatePrice = async (req, res) => {
     }
 };
 
+
+// ======================================================
+// CREATE ORDER
+// ======================================================
+
 const createOrder = async (req, res) => {
+
     console.log("CREATE ORDER CONTROLLER HIT");
+
     try {
+
         const {
             customerId,
             files,
+            paymentMethod,
             transactionId
         } = req.body;
+
+
+        // --------------------------------
+        // Find customer
+        // --------------------------------
 
         const customer = await Customer.findById(customerId);
 
@@ -125,16 +123,54 @@ const createOrder = async (req, res) => {
             });
         }
 
-        // Check transaction ID
-        const existingOrder = await Order.findOne({ transactionId });
 
-        if (existingOrder) {
-            return res.status(409).json({
-                message: "Transaction ID already used"
+        // --------------------------------
+        // Validate payment method
+        // --------------------------------
+
+        if (!["COD", "GPay"].includes(paymentMethod)) {
+            return res.status(400).json({
+                message: "Invalid payment method"
             });
         }
 
+
+        // --------------------------------
+        // Validate GPay transaction ID
+        // --------------------------------
+
+        if (
+            paymentMethod === "GPay" &&
+            (!transactionId || !transactionId.trim())
+        ) {
+            return res.status(400).json({
+                message: "Transaction ID is required for GPay payment"
+            });
+        }
+
+
+        // --------------------------------
+        // Check duplicate transaction ID
+        // --------------------------------
+
+        if (paymentMethod === "GPay") {
+
+            const existingOrder = await Order.findOne({
+                transactionId: transactionId.trim()
+            });
+
+            if (existingOrder) {
+                return res.status(409).json({
+                    message: "Transaction ID already used"
+                });
+            }
+        }
+
+
+        // --------------------------------
         // Validate files
+        // --------------------------------
+
         if (!Array.isArray(files) || files.length === 0) {
             return res.status(400).json({
                 message: "At least one file is required"
@@ -147,40 +183,78 @@ const createOrder = async (req, res) => {
             });
         }
 
-        let totalAmount = 0;
+
+        // --------------------------------
+        // Verify S3 files
+        // --------------------------------
 
         for (const file of files) {
 
-            if (!file.fileUrl || !file.pageCount) {
+            if (!file.s3Key || !file.pageCount) {
                 return res.status(400).json({
-                    message: "File URL and page count are required"
+                    message: "S3 key and page count are required"
                 });
             }
 
-            const filename = path.basename(file.fileUrl);
 
-            const filePath = path.join("uploads", filename);
+            try {
 
-            if (!fs.existsSync(filePath)) {
+                const command = new GetObjectCommand({
+                    Bucket: process.env.AWS_S3_BUCKET,
+                    Key: file.s3Key
+                });
+
+                const s3Response = await s3.send(command);
+
+
+                // Convert S3 stream to buffer
+                const chunks = [];
+
+                for await (const chunk of s3Response.Body) {
+                    chunks.push(chunk);
+                }
+
+                const pdfBytes = Buffer.concat(chunks);
+
+
+                // Read PDF
+                const pdfDoc = await PDFDocument.load(pdfBytes);
+
+                const actualPageCount = pdfDoc.getPageCount();
+
+
+                // Verify page count
+                if (actualPageCount !== file.pageCount) {
+
+                    return res.status(400).json({
+                        message:
+                            `Page count mismatch for ${file.s3Key}`
+                    });
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "S3 PDF verification error:",
+                    error
+                );
+
                 return res.status(400).json({
-                    message: "Uploaded file not found"
+                    message:
+                        `Unable to verify uploaded PDF: ${file.s3Key}`
                 });
             }
-            const pdfBytes = fs.readFileSync(filePath);
-            const pdfDoc = await PDFDocument.load(pdfBytes);
-
-            const actualPageCount = pdfDoc.getPageCount();
-
-            if (actualPageCount !== file.pageCount) {
-                return res.status(400).json({ 
-                    message: `Page count mismatch for ${file.fileUrl}`
-                });
-            }
-
         }
 
-        // Calculate amount for each file
+
+        // --------------------------------
+        // Calculate total amount
+        // --------------------------------
+
+        let totalAmount = 0;
+
         const updatedFiles = files.map((file) => {
+
             const amount = calculateFilePrice(
                 file.pageCount,
                 file.copies,
@@ -196,43 +270,79 @@ const createOrder = async (req, res) => {
             };
         });
 
+
+        // --------------------------------
         // Generate order number
+        // --------------------------------
+
         const orderNumber = await generateOrderNumber();
 
+
+        // --------------------------------
         // Create order
+        // --------------------------------
+
         const order = new Order({
             customerId,
+
             orderNumber,
+
             files: updatedFiles,
+
             totalAmount,
-            transactionId
+
+            paymentMethod,
+
+            transactionId:
+                paymentMethod === "GPay"
+                    ? transactionId.trim()
+                    : undefined
         });
+
 
         await order.save();
 
+
+        // --------------------------------
+        // Response
+        // --------------------------------
+
         return res.status(201).json({
+
             message: "Order created successfully",
+
             order
+
         });
 
     } catch (error) {
-        console.error("Create order error:", error);
+
+        console.error(
+            "Create order error:",
+            error
+        );
+
 
         // Duplicate transaction ID
         if (
             error.code === 11000 &&
             error.keyPattern?.transactionId
         ) {
+
             return res.status(409).json({
                 message: "Transaction ID already used"
             });
         }
 
+
+        // Mongoose validation error
         if (error.name === "ValidationError") {
+
             return res.status(400).json({
                 message: error.message
             });
         }
+
 
         return res.status(500).json({
             message: "Internal server error"
@@ -241,11 +351,19 @@ const createOrder = async (req, res) => {
 };
 
 
+// ======================================================
+// GET ORDER BY NUMBER
+// ======================================================
+
 const getOrderByNumber = async (req, res) => {
+
     try {
+
         const { orderNumber } = req.params;
 
-        const order = await Order.findOne({ orderNumber });
+        const order = await Order.findOne({
+            orderNumber
+        });
 
         if (!order) {
             return res.status(404).json({
@@ -258,7 +376,11 @@ const getOrderByNumber = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Get order error:", error);
+
+        console.error(
+            "Get order error:",
+            error
+        );
 
         return res.status(500).json({
             message: "Internal server error"
@@ -267,19 +389,32 @@ const getOrderByNumber = async (req, res) => {
 };
 
 
+// ======================================================
+// GET MY ORDERS
+// ======================================================
+
 const getMyOrders = async (req, res) => {
+
     try {
+
         const { customerId } = req.params;
 
-        const orders = await Order.find({ customerId })
-            .sort({ createdAt: -1 });
+        const orders = await Order.find({
+            customerId
+        }).sort({
+            createdAt: -1
+        });
 
         return res.status(200).json({
             orders
         });
 
     } catch (error) {
-        console.error("Get my orders error:", error);
+
+        console.error(
+            "Get my orders error:",
+            error
+        );
 
         return res.status(500).json({
             message: "Internal server error"
@@ -287,6 +422,10 @@ const getMyOrders = async (req, res) => {
     }
 };
 
+
+// ======================================================
+// EXPORT
+// ======================================================
 
 module.exports = {
     createOrder,

@@ -33,3 +33,27 @@
 .empty {
     text-align: center;
 }
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab,
+.activeTab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.tab {
+    background: #eee;
+}
+
+.activeTab {
+    background: #222;
+    color: white;
+}

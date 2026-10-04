@@ -1,236 +1,388 @@
-/* ===========================
-   Fonts (optional — remove if already loaded elsewhere)
-=========================== */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
 
 /* ===========================
-   Layout / Background (admin palette: gold + indigo)
+   Variables
 =========================== */
+:root {
+  --white: #ffffff;
+  --black: #000000;
+  --text-dark: #000000;
+  --border: #d0d0d0;
+  --error: #dc2626;
+}
 
+/* ===========================
+   Global
+=========================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--white);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* ===========================
+   Container
+=========================== */
 .container {
-  position: relative;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 30px;
-  overflow: hidden;
-  font-family: "Poppins", sans-serif;
-
-  background: radial-gradient(circle at 15% 20%, #241a3d 0%, transparent 45%),
-    radial-gradient(circle at 85% 80%, #1d1810 0%, transparent 45%),
-    linear-gradient(160deg, #0b0e1f 0%, #14121f 55%, #1a1512 100%);
+  justify-content: center;
+  padding: 20px;
+  background-color: var(--white);
 }
 
-.container::before,
-.container::after {
-  content: "";
-  position: absolute;
-  width: 340px;
-  height: 340px;
-  border-radius: 50%;
-  filter: blur(70px);
-  pointer-events: none;
-  animation: drift 8s ease-in-out infinite;
-}
-
-.container::before {
-  top: -80px;
-  left: -80px;
-  background: rgba(245, 158, 11, 0.16);
-}
-
-.container::after {
-  bottom: -100px;
-  right: -100px;
-  background: rgba(99, 102, 241, 0.22);
-  animation-delay: 2.5s;
-}
-
-@keyframes drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(20px, -20px) scale(1.08); }
+.wrapper {
+  width: 100%;
+  max-width: 400px;
+  background: var(--white);
+  padding: 50px 40px;
+  border: 1px solid var(--border);
 }
 
 /* ===========================
-   Card
+   Header
 =========================== */
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
 
+.header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+.header p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* ===========================
+   Error
+=========================== */
+.error {
+  background: #ffe6e6;
+  border: 1px solid #ffcccc;
+  color: var(--error);
+  padding: 12px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* ===========================
+   Form
+=========================== */
 .form {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: 420px;
-  padding: 58px 34px 36px;
-  border-radius: 22px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-
-  background: rgba(24, 21, 38, 0.76);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 30px 60px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
-  backdrop-filter: blur(20px);
-
-  transform: perspective(1000px) rotateX(0deg) translateY(0);
-  transition: transform 0.5s ease, box-shadow 0.5s ease;
-  animation: fadeInUp 0.6s ease;
+  gap: 20px;
 }
 
-.form:hover {
-  transform: perspective(1000px) rotateX(2deg) rotateY(-1.5deg) translateY(-4px);
-  box-shadow: 0 40px 70px rgba(0, 0, 0, 0.65);
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+.group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dark);
 }
 
-/* glow behind the floating icon */
-.form::after {
-  content: "";
-  position: absolute;
-  top: -78px;
-  left: 50%;
-  width: 150px;
-  height: 150px;
-  transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.3), transparent 70%);
-  filter: blur(18px);
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* floating 3D padlock icon — pure SVG, no image file needed */
-.form::before {
-  content: "";
-  position: absolute;
-  top: -60px;
-  left: 50%;
-  width: 90px;
-  height: 92px;
-  transform: translateX(-50%);
-  background-repeat: no-repeat;
-  background-size: contain;
-  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.55));
-  z-index: 1;
-  animation: floatIcon 4.5s ease-in-out infinite;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 100'%3E%3Cpath d='M27 34 V22 A14 14 0 0 1 55 22 V34' fill='none' stroke='%23fcd9a0' stroke-width='7' stroke-linecap='round'/%3E%3Crect x='22' y='42' width='54' height='44' rx='8' fill='%234338ca'/%3E%3Crect x='18' y='38' width='54' height='44' rx='8' fill='%236366f1'/%3E%3Crect x='14' y='34' width='54' height='44' rx='8' fill='%23a5b4fc'/%3E%3Ccircle cx='41' cy='58' r='9' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-opacity='0.7'/%3E%3Ccircle cx='41' cy='58' r='6' fill='%230f172a'/%3E%3Crect x='38' y='61' width='6' height='11' rx='2' fill='%230f172a'/%3E%3C/svg%3E");
-}
-
-@keyframes floatIcon {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-8px); }
-}
-
-/* ===========================
-   Heading
-=========================== */
-
-.form h1 {
-  text-align: center;
-  margin-bottom: 4px;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-  background: linear-gradient(135deg, #f59e0b, #a78bfa 60%, #818cf8);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* ===========================
-   Inputs
-=========================== */
-
-.form input {
-  width: 100%;
-  padding: 13px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  font-size: 15px;
+.group input {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: 14px;
   font-family: inherit;
-  color: #ede9fe;
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow:
-    inset 3px 3px 6px rgba(0, 0, 0, 0.4),
-    inset -2px -2px 5px rgba(255, 255, 255, 0.03);
-  box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  color: var(--text-dark);
+  transition: all 0.2s ease;
 }
 
-.form input::placeholder {
-  color: #7c7a8c;
+.group input::placeholder {
+  color: #999;
 }
 
-.form input:hover {
-  border-color: rgba(255, 255, 255, 0.14);
+.group input:hover {
+  border-color: #999;
 }
 
-.form input:focus {
+.group input:focus {
   outline: none;
-  border-color: #f59e0b;
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow:
-    inset 2px 2px 5px rgba(0, 0, 0, 0.35),
-    0 0 0 4px rgba(245, 158, 11, 0.2);
+  border-color: var(--text-dark);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+.group input:disabled {
+  background: #f5f5f5;
+  opacity: 0.6;
 }
 
 /* ===========================
    Button
 =========================== */
-
-.form button {
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 16px;
+.btn {
+  padding: 12px 20px;
+  margin-top: 10px;
+  border: 1px solid var(--text-dark);
+  background: var(--text-dark);
+  color: var(--white);
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.2px;
-  color: #ffffff;
-  margin-top: 6px;
-  background: linear-gradient(135deg, #4f46e5, #f59e0b);
-  box-shadow: 0 10px 20px rgba(79, 70, 229, 0.35), 0 4px 10px rgba(245, 158, 11, 0.25);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
-.form button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 26px rgba(79, 70, 229, 0.45), 0 6px 14px rgba(245, 158, 11, 0.3);
-  filter: brightness(1.06);
+.btn:hover:not(:disabled) {
+  background: #333;
+  border-color: #333;
 }
 
-.form button:active {
-  transform: translateY(1px);
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35) inset;
+.btn:active:not(:disabled) {
+  opacity: 0.9;
 }
 
-.form button:focus-visible {
-  outline: 3px solid rgba(245, 158, 11, 0.4);
-  outline-offset: 2px;
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* ===========================
-   Responsive
+   Footer
 =========================== */
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
 
-@media (max-width: 480px) {
-  .container { padding: 16px; }
+.footer a {
+  font-size: 13px;
+  color: #555;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
 
-  .form {
-    padding: 52px 22px 30px;
-    border-radius: 18px;
+.footer a:hover {
+  color: var(--text-dark);
+}
+
+/* ===========================
+   Tablet (481px - 768px)
+=========================== */
+@media (max-width: 768px) {
+  .wrapper {
+    max-width: 100%;
+    padding: 40px 30px;
   }
 
-  .form h1 { font-size: 19px; }
+  .header h1 {
+    font-size: 26px;
+  }
 
-  .form::before {
-    width: 76px;
-    height: 78px;
-    top: -50px;
+  .header {
+    margin-bottom: 35px;
+  }
+}
+
+/* ===========================
+   Mobile (max-width: 480px)
+=========================== */
+@media (max-width: 480px) {
+  .container {
+    padding: 16px;
+  }
+
+  .wrapper {
+    padding: 35px 24px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .header p {
+    font-size: 13px;
+  }
+
+  .header {
+    margin-bottom: 30px;
+  }
+
+  .form {
+    gap: 18px;
+  }
+
+  .group label {
+    font-size: 12px;
+  }
+
+  .group input {
+    padding: 11px 12px;
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 11px 18px;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  .error {
+    padding: 10px 12px;
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+
+  .footer {
+    margin-top: 18px;
+    padding-top: 18px;
+  }
+
+  .footer a {
+    font-size: 12px;
+  }
+}
+
+/* ===========================
+   Small Phone (max-width: 375px)
+=========================== */
+@media (max-width: 375px) {
+  .wrapper {
+    padding: 30px 20px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .header p {
+    font-size: 12px;
+  }
+
+  .header {
+    margin-bottom: 25px;
+  }
+
+  .form {
+    gap: 16px;
+  }
+
+  .group input {
+    padding: 10px 11px;
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+}
+
+/* ===========================
+   Large Desktop (1024px+)
+=========================== */
+@media (min-width: 1024px) {
+  .wrapper {
+    padding: 60px 50px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .form {
+    gap: 22px;
+  }
+
+  .group input {
+    padding: 13px 15px;
+    font-size: 15px;
+  }
+
+  .btn {
+    padding: 13px 22px;
+    font-size: 15px;
+  }
+}
+
+/* ===========================
+   Landscape
+=========================== */
+@media (max-height: 600px) and (orientation: landscape) {
+  .container {
+    padding: 12px;
+  }
+
+  .wrapper {
+    padding: 25px 20px;
+  }
+
+  .header {
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .header p {
+    font-size: 12px;
+  }
+
+  .form {
+    gap: 14px;
+  }
+
+  .group label {
+    font-size: 11px;
+  }
+
+  .group input {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+
+  .footer {
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+
+  .footer a {
+    font-size: 11px;
+  }
+}
+
+/* ===========================
+   Accessibility
+=========================== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
   }
 }

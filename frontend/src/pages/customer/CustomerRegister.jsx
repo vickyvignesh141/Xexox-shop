@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./CustomerRegister.module.css";
 
 function CustomerRegister() {
+  const [existingCustomer, setExistingCustomer] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -20,27 +21,71 @@ function CustomerRegister() {
       [e.target.name]: e.target.value,
     });
   };
+  const handleVerify = async () => {
+    if (!form.mobile || form.mobile.length !== 10) {
+      alert("Enter a valid 10 digit mobile number");
+      return;
+    }
 
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/customers/${form.mobile}`
+      );
+
+      const customer = response.data.customer;
+
+      setForm({
+        name: customer.name,
+        mobile: customer.mobile,
+        department: customer.department,
+        year: customer.year,
+        section: customer.section,
+        email: customer.email,
+        
+      });
+
+      localStorage.setItem(
+        "xeroxCustomerId",
+        customer._id
+      );
+      setExistingCustomer(true);
+
+      alert("Customer found!");
+
+    } catch (error) {
+      if (error.response?.status === 404) {
+        setExistingCustomer(false);
+        alert("Customer not found. Please register.");
+      } else {
+        alert("Verification failed");
+      }
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
+      if (existingCustomer) {
+        navigate("/upload");
+        return;
+    }
+
 
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/customers`,
         form
       );
-console.log("REGISTER RESPONSE:", response.data);
+      console.log("REGISTER RESPONSE:", response.data);
 
-console.log(
-  "CUSTOMER ID:",
-  response.data.customer._id
-);
+      console.log(
+        "CUSTOMER ID:",
+        response.data.customer._id
+      );
 
-localStorage.setItem(
-  "xeroxCustomerId",
-  response.data.customer._id
-);
-     
+      localStorage.setItem(
+        "xeroxCustomerId",
+        response.data.customer._id
+      );
+
 
       alert("Registration successful!");
       navigate("/upload");
@@ -63,7 +108,25 @@ localStorage.setItem(
   return (
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
-        <h1>Customer Registration</h1>
+        <h1>Registration</h1>
+
+        <div>
+          <input
+            name="mobile"
+            placeholder="Mobile Number"
+            value={form.mobile}
+            onChange={handleChange}
+            maxLength="10"
+            required
+          />
+
+          <button
+            type="button"
+            onClick={handleVerify}
+          >
+            Verify
+          </button>
+        </div>
 
         <input
           name="name"
@@ -73,14 +136,7 @@ localStorage.setItem(
           required
         />
 
-        <input
-          name="mobile"
-          placeholder="Mobile Number"
-          value={form.mobile}
-          onChange={handleChange}
-          maxLength="10"
-          required
-        />
+
 
         <select
           name="department"
@@ -88,8 +144,8 @@ localStorage.setItem(
           onChange={handleChange}
           required
         >
-          <option value="">Select Department</option>
-          <option>Aeronautical Engineering</option>
+          <option value=""  disabled>Department</option>
+          <option>Artificial Intelligence & Data Science Engineering</option>
           <option>Automobile Engineering</option>
           <option>Civil Engineering</option>
           <option>Electrical and Electronics Engineering</option>
@@ -137,8 +193,10 @@ localStorage.setItem(
           required
         />
 
-        <button type="submit">Register</button>
-      </form>
+<button type="submit">
+    {existingCustomer ? "Continue to Upload" : "Register"}
+</button>      
+</form>
     </div>
   );
 }
