@@ -21,7 +21,7 @@ const orderSchema = new mongoose.Schema(
                     required: true
                 },
 
-                fileUrl: {
+                s3Key: {
                     type: String,
                     required: true
                 },

@@ -2,6 +2,53 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Owner = require("../models/owner");
 
+
+
+const registerOwner = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                message: "All fields are required"
+            });
+        }
+
+        const existingOwner = await Owner.findOne({
+            email: email.toLowerCase()
+        });
+
+        if (existingOwner) {
+            return res.status(409).json({
+                message: "Owner already exists"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const owner = new Owner({
+            name,
+            email: email.toLowerCase(),
+            password: hashedPassword
+        });
+
+        await owner.save();
+
+        return res.status(201).json({
+            message: "Owner created successfully"
+        });
+
+    } catch (error) {
+        console.error("Create owner error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};
+
+
+
 const loginOwner = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -58,5 +105,6 @@ const loginOwner = async (req, res) => {
 };
 
 module.exports = {
-    loginOwner
+    loginOwner,
+    registerOwner
 };

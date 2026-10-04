@@ -191,8 +191,7 @@ function UploadOrder() {
 
             files: files.map((file) => ({
                 filename: file.originalFilename,
-                fileUrl: file.fileUrl,
-                fileSize: file.fileSize,
+s3Key: file.s3Key,                fileSize: file.fileSize,
                 pageCount: file.pageCount,
                 copies: file.copies,
                 colorMode: file.colorMode,

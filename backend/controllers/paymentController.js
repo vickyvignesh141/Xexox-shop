@@ -96,7 +96,7 @@ const createPaymentOrder = async (req, res) => {
             // Store calculated amount with the file
             processedFiles.push({
                 filename: file.filename,
-                fileUrl: file.fileUrl,
+                s3Key: file.s3Key,
                 fileSize: file.fileSize,
                 pageCount: file.pageCount,
                 copies: file.copies,

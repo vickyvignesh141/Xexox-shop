@@ -7,13 +7,17 @@ const ownerAuth = require("../middleware/ownerAuth");
 const {
     verifyPayment,
     updateOrderStatus,
-    getAllOrders
+    getAllOrders,getPdfUrl
 } = require("../controllers/ownerController");
+
+
 router.use((req, res, next) => {
     console.log("OWNER ROUTE HIT:", req.method, req.originalUrl);
     next();
 });
+
 console.log("PATCH ROUTE REGISTERING");
+
 router.patch(
     "/orders/:orderNumber/payment",
     ownerAuth,
@@ -27,5 +31,12 @@ router.patch(
 );
 
 router.get("/orders", ownerAuth, getAllOrders);
+
+router.get(
+    "/pdf-url",
+    ownerAuth,
+    getPdfUrl
+);
+
 
 module.exports = router;
