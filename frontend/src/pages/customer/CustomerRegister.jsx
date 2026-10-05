@@ -3,6 +3,7 @@ import axios from "axios";
 import { Toaster, toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import styles from "./CustomerRegister.module.css";
+import Header from "../common/header.jsx"; // Import the Header component
 
 function CustomerRegister() {
   const [existingCustomer, setExistingCustomer] = useState(false);
@@ -22,6 +23,7 @@ function CustomerRegister() {
       [e.target.name]: e.target.value,
     });
   };
+
   const handleVerify = async () => {
     if (!form.mobile || form.mobile.length !== 10) {
       toast.error("Enter a valid 10 digit mobile number");
@@ -42,17 +44,12 @@ function CustomerRegister() {
         year: customer.year,
         section: customer.section,
         email: customer.email,
-        
       });
 
-      localStorage.setItem(
-        "xeroxCustomerId",
-        customer._id
-      );
+      localStorage.setItem("xeroxCustomerId", customer._id);
       setExistingCustomer(true);
 
       toast.success("Customer found!");
-
     } catch (error) {
       if (error.response?.status === 404) {
         setExistingCustomer(false);
@@ -62,13 +59,13 @@ function CustomerRegister() {
       }
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-      if (existingCustomer) {
-        navigate("/upload");
-        return;
+    if (existingCustomer) {
+      navigate("/upload");
+      return;
     }
-
 
     try {
       const response = await axios.post(
@@ -76,17 +73,9 @@ function CustomerRegister() {
         form
       );
       console.log("REGISTER RESPONSE:", response.data);
+      console.log("CUSTOMER ID:", response.data.customer._id);
 
-      console.log(
-        "CUSTOMER ID:",
-        response.data.customer._id
-      );
-
-      localStorage.setItem(
-        "xeroxCustomerId",
-        response.data.customer._id
-      );
-
+      localStorage.setItem("xeroxCustomerId", response.data.customer._id);
 
       toast.success("Registration successful!");
       navigate("/upload");
@@ -99,107 +88,106 @@ function CustomerRegister() {
         section: "",
         email: "",
       });
-
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Registration failed"
-      );
+      toast.error(error.response?.data?.message || "Registration failed");
     }
   };
-  return (
-    <div className={styles.container}>
-      <Toaster position="top-right" richColors />
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <h1>Registration</h1>
 
-        <div>
+  return (
+    <>
+      {/* ✅ Header added here */}
+      <Header />
+
+      <div className={styles.container}>
+        <Toaster position="top-right" richColors />
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <h1>Registration</h1>
+
+          <div>
+            <input
+              name="mobile"
+              placeholder="Mobile Number"
+              value={form.mobile}
+              onChange={handleChange}
+              maxLength="10"
+              required
+            />
+            <button type="button" onClick={handleVerify}>
+              Verify
+            </button>
+          </div>
+
           <input
-            name="mobile"
-            placeholder="Mobile Number"
-            value={form.mobile}
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
             onChange={handleChange}
-            maxLength="10"
             required
           />
 
-          <button
-            type="button"
-            onClick={handleVerify}
+          <select
+            name="department"
+            value={form.department}
+            onChange={handleChange}
+            required
           >
-            Verify
+            <option value="" disabled>
+              Department
+            </option>
+            <option>Artificial Intelligence & Data Science Engineering</option>
+            <option>Automobile Engineering</option>
+            <option>Civil Engineering</option>
+            <option>Electrical and Electronics Engineering</option>
+            <option>Electronics and Communication Engineering</option>
+            <option>Information Technology</option>
+            <option>Computer Science and Engineering (Cyber Security)</option>
+            <option>Computer Science and Engineering</option>
+            <option>Mechanical Engineering</option>
+            <option>Electronics and Instrumentation Engineering</option>
+            <option>Master of Business Administration</option>
+          </select>
+
+          <select
+            name="year"
+            value={form.year}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+
+          <select
+            name="section"
+            value={form.section}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Section</option>
+            <option>A</option>
+            <option>B</option>
+            <option>C</option>
+            <option>D</option>
+          </select>
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+
+          <button type="submit">
+            {existingCustomer ? "Continue to Upload" : "Register"}
           </button>
-        </div>
-
-        <input
-          name="name"
-          placeholder="Full Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-
-
-
-        <select
-          name="department"
-          value={form.department}
-          onChange={handleChange}
-          required
-        >
-          <option value=""  disabled>Department</option>
-          <option>Artificial Intelligence & Data Science Engineering</option>
-          <option>Automobile Engineering</option>
-          <option>Civil Engineering</option>
-          <option>Electrical and Electronics Engineering</option>
-          <option>Electronics and Communication Engineering</option>
-          <option>Information Technology</option>
-          <option>Computer Science and Engineering (Cyber Security)</option>
-          <option>Computer Science and Engineering</option>
-          <option>Mechanical Engineering</option>
-          <option>Electronics and Instrumentation Engineering</option>
-          <option>Master of Business Administration</option>
-        </select>
-
-        <select
-          name="year"
-          value={form.year}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select Year</option>
-          <option value="1">1st Year</option>
-          <option value="2">2nd Year</option>
-          <option value="3">3rd Year</option>
-          <option value="4">4th Year</option>
-        </select>
-
-        <select
-          name="section"
-          value={form.section}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select Section</option>
-          <option>A</option>
-          <option>B</option>
-          <option>C</option>
-          <option>D</option>
-        </select>
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-
-<button type="submit">
-    {existingCustomer ? "Continue to Upload" : "Register"}
-</button>      
-</form>
-    </div>
+        </form>
+      </div>
+    </>
   );
 }
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import styles from "./OrderTracking.module.css";
+import Header from "../common/header.jsx"; // Import the Header component
 
 
 function OrderTracking() {
@@ -22,6 +23,9 @@ function OrderTracking() {
     };
 
     return (
+        <>
+      {/* ✅ Header added here */}
+      <Header />
         <div className={styles.container}>
             <div className={styles.card}>
 
@@ -81,6 +85,7 @@ function OrderTracking() {
 
             </div>
         </div>
+         </>
     );
 }
 
