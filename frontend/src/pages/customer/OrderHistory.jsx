@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./OrderHistory.module.css";
+import Header from "../common/header.jsx"; // Import the Header component
 
 function OrderHistory() {
     const [orders, setOrders] = useState([]);
@@ -29,6 +30,9 @@ function OrderHistory() {
     }, [customerId]);
 
     return (
+        <>
+      {/* ✅ Header added here */}
+      <Header />
         <div className={styles.container}>
             <div className={styles.card}>
 
@@ -73,6 +77,7 @@ function OrderHistory() {
 
             </div>
         </div>
+            </>
     );
 }
 

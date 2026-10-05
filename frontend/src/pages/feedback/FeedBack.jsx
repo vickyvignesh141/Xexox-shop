@@ -10,6 +10,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import styles from './feedback.module.css';
+import Header from "../common/header.jsx"; // Import the Header component
 
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -80,6 +81,9 @@ export default function FeedbackForm({}) {
   };
 
   return (
+     <>
+      {/* ✅ Header added here */}
+      <Header />
     <div className={styles.container}>
       {isSubmitted ? (
         <div className={styles.form}>
@@ -169,6 +173,7 @@ export default function FeedbackForm({}) {
         </form>
       )}
     </div>
+     </>
   );
 }
 

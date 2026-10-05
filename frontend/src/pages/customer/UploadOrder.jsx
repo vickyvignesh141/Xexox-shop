@@ -15,6 +15,7 @@ import {
     IndianRupee
 } from "lucide-react";
 import styles from "./UploadOrder.module.css";
+import Header from "../common/header.jsx"; // Import the Header component
 
 function UploadOrder() {
     const navigate = useNavigate();
@@ -241,6 +242,9 @@ s3Key: file.s3Key,
     };
 
     return (
+         <>
+      {/* ✅ Header added here */}
+      <Header />
         <div className={styles.container}>
 
             <div className={styles.form}>
@@ -569,6 +573,7 @@ s3Key: file.s3Key,
             </div>
 
         </div>
+         </>
     );
 }
 
