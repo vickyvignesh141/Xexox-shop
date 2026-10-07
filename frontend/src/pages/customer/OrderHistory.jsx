@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./OrderHistory.module.css";
-import Header from "../common/header.jsx"; // Import the Header component
 
 function OrderHistory() {
     const [orders, setOrders] = useState([]);
+    const [view, setView] = useState("CURRENT");
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const customerId = localStorage.getItem("xeroxCustomerId");
 
@@ -14,7 +15,6 @@ function OrderHistory() {
                 const response = await axios.get(
                     `${import.meta.env.VITE_API_URL}/api/orders/customer/${customerId}`
                 );
-
                 setOrders(response.data.orders);
             } catch (error) {
                 alert(
@@ -29,55 +29,110 @@ function OrderHistory() {
         }
     }, [customerId]);
 
+    const displayedOrders =
+        view === "CURRENT"
+            ? orders.slice(0, 1)
+            : orders;
+
+    const handleSelectView = (selectedView) => {
+        setView(selectedView);
+        setDropdownOpen(false);
+    };
+
     return (
-        <>
-      {/* ✅ Header added here */}
-      <Header />
         <div className={styles.container}>
-            <div className={styles.card}>
+            <div className={styles.header}>
+                <h1>Order History</h1>
+                <div className={styles.dropdownWrapper}>
+                    <button
+                        className={styles.dropdownBtn}
+                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                        <span>{view === "CURRENT" ? "Current" : "Overall"}</span>
+                        <span>▼</span>
+                    </button>
+                    {dropdownOpen && (
+                        <div className={styles.dropdownMenu}>
+                            <a
+                                href="#"
+                                className={view === "CURRENT" ? styles.selected : ""}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleSelectView("CURRENT");
+                                }}
+                            >
+                                Current
+                            </a>
+                            <a
+                                href="#"
+                                className={view === "OVERALL" ? styles.selected : ""}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleSelectView("OVERALL");
+                                }}
+                            >
+                                Overall
+                            </a>
+                        </div>
+                    )}
+                </div>
+            </div>
 
-                <h1 className={styles.title}>My Orders</h1>
-
-                {orders.length === 0 ? (
-                    <p className={styles.empty}>
-                        No orders found.
-                    </p>
+            <div className={styles.cardsContainer}>
+                {displayedOrders.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        <p>No orders found.</p>
+                    </div>
                 ) : (
-                    orders.map((order) => (
-                        <div
-                            key={order._id}
-                            className={styles.orderCard}
-                        >
-                            <h2>
-                                Order: {order.orderNumber}
-                            </h2>
-
-                            <p>
-                                Payment:{" "}
-                                {order.paymentVerificationStatus}
-                            </p>
-
-                            <p>
-                                Status: {order.orderStatus}
-                            </p>
-
-                            <p>
-                                Total Amount: ₹{order.totalAmount}
-                            </p>
-
-                            <p>
-                                Date:{" "}
-                                {new Date(
-                                    order.createdAt
-                                ).toLocaleString()}
-                            </p>
+                    displayedOrders.map((order) => (
+                        <div key={order._id} className={styles.orderCard}>
+                            <div className={styles.orderHeader}>
+                                <h2>Order #{order.orderNumber}</h2>
+                                <span className={styles.orderStatus}>
+                                    {order.orderStatus}
+                                </span>
+                            </div>
+                            <div className={styles.orderDetails}>
+                                <div className={styles.detailItem}>
+                                    <span className={styles.detailLabel}>
+                                        Payment Status
+                                    </span>
+                                    <span className={styles.detailValue}>
+                                        {order.paymentVerificationStatus}
+                                    </span>
+                                </div>
+                                <div className={styles.detailItem}>
+                                    <span className={styles.detailLabel}>
+                                        Payment Method
+                                    </span>
+                                    <span className={styles.detailValue}>
+                                        {order.paymentMethod}
+                                    </span>
+                                </div>
+                                <div className={styles.detailItem}>
+                                    <span className={styles.detailLabel}>
+                                        Total Amount
+                                    </span>
+                                    <span className={styles.detailValue}>
+                                        ₹{order.totalAmount}
+                                    </span>
+                                </div>
+                                <div className={styles.detailItem}>
+                                    <span className={styles.detailLabel}>
+                                        Date
+                                    </span>
+                                    <span className={styles.detailValue}>
+                                        {new Date(
+                                            order.createdAt
+                                        ).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     ))
                 )}
-
             </div>
         </div>
-            </>
     );
 }
 
