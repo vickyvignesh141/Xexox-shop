@@ -7,6 +7,7 @@ import Header from "../common/header"; // Import the Header component
 
 function CustomerRegister() {
   const [existingCustomer, setExistingCustomer] = useState(false);
+  const [hasOrder, setHasOrder] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -49,10 +50,17 @@ function CustomerRegister() {
       localStorage.setItem("xeroxCustomerId", customer._id);
       setExistingCustomer(true);
 
+      const ordersResponse = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/orders/customer/${customer._id}`
+      );
+
+      setHasOrder(ordersResponse.data.orders?.length > 0);
+
       toast.success("Customer found!");
     } catch (error) {
       if (error.response?.status === 404) {
         setExistingCustomer(false);
+        setHasOrder(false);
         toast.error("Customer not found. Please register.");
       } else {
         toast.error("Verification failed");
@@ -185,6 +193,15 @@ function CustomerRegister() {
           <button type="submit">
             {existingCustomer ? "Continue to Upload" : "Register"}
           </button>
+
+          {existingCustomer && hasOrder && (
+            <button
+              type="button"
+              onClick={() => navigate("/orderhistory")}
+            >
+              Check Order Status
+            </button>
+          )}
         </form>
       </div>
     </>
