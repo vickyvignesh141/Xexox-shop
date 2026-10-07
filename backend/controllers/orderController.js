@@ -107,7 +107,8 @@ const createOrder = async (req, res) => {
             customerId,
             files,
             paymentMethod,
-            transactionId
+            transactionId,
+            customerComment
         } = req.body;
 
 
@@ -282,24 +283,20 @@ const createOrder = async (req, res) => {
         // Create order
         // --------------------------------
 
-        const order = new Order({
-            customerId,
+        const orderData = {
+    customerId,
+    orderNumber,
+    files: updatedFiles,
+    totalAmount,
+    paymentMethod,
+    customerComment: customerComment?.trim() || undefined
+};
 
-            orderNumber,
+if (paymentMethod === "GPay") {
+    orderData.transactionId = transactionId.trim();
+}
 
-            files: updatedFiles,
-
-            totalAmount,
-
-            paymentMethod,
-
-            transactionId:
-                paymentMethod === "GPay"
-                    ? transactionId.trim()
-                    : undefined
-        });
-
-
+const order = new Order(orderData);
         await order.save();
 
 
