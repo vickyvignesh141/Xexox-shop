@@ -104,6 +104,11 @@ const orderSchema = new mongoose.Schema(
             enum: ["PENDING", "COMPLETED", "NOT_COMPLETED"],
             default: "PENDING"
         },
+        customerComment: {
+            type: String,
+            trim: true,
+            maxlength: 500
+        },
     },
     {
         collection: "orders",

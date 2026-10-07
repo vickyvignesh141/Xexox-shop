@@ -3,7 +3,7 @@ import axios from "axios";
 import { Toaster, toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import styles from "./CustomerRegister.module.css";
-import Header from "../common/header.jsx"; // Import the Header component
+import Header from "../common/header"; // Import the Header component
 
 function CustomerRegister() {
   const [existingCustomer, setExistingCustomer] = useState(false);

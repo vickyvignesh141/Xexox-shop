@@ -281,6 +281,22 @@ function OwnerOrders() {
                   </div>
                 </div>
 
+{order.customerComment?.trim() && (
+    <div className={styles.infoRow}>
+        <FileText size={18} className={styles.icon} />
+
+        <div>
+            <div className={styles.label}>
+                Customer Comment
+            </div>
+
+            <div className={styles.value}>
+                {order.customerComment}
+            </div>
+        </div>
+    </div>
+)}
+
                 {/* <div className={styles.infoRow}>
                   <AlertCircle size={18} className={styles.icon} />
                   <div>

@@ -28,7 +28,7 @@ function UploadOrder() {
 
     const [uploading, setUploading] = useState(false);
 
-    const [paymentType, setPaymentType] = useState("");
+    const [paymentType, setPaymentType] = useState("COD");
 
     // -----------------------------------------
     // Select PDF
@@ -161,7 +161,7 @@ function UploadOrder() {
             );
 
             // Reset payment selection
-            setPaymentType("");
+            setPaymentType("COD");
 
         } catch (error) {
             toast.error(
@@ -508,17 +508,17 @@ s3Key: file.s3Key,
                                             )
                                         }
                                     >
-                                        <option value="">
+                                        {/* <option value="">
                                             Select Payment Type
-                                        </option>
+                                        </option> */}
 
                                         <option value="COD">
                                             Cash on Delivery
                                         </option>
 
-                                        <option value="UPI">
+                                        {/* <option value="UPI">
                                             UPI / QR Payment
-                                        </option>
+                                        </option> */}
                                     </select>
 
 
