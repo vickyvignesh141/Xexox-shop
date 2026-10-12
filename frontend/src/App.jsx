@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedOwnerRoute from "./components/ProtectedOwnerRoute";
 
 import CustomerRegister from "./pages/customer/CustomerRegister";
 import UploadOrder from "./pages/customer/UploadOrder";
@@ -21,17 +22,21 @@ function App() {
         <Route path="/tracking" element={<OrderTracking />} />
         <Route path="/orderhistory" element={<OrderHistory />} />
         <Route path="/payment" element={<Payment />} />
- 
+
 
         <Route path="/owner-login" element={<OwnerLogin />} />
-        <Route path="/owner-orders" element={<OwnerOrders />} />
 
+        
+        <Route element={<ProtectedOwnerRoute />}>
+          <Route path="/owner-orders" element={<OwnerOrders />} />
+        </Route>
+        
         <Route path="/feedback" element={<Feedback />} />
 
       </Routes>
       <FeedbackButton />
 
-      
+
     </BrowserRouter>
   );
 }
