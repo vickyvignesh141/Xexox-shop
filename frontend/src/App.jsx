@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedOwnerRoute from "./components/ProtectedOwnerRoute";
+import ChooseRole from "./pages/common/ChooseRole";
+
 
 import CustomerRegister from "./pages/customer/CustomerRegister";
 import UploadOrder from "./pages/customer/UploadOrder";
@@ -17,8 +19,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<CustomerRegister />} />
-        <Route path="/upload" element={<UploadOrder />} />
+<Route path="/" element={<ChooseRole />} />
+<Route path="/register" element={<CustomerRegister />} />
         <Route path="/tracking" element={<OrderTracking />} />
         <Route path="/orderhistory" element={<OrderHistory />} />
         <Route path="/payment" element={<Payment />} />
