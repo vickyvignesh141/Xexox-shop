@@ -23,6 +23,8 @@ import Header from "../common/header.jsx"; // Import the Header component
 
 function OwnerOrders() {
   const [orders, setOrders] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [selectedDate, setSelectedDate] = useState("");
 
   const token = localStorage.getItem("ownerToken");
 
@@ -158,9 +160,43 @@ function OwnerOrders() {
     }
   };
 
-  const activeorders = orders.filter(
-    (order) => order.orderStatus !== "COMPLETED"
-  );
+  
+const filteredOrders = orders.filter((order) => {
+  // Status filter
+  if (
+    statusFilter === "COMPLETED" &&
+    order.orderStatus !== "COMPLETED"
+  ) {
+    return false;
+  }
+
+  if (
+    statusFilter === "NOT-COMPLETED" &&
+    order.orderStatus !== "NOT-COMPLETED"
+  ) {
+    return false;
+  }
+
+  if (
+    statusFilter === "ALL" &&
+    order.orderStatus === "COMPLETED"
+  ) {
+    return false;
+  }
+
+  // Date filter
+  if (selectedDate) {
+    const orderDate = new Date(order.createdAt)
+      .toLocaleDateString("en-CA");
+
+    if (orderDate !== selectedDate) {
+      return false;
+    }
+  }
+
+  return true;
+});
+
 
   return (
      <>
@@ -169,18 +205,57 @@ function OwnerOrders() {
     <div className={styles.container}>
       <Toaster position="top-right" richColors />
 
-      <h1 className={styles.title}>
-        <FileCheck size={28} className={styles.titleIcon} />
-        Owner Orders
-      </h1>
+      
+<h1 className={styles.title}>
+  <FileCheck size={28} className={styles.titleIcon} />
+  Owner Orders
+</h1>
 
-      {activeorders.length === 0 ? (
+
+<div className={styles.filters}>
+  <label className={styles.filterGroup}>
+    <span>Date</span>
+    <input
+      className={styles.filterInput}
+      type="date"
+      value={selectedDate}
+      onChange={(e) => setSelectedDate(e.target.value)}
+    />
+  </label>
+
+  <label className={styles.filterGroup}>
+    <span>Status</span>
+    <select
+      className={styles.filterInput}
+      value={statusFilter}
+      onChange={(e) => setStatusFilter(e.target.value)}
+    >
+      <option value="ALL">All</option>
+      <option value="COMPLETED">Completed</option>
+      <option value="NOT-COMPLETED">Not Completed</option>
+    </select>
+  </label>
+
+  <button
+    type="button"
+    className={styles.resetButton}
+    onClick={() => {
+      setSelectedDate("");
+      setStatusFilter("ALL");
+    }}
+  >
+    Reset Filters
+  </button>
+</div>
+
+
+      {filteredOrders.length === 0 ? (
         <div className={styles.emptyState}>
           <AlertCircle size={48} />
           <p>No active orders found.</p>
         </div>
       ) : (
-        activeorders.map((order) => (
+        filteredOrders.map((order) => (
           <div
             key={order._id}
             className={styles.orderCard}
