@@ -61,6 +61,14 @@ function UploadOrder() {
     // Upload selected PDF
     // -----------------------------------------
     const handleUpload = async () => {
+
+        const customerToken = localStorage.getItem("customerToken");
+
+        if (!customerToken) {
+            toast.error("Please login before uploading PDFs");
+            navigate("/login");
+            return;
+        }
         if (selectedFiles.length === 0) {
             toast.warning("Please select a PDF");
             return;
@@ -78,6 +86,11 @@ function UploadOrder() {
 
                 const response = await axios.post(
                     `${import.meta.env.VITE_API_URL}/api/upload`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${customerToken}`,
+                        },
+                    },
                     formData
                 );
 
@@ -148,6 +161,11 @@ function UploadOrder() {
                         colorMode: file.colorMode,
                         side: file.side
                     }))
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("customerToken")}`,
+                    },
                 }
             );
 
@@ -184,6 +202,14 @@ function UploadOrder() {
     // Continue based on payment type
     // -----------------------------------------
     const handlePaymentContinue = () => {
+
+        const customerToken = localStorage.getItem("customerToken");
+
+        if (!customerToken) {
+            toast.error("Please login first");
+            navigate("/login");
+            return;
+        }
         if (files.length === 0) {
             toast.warning("Please upload at least one PDF");
             return;
@@ -200,12 +226,11 @@ function UploadOrder() {
         }
 
         const orderData = {
-            customerId:
-                localStorage.getItem("xeroxCustomerId"),
+
 
             files: files.map((file) => ({
                 filename: file.originalFilename,
-s3Key: file.s3Key,
+                s3Key: file.s3Key,
                 fileSize: file.fileSize,
                 pageCount: file.pageCount,
                 copies: file.copies,
@@ -242,338 +267,338 @@ s3Key: file.s3Key,
     };
 
     return (
-         <>
-      {/* ✅ Header added here */}
-      <Header />
-        <div className={styles.container}>
+        <>
+            {/* ✅ Header added here */}
+            <Header />
+            <div className={styles.container}>
 
-            <div className={styles.form}>
+                <div className={styles.form}>
 
-                <h1 className={styles.title}>
-                    <UploadCloud size={20} />
-                    Upload PDF
-                </h1>
+                    <h1 className={styles.title}>
+                        <UploadCloud size={20} />
+                        Upload PDF
+                    </h1>
 
-                {/* Select PDF */}
+                    {/* Select PDF */}
 
-                {files.length === 0 && selectedFiles.length === 0 && (
-                    <input
-                        type="file"
-                        accept=".pdf,application/pdf"
-                        onChange={handleFileSelect}
-                        className={styles.fileInput}
-                    />
-                )}
-
-                {/* Selected files */}
-
-                {selectedFiles.length > 0 && (
-                    <div className={styles.selectedFilesBox}>
-
-                        <h3 className={styles.smallHeading}>
-                            Files Selected
-                        </h3>
-
-                        {selectedFiles.map((file, index) => (
-                            <p key={index} className={styles.selectedName}>
-                                <FileText size={16} />
-                                <span>{file.name}</span>
-                            </p>
-                        ))}
-
-                    </div>
-                )}
-
-                <button
-                    type="button"
-                    onClick={handleUpload}
-                    disabled={uploading}
-                    className={styles.uploadButton}
-                >
-                    {uploading ? (
-                        <>
-                            <Loader2 size={18} className={styles.spin} />
-                            Uploading...
-                        </>
-                    ) : (
-                        <>
-                            <UploadCloud size={18} />
-                            Upload PDF
-                        </>
+                    {files.length === 0 && selectedFiles.length === 0 && (
+                        <input
+                            type="file"
+                            accept=".pdf,application/pdf"
+                            onChange={handleFileSelect}
+                            className={styles.fileInput}
+                        />
                     )}
-                </button>
 
+                    {/* Selected files */}
 
-                {/* Uploaded Files */}
+                    {selectedFiles.length > 0 && (
+                        <div className={styles.selectedFilesBox}>
 
-                {files.length > 0 && (
-                    <div className={styles.uploadedSection}>
+                            <h3 className={styles.smallHeading}>
+                                Files Selected
+                            </h3>
 
-                        <h2 className={styles.sectionHeading}>
-                            Uploaded Files
-                            <span className={styles.count}>
-                                {files.length}
-                            </span>
-                        </h2>
+                            {selectedFiles.map((file, index) => (
+                                <p key={index} className={styles.selectedName}>
+                                    <FileText size={16} />
+                                    <span>{file.name}</span>
+                                </p>
+                            ))}
 
-                        {files.map((file, index) => (
+                        </div>
+                    )}
 
-                            <div
-                                key={index}
-                                className={styles.fileCard}
-                            >
-
-                                <div className={styles.fileTop}>
-                                    <FileText
-                                        size={20}
-                                        className={styles.fileIcon}
-                                    />
-
-                                    <div className={styles.fileInfo}>
-                                        <h3 className={styles.fileCardTitle}>
-                                            {file.originalFilename}
-                                        </h3>
-
-                                        <p className={styles.pages}>
-                                            Pages: {file.pageCount}
-                                        </p>
-                                    </div>
-                                </div>
-
-
-                                <div className={styles.fieldGrid}>
-
-                                    {/* Copies */}
-
-                                    <div className={styles.field}>
-                                        <label>
-                                            Copies
-                                        </label>
-
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={file.copies}
-                                            onChange={(e) =>
-                                                updateFile(
-                                                    index,
-                                                    "copies",
-                                                    Number(e.target.value)
-                                                )
-                                            }
-                                        />
-                                    </div>
-
-
-                                    {/* Color */}
-
-                                    <div className={styles.field}>
-                                        <label>
-                                            Color
-                                        </label>
-
-                                        <select
-                                            value={file.colorMode}
-                                            onChange={(e) =>
-                                                updateFile(
-                                                    index,
-                                                    "colorMode",
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-                                            <option value="BW">
-                                                Black & White
-                                            </option>
-
-                                            <option value="COLOR">
-                                                Color
-                                            </option>
-                                        </select>
-                                    </div>
-
-
-                                    {/* Side */}
-
-                                    <div className={`${styles.field} ${styles.fullRow}`}>
-                                        <label>
-                                            Side
-                                        </label>
-
-                                        <select
-                                            value={file.side}
-                                            onChange={(e) =>
-                                                updateFile(
-                                                    index,
-                                                    "side",
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-                                            <option value="SINGLE">
-                                                Single Side
-                                            </option>
-
-                                            <option value="DOUBLE">
-                                                Double Side
-                                            </option>
-                                        </select>
-                                    </div>
-
-                                </div>
-
-
-                                {/* Amount */}
-
-                                {file.amount > 0 && (
-                                    <h3 className={styles.amountBadge}>
-                                        <IndianRupee size={14} />
-                                        Amount: ₹{file.amount}
-                                    </h3>
-                                )}
-
-
-                                {/* Remove */}
-
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        removeFile(index)
-                                    }
-                                    className={styles.removeButton}
-                                >
-                                    <Trash2 size={16} />
-                                    Remove
-                                </button>
-
-                            </div>
-                        ))}
-
-
-                        {/* Add More */}
-
-                        {files.length > 0 && files.length < 2 && (
+                    <button
+                        type="button"
+                        onClick={handleUpload}
+                        disabled={uploading}
+                        className={styles.uploadButton}
+                    >
+                        {uploading ? (
                             <>
-                                <label className={styles.addMoreLabel}>
-                                    <strong>
-                                        <Plus size={16} />
-                                        Add Another PDF
-                                    </strong>
-                                </label>
-
-                                <input
-                                    type="file"
-                                    accept=".pdf,application/pdf"
-                                    onChange={handleFileSelect}
-                                    className={styles.fileInput}
-                                />
+                                <Loader2 size={18} className={styles.spin} />
+                                Uploading...
+                            </>
+                        ) : (
+                            <>
+                                <UploadCloud size={18} />
+                                Upload PDF
                             </>
                         )}
+                    </button>
 
 
-                        {/* Calculate */}
+                    {/* Uploaded Files */}
 
-                        <button
-                            type="button"
-                            onClick={handleCalculatePrice}
-                            className={styles.calculateButton}
-                        >
-                            <Calculator size={18} />
-                            Calculate Amount
-                        </button>
+                    {files.length > 0 && (
+                        <div className={styles.uploadedSection}>
 
+                            <h2 className={styles.sectionHeading}>
+                                Uploaded Files
+                                <span className={styles.count}>
+                                    {files.length}
+                                </span>
+                            </h2>
 
-                        {/* Grand Total */}
+                            {files.map((file, index) => (
 
-                        {totalAmount > 0 && (
-                            <>
-                                <h2 className={styles.totalAmount}>
-                                    Total Amount: ₹{totalAmount}
-                                </h2>
+                                <div
+                                    key={index}
+                                    className={styles.fileCard}
+                                >
 
-                                {/* Payment Type */}
+                                    <div className={styles.fileTop}>
+                                        <FileText
+                                            size={20}
+                                            className={styles.fileIcon}
+                                        />
 
-                                <div className={styles.paymentSection}>
+                                        <div className={styles.fileInfo}>
+                                            <h3 className={styles.fileCardTitle}>
+                                                {file.originalFilename}
+                                            </h3>
 
-                                    <h3 className={styles.paymentHeading}>
-                                        <Wallet size={16} />
-                                        Select Payment Type
-                                    </h3>
-
-                                    <select
-                                        value={paymentType}
-                                        onChange={(e) =>
-                                            setPaymentType(
-                                                e.target.value
-                                            )
-                                        }
-                                    >
-                                        {/* <option value="">
-                                            Select Payment Type
-                                        </option> */}
-
-                                        <option value="COD">
-                                            Cash on Delivery
-                                        </option>
-
-                                        {/* <option value="UPI">
-                                            UPI / QR Payment
-                                        </option> */}
-                                    </select>
+                                            <p className={styles.pages}>
+                                                Pages: {file.pageCount}
+                                            </p>
+                                        </div>
+                                    </div>
 
 
-                                    {paymentType === "COD" && (
-                                        <p className={styles.paymentText}>
-                                            Pay cash at the shop.
-                                        </p>
+                                    <div className={styles.fieldGrid}>
+
+                                        {/* Copies */}
+
+                                        <div className={styles.field}>
+                                            <label>
+                                                Copies
+                                            </label>
+
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={file.copies}
+                                                onChange={(e) =>
+                                                    updateFile(
+                                                        index,
+                                                        "copies",
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                            />
+                                        </div>
+
+
+                                        {/* Color */}
+
+                                        <div className={styles.field}>
+                                            <label>
+                                                Color
+                                            </label>
+
+                                            <select
+                                                value={file.colorMode}
+                                                onChange={(e) =>
+                                                    updateFile(
+                                                        index,
+                                                        "colorMode",
+                                                        e.target.value
+                                                    )
+                                                }
+                                            >
+                                                <option value="BW">
+                                                    Black & White
+                                                </option>
+
+                                                <option value="COLOR">
+                                                    Color
+                                                </option>
+                                            </select>
+                                        </div>
+
+
+                                        {/* Side */}
+
+                                        <div className={`${styles.field} ${styles.fullRow}`}>
+                                            <label>
+                                                Side
+                                            </label>
+
+                                            <select
+                                                value={file.side}
+                                                onChange={(e) =>
+                                                    updateFile(
+                                                        index,
+                                                        "side",
+                                                        e.target.value
+                                                    )
+                                                }
+                                            >
+                                                <option value="SINGLE">
+                                                    Single Side
+                                                </option>
+
+                                                <option value="DOUBLE">
+                                                    Double Side
+                                                </option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+
+                                    {/* Amount */}
+
+                                    {file.amount > 0 && (
+                                        <h3 className={styles.amountBadge}>
+                                            <IndianRupee size={14} />
+                                            Amount: ₹{file.amount}
+                                        </h3>
                                     )}
 
-                                    {paymentType === "UPI" && (
-                                        <p className={styles.paymentText}>
-                                            You will be taken to the
-                                            payment page.
-                                        </p>
-                                    )}
 
+                                    {/* Remove */}
 
                                     <button
                                         type="button"
-                                        onClick={
-                                            handlePaymentContinue
+                                        onClick={() =>
+                                            removeFile(index)
                                         }
-                                        className={
-                                            styles.createOrderButton
-                                        }
+                                        className={styles.removeButton}
                                     >
-                                        Continue to Payment
-                                        <ArrowRight size={18} />
+                                        <Trash2 size={16} />
+                                        Remove
                                     </button>
 
                                 </div>
-                            </>
-                        )}
-
-                    </div>
-                )}
+                            ))}
 
 
-                {/* Back */}
+                            {/* Add More */}
 
-                <button
-                    type="button"
-                    onClick={() =>
-                        window.location.href = "/"
-                    }
-                    className={styles.backButton}
-                >
-                    <ArrowLeft size={16} />
-                    Back to Register
-                </button>
+                            {files.length > 0 && files.length < 2 && (
+                                <>
+                                    <label className={styles.addMoreLabel}>
+                                        <strong>
+                                            <Plus size={16} />
+                                            Add Another PDF
+                                        </strong>
+                                    </label>
+
+                                    <input
+                                        type="file"
+                                        accept=".pdf,application/pdf"
+                                        onChange={handleFileSelect}
+                                        className={styles.fileInput}
+                                    />
+                                </>
+                            )}
+
+
+                            {/* Calculate */}
+
+                            <button
+                                type="button"
+                                onClick={handleCalculatePrice}
+                                className={styles.calculateButton}
+                            >
+                                <Calculator size={18} />
+                                Calculate Amount
+                            </button>
+
+
+                            {/* Grand Total */}
+
+                            {totalAmount > 0 && (
+                                <>
+                                    <h2 className={styles.totalAmount}>
+                                        Total Amount: ₹{totalAmount}
+                                    </h2>
+
+                                    {/* Payment Type */}
+
+                                    <div className={styles.paymentSection}>
+
+                                        <h3 className={styles.paymentHeading}>
+                                            <Wallet size={16} />
+                                            Select Payment Type
+                                        </h3>
+
+                                        <select
+                                            value={paymentType}
+                                            onChange={(e) =>
+                                                setPaymentType(
+                                                    e.target.value
+                                                )
+                                            }
+                                        >
+                                            {/* <option value="">
+                                            Select Payment Type
+                                        </option> */}
+
+                                            <option value="COD">
+                                                Cash on Delivery
+                                            </option>
+
+                                            {/* <option value="UPI">
+                                            UPI / QR Payment
+                                        </option> */}
+                                        </select>
+
+
+                                        {paymentType === "COD" && (
+                                            <p className={styles.paymentText}>
+                                                Pay cash at the shop.
+                                            </p>
+                                        )}
+
+                                        {paymentType === "UPI" && (
+                                            <p className={styles.paymentText}>
+                                                You will be taken to the
+                                                payment page.
+                                            </p>
+                                        )}
+
+
+                                        <button
+                                            type="button"
+                                            onClick={
+                                                handlePaymentContinue
+                                            }
+                                            className={
+                                                styles.createOrderButton
+                                            }
+                                        >
+                                            Continue to Payment
+                                            <ArrowRight size={18} />
+                                        </button>
+
+                                    </div>
+                                </>
+                            )}
+
+                        </div>
+                    )}
+
+
+                    {/* Back */}
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                            window.location.href = "/"
+                        }
+                        className={styles.backButton}
+                    >
+                        <ArrowLeft size={16} />
+                        Back to Register
+                    </button>
+
+                </div>
 
             </div>
-
-        </div>
-         </>
+        </>
     );
 }
 

@@ -104,13 +104,13 @@ const createOrder = async (req, res) => {
     try {
 
         const {
-            customerId,
             files,
             paymentMethod,
             transactionId,
             customerComment
         } = req.body;
 
+        const customerId = req.customerId;
 
         // --------------------------------
         // Find customer
@@ -284,19 +284,19 @@ const createOrder = async (req, res) => {
         // --------------------------------
 
         const orderData = {
-    customerId,
-    orderNumber,
-    files: updatedFiles,
-    totalAmount,
-    paymentMethod,
-    customerComment: customerComment?.trim() || undefined
-};
+            customerId,
+            orderNumber,
+            files: updatedFiles,
+            totalAmount,
+            paymentMethod,
+            customerComment: customerComment?.trim() || undefined
+        };
 
-if (paymentMethod === "GPay") {
-    orderData.transactionId = transactionId.trim();
-}
+        if (paymentMethod === "GPay") {
+            orderData.transactionId = transactionId.trim();
+        }
 
-const order = new Order(orderData);
+        const order = new Order(orderData);
         await order.save();
 
 
@@ -357,9 +357,10 @@ const getOrderByNumber = async (req, res) => {
     try {
 
         const { orderNumber } = req.params;
-
+        
         const order = await Order.findOne({
-            orderNumber
+            orderNumber,
+            customerId: req.customerId
         });
 
         if (!order) {
@@ -394,10 +395,9 @@ const getMyOrders = async (req, res) => {
 
     try {
 
-        const { customerId } = req.params;
 
         const orders = await Order.find({
-            customerId
+            customerId: req.customerId
         }).sort({
             createdAt: -1
         });

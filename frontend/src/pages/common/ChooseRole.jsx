@@ -9,7 +9,7 @@ function ChooseRole() {
     const selectrole = (role) => {
         localStorage.setItem("selectrole", role)
         if (role === "customer") {
-            navigate("/register");
+            navigate("/login");
         } else {
             navigate("/owner-login");
         }
@@ -20,7 +20,7 @@ function ChooseRole() {
   const savedRole = localStorage.getItem("selectrole");
 
   if (savedRole === "customer") {
-    navigate("/register", { replace: true });
+    navigate("/login", { replace: true });
   } else if (savedRole === "owner") {
     navigate("/owner-login", { replace: true });
   }
@@ -40,6 +40,7 @@ function ChooseRole() {
                 <p className={styles.subtitle}>
                     Welcome! Choose how you want to continue.
                 </p>
+                
 
                 <button
                     className={styles.customer}
