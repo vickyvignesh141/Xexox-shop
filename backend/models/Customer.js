@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 const mongoose = require("mongoose")
 
 const customerSchema = new mongoose.Schema({
@@ -18,7 +19,7 @@ const customerSchema = new mongoose.Schema({
         required: true,
         trim: true,
         enum: [
-"Artificial Intelligence & Data Science Engineering",            "Automobile Engineering",
+            "Artificial Intelligence & Data Science Engineering", "Automobile Engineering",
             "Civil Engineering",
             "Electrical and Electronics Engineering",
             "Electronics and Communication Engineering",
@@ -66,13 +67,26 @@ const customerSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     },
-}, {
-    collection: "customers",
-    versionKey: false,  // collection name in db
-    timestamps: true
+    password: {
+        type: String,
+        required: true,
+        select: false,
+        minlength: 3,
+        maxlength: 6,
+    },
+},
+    {
+        collection: "customers",
+        versionKey: false,  // collection name in db
+        timestamps: true
 
+    });
+customerSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
+
+    this.password = await bcrypt.hash(this.password, 12);
 });
 
 module.exports = mongoose.model("Customer", customerSchema);

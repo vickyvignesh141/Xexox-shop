@@ -63,6 +63,19 @@
   margin-top: 20px;
 }
 
+
+.registerButton {
+  border: none;
+  background: none;
+  color: #007bff;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.registerButton:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 450px) {
   .loginContainer {
     width: auto;

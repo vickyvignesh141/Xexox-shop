@@ -218,7 +218,7 @@ function CustomerRegister() {
             <button
               type="button"
               className={styles.signInButton}
-              onClick={() => navigate("/customer-login")}
+              onClick={() => navigate("/login")}
             >
               Sign in
             </button>

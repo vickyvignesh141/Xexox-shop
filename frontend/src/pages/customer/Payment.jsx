@@ -18,6 +18,7 @@ import Header from "../common/header.jsx"; // Import the Header component
 
 function Payment() {
     const navigate = useNavigate();
+    const customerToken = localStorage.getItem("customerToken");
 
     const [transactionId, setTransactionId] = useState("");
     const [customerComment, setCustomerComment] = useState("");
@@ -78,7 +79,6 @@ function Payment() {
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}/api/orders`,
                 {
-                    customerId: pendingOrder.customerId,
                     files: pendingOrder.files,
                     paymentMethod: "COD",
                     customerComment: customerComment.trim()
@@ -128,7 +128,6 @@ function Payment() {
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}/api/orders`,
                 {
-                    customerId: pendingOrder.customerId,
                     files: pendingOrder.files,
                     paymentMethod: "GPay",
                     transactionId: transactionId.trim(),

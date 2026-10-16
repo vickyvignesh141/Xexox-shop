@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const { createCustomer, getCustomerByMobile } = require("../controllers/customerController");
+const { createCustomer, loginCustomer, getCustomerByMobile } = require("../controllers/customerController");
 
 router.post("/", createCustomer)
-router.get("/:mobile", getCustomerByMobile)
+router.post("/login", loginCustomer);
+// router.get("/:mobile", getCustomerByMobile)
+
 module.exports = router;
