@@ -308,3 +308,52 @@
 @media (prefers-reduced-motion: reduce) {
   .form input, .form select, .form button, .form select::picker-icon { transition: none; }
 }
+
+
+.passwordField {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.passwordField input {
+  width: 100%;
+  padding-right: 46px;
+  box-sizing: border-box;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.passwordHint {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: -8px;
+}
+
+.signInText {
+  text-align: center;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.signInButton {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
