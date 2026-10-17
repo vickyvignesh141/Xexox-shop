@@ -1,33 +1,46 @@
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./OrderHistory.module.css";
 
 function OrderHistory() {
+    const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [view, setView] = useState("CURRENT");
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const customerToken = localStorage.getItem("customerToken");
+
 
     const customerId = localStorage.getItem("xeroxCustomerId");
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await axios.get(
-                    `${import.meta.env.VITE_API_URL}/api/orders/customer/${customerId}`
-                );
-                setOrders(response.data.orders);
-            } catch (error) {
-                alert(
-                    error.response?.data?.message ||
-                    "Failed to load orders"
-                );
-            }
-        };
+   useEffect(() => {
+    const fetchOrders = async () => {
+        try {
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_URL}/api/orders/my-orders`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${customerToken}`,
+                    },
+                }
+            );
 
-        if (customerId) {
-            fetchOrders();
+            setOrders(response.data.orders);
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                "Failed to load orders"
+            );
         }
-    }, [customerId]);
+    };
+
+    if (customerToken) {
+        fetchOrders();
+    } else {
+        navigate("/login");
+    }
+}, [customerToken, navigate]);
 
     const displayedOrders =
         view === "CURRENT"
@@ -87,7 +100,7 @@ function OrderHistory() {
                     displayedOrders.map((order) => (
                         <div key={order._id} className={styles.orderCard}>
                             <div className={styles.orderHeader}>
-                                <h2>Order #{order.orderNumber}</h2>
+                                <h2>Order : {order.orderNumber}</h2>
                                 <span className={styles.orderStatus}>
                                     {order.orderStatus}
                                 </span>

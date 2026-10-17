@@ -86,12 +86,13 @@ function UploadOrder() {
 
                 const response = await axios.post(
                     `${import.meta.env.VITE_API_URL}/api/upload`,
+                    formData,
                     {
                         headers: {
                             Authorization: `Bearer ${customerToken}`,
                         },
                     },
-                    formData
+                    
                 );
 
                 uploadedResults.push({
