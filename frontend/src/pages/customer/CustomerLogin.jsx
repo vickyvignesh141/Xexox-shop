@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import styles from "./CustomerLogin.module.css";
 
 function CustomerLogin() {
@@ -11,6 +10,7 @@ function CustomerLogin() {
 
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e) => {
@@ -34,10 +34,7 @@ function CustomerLogin() {
 
       // Save customer ID if other frontend pages need it
       if (response.data.customer?._id) {
-        localStorage.setItem(
-          "xeroxCustomerId",
-          response.data.customer._id
-        );
+        localStorage.setItem("xeroxCustomerId", response.data.customer._id);
       }
 
       toast.success("Login successful!");
@@ -60,12 +57,15 @@ function CustomerLogin() {
 
       <h1 className={styles.h1}>WELCOME BACK</h1>
 
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleLogin} autoComplete="on">
         <div className={styles.formGroup}>
           <label htmlFor="phone">Phone Number</label>
           <input
             id="phone"
+            name="username"
             type="tel"
+            inputMode="numeric"
+            autoComplete="username"
             placeholder="Enter Your Phone Number"
             value={mobile}
             onChange={(e) => setMobile(e.target.value)}
@@ -75,14 +75,27 @@ function CustomerLogin() {
 
         <div className={styles.formGroup}>
           <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Enter Your Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className={styles.passwordWrapper}>
+            <input
+  id="password"
+  name="password"
+  type={showPassword ? "text" : "password"}
+  autoComplete="current-password"
+  placeholder="Enter Your Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  required
+/>
+            <button
+              type="button"
+              className={styles.eyeButton}
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
         <button
@@ -104,16 +117,17 @@ function CustomerLogin() {
       <p className={styles.footerText}>
         Welcome back! Please login to continue.
       </p>
-      <p>
-  No account?{" "}
-  <button
-    type="button"
-    onClick={() => navigate("/register")}
-    className={styles.registerButton}
-  >
-    Register
-  </button>
-</p>
+
+      <p className={styles.registerRow}>
+        No account?{" "}
+        <button
+          type="button"
+          onClick={() => navigate("/register")}
+          className={styles.registerButton}
+        >
+          Register
+        </button>
+      </p>
     </div>
   );
 }

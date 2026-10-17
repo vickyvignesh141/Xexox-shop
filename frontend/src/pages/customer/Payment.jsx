@@ -84,6 +84,11 @@ function Payment() {
                     customerComment: customerComment.trim()
     ? customerComment.trim()
     : undefined,    
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${customerToken}`,
+                    },
                 }
             );
 

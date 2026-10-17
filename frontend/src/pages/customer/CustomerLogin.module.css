@@ -1,85 +1,289 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+/* ===========================
+   Theme
+=========================== */
 .loginContainer {
-  width: 350px;
-  margin: 100px auto;
-  padding: 30px;
-  background-color: #ffffff;
+  --blue: #1d4ed8;
+  --blue-dark: #1e3a8a;
+  --blue-light: #93c5fd;
+  --flame: #f97316;
+  --border: #dbe4f0;
+  --text: #0f172a;
+  --muted: #64748b;
+
+  width: 100%;
+  max-width: 380px;
+  margin: 60px auto;
+  padding: 44px 36px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--blue);
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  font-family: Arial, sans-serif;
+  box-shadow: 0 10px 30px rgba(29, 78, 216, 0.08);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text);
 }
 
+/* ===========================
+   Heading
+=========================== */
 .h1 {
   text-align: center;
-  color: #800000;
-  font-size: 26px;
-  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 32px;
+  background: linear-gradient(90deg, var(--blue), var(--flame));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
+/* ===========================
+   Form
+=========================== */
 .formGroup {
   display: flex;
   flex-direction: column;
+  gap: 8px;
   margin-bottom: 20px;
 }
 
 .formGroup label {
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #333333;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue-dark);
 }
 
 .formGroup input {
-  padding: 12px;
-  border: 1px solid #cccccc;
-  border-radius: 6px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
   font-size: 14px;
-  outline: none;
+  font-family: inherit;
+  color: var(--text);
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formGroup input::placeholder {
+  color: #94a3b8;
+}
+
+.formGroup input:hover:not(:disabled) {
+  border-color: var(--blue-light);
 }
 
 .formGroup input:focus {
-  border-color: #800000;
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
 }
 
-.loginButton {
+/* ===========================
+   Password eye toggle
+=========================== */
+.passwordWrapper {
+  position: relative;
   width: 100%;
-  padding: 12px;
-  background-color: #800000;
-  color: white;
+}
+
+.passwordWrapper input {
+  padding-right: 44px;
+}
+
+.eyeButton {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
+  padding: 0;
+  color: var(--muted);
   cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
-.loginButton:hover {
-  background-color: #600000;
+.eyeButton:hover {
+  color: var(--blue);
+  background: rgba(29, 78, 216, 0.08);
 }
 
+.eyeButton:focus-visible {
+  outline: 2px solid rgba(29, 78, 216, 0.35);
+  outline-offset: 1px;
+}
+
+/* ===========================
+   Login button
+=========================== */
+.loginButton {
+  width: 100%;
+  margin-top: 8px;
+  padding: 13px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--blue), var(--flame));
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.loginButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: 0 10px 22px rgba(249, 115, 22, 0.3);
+}
+
+.loginButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.loginButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.loginButton:focus-visible {
+  outline: 3px solid rgba(29, 78, 216, 0.35);
+  outline-offset: 2px;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===========================
+   Footer text and register
+=========================== */
 .footerText {
   text-align: center;
-  color: #777777;
-  font-size: 12px;
-  margin-top: 20px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
+.registerRow {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 12px;
+}
 
 .registerButton {
-  border: none;
   background: none;
-  color: #007bff;
+  border: none;
+  padding: 0;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
-  font-weight: bold;
 }
 
 .registerButton:hover {
+  color: var(--flame);
   text-decoration: underline;
 }
 
-@media (max-width: 450px) {
+/* ===========================
+   Tablet (max 768px)
+=========================== */
+@media (max-width: 768px) {
   .loginContainer {
-    width: auto;
-    margin: 40px 16px;
-    padding: 24px;
+    margin: 40px auto;
+    padding: 40px 30px;
+  }
+}
+
+/* ===========================
+   Mobile (max 480px)
+=========================== */
+@media (max-width: 480px) {
+  .eyeButton {
+    width: 28px;
+    height: 28px;
+    right: 6px;
+  }
+
+  .loginContainer {
+    margin: 24px auto;
+    padding: 32px 22px;
+    border-radius: 10px;
+  }
+
+  .h1 {
+    font-size: 20px;
+    margin-bottom: 26px;
+  }
+
+  .formGroup {
+    margin-bottom: 16px;
+  }
+
+  .formGroup input {
+    padding: 11px 12px;
+    font-size: 13px;
+  }
+
+  .loginButton {
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  .footerText,
+  .registerRow {
+    font-size: 12px;
+  }
+}
+
+/* ===========================
+   Small phones (max 360px)
+=========================== */
+@media (max-width: 360px) {
+  .loginContainer {
+    padding: 28px 18px;
+  }
+
+  .h1 {
+    font-size: 18px;
+  }
+}
+
+/* ===========================
+   Reduced motion
+=========================== */
+@media (prefers-reduced-motion: reduce) {
+  .loginButton,
+  .formGroup input,
+  .spin {
+    transition: none;
+    animation: none;
   }
 }
