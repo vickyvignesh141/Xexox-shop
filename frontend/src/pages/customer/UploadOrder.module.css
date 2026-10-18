@@ -1,39 +1,40 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 /* ===========================
-   Page
+   Theme
 =========================== */
 .container {
-  --blue: #2563eb;
-  --blue-dark: #1d4ed8;
-  --blue-soft: #eff6ff;
-  --green: #10b981;
-  --green-dark: #059669;
+  --blue: #1d4ed8;
+  --blue-dark: #1e3a8a;
+  --blue-light: #93c5fd;
+  --flame: #f97316;
+  --green: #16a34a;
+  --green-bg: #dcfce7;
   --red: #dc2626;
-  --line: #e2e8f0;
-  --text: #1e293b;
-  --muted: #94a3b8;
+  --red-bg: #fef2f2;
+  --border: #dbe4f0;
+  --text: #0f172a;
+  --muted: #64748b;
 
   min-height: 100vh;
-  min-height: 100dvh;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
-  padding: 24px 16px;
-  padding-top: max(24px, env(safe-area-inset-top));
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: 40px 20px;
+  background: #f8fafc;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--text);
-  -webkit-text-size-adjust: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.container *,
-.container *::before,
-.container *::after {
-  box-sizing: border-box;
+/* ===========================
+   Top bar (outside the card)
+=========================== */
+.topBar {
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
 }
 
 /* ===========================
@@ -41,479 +42,146 @@
 =========================== */
 .form {
   width: 100%;
-  max-width: 560px;
+  max-width: 620px;
+  height: fit-content;
   background: #ffffff;
-  border: 1px solid var(--line);
-  border-top: 4px solid var(--blue);
-  border-radius: 18px;
-  padding: 28px 24px 24px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 36px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+}
+
+/* ===========================
+   Title row
+=========================== */
+.titleRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28px;
 }
 
 .title {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--line);
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--text);
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, var(--blue), var(--flame));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .title svg {
   color: var(--blue);
+  flex-shrink: 0;
 }
 
-/* ===========================
-   Shared text
-=========================== */
-.smallHeading {
-  margin: 0 0 8px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.form p {
-  margin: 0;
-}
-
-.form label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-/* ===========================
-   Inputs & selects
-=========================== */
-.form input:not([type="file"]),
-.form select {
-  width: 100%;
-  min-height: 52px;
-  padding: 0 16px;
-  border: 1.5px solid var(--line);
-  border-radius: 12px;
-  background-color: #f8fafc;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 500;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-}
-
-.form input:not([type="file"]):hover,
-.form select:hover {
-  border-color: #cbd5e1;
-  background-color: #ffffff;
-}
-
-.form input:not([type="file"]):focus,
-.form select:focus {
-  outline: none;
-  border-color: var(--blue);
-  background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
-}
-
-/* ===========================
-   Dropdown theme
-=========================== */
-.form select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding-right: 44px;
-  cursor: pointer;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-}
-
-.form select option {
-  padding: 12px 14px;
-  color: #0f172a;
+.statusButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
   background: #ffffff;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-@supports (appearance: base-select) {
-  .form select,
-  .form select::picker(select) {
-    appearance: base-select;
-  }
-
-  .form select {
-    background-image: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .form select::picker-icon {
-    color: var(--blue);
-    transition: transform 0.2s ease;
-  }
-
-  .form select:open::picker-icon {
-    transform: rotate(180deg);
-  }
-
-  .form select::picker(select) {
-    margin-top: 6px;
-    padding: 6px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: #ffffff;
-    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15);
-    max-height: 320px;
-  }
-
-  .form select option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text);
-    white-space: normal;
-    cursor: pointer;
-  }
-
-  .form select option::checkmark {
-    order: 2;
-    margin-left: auto;
-    color: var(--blue);
-  }
-
-  .form select option:hover,
-  .form select option:focus-visible {
-    background: var(--blue-soft);
-    color: var(--blue-dark);
-    outline: none;
-  }
-
-  .form select option:checked {
-    background: var(--blue-soft);
-    color: var(--blue-dark);
-    font-weight: 600;
-  }
+.statusButton:hover {
+  background: var(--blue);
+  color: #ffffff;
 }
 
 /* ===========================
-   File input (dropzone)
+   File input
 =========================== */
 .fileInput {
   width: 100%;
   padding: 14px;
-  border: 1.5px dashed #cbd5e1;
-  border-radius: 12px;
-  background: #f8fafc;
-  color: #64748b;
+  border: 1px dashed var(--blue-light);
+  border-radius: 8px;
+  background: #f8fbff;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 13px;
+  color: var(--muted);
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.fileInput:hover {
-  border-color: var(--blue);
-  background: var(--blue-soft);
 }
 
 .fileInput::file-selector-button {
-  padding: 9px 16px;
   margin-right: 12px;
+  padding: 8px 14px;
   border: none;
-  border-radius: 9px;
+  border-radius: 6px;
   background: var(--blue);
   color: #ffffff;
-  font-family: inherit;
   font-weight: 600;
-  font-size: 14px;
+  font-family: inherit;
   cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.fileInput::file-selector-button:hover {
-  background: var(--blue-dark);
 }
 
 /* ===========================
-   Selected files box
+   Selected files
 =========================== */
 .selectedFilesBox {
-  background: var(--blue-soft);
-  border: 1px solid #bfdbfe;
-  border-radius: 12px;
+  margin-top: 16px;
   padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.smallHeading {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue-dark);
+  margin-bottom: 8px;
 }
 
 .selectedName {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
   color: var(--text);
+  padding: 4px 0;
 }
 
 .selectedName svg {
-  flex: none;
   color: var(--blue);
+  flex-shrink: 0;
 }
 
-.selectedName span {
-  min-width: 0;
-  word-break: break-word;
-}
-
-/* ===========================
-   Uploaded section
-=========================== */
-.uploadedSection {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
-}
-
-.sectionHeading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.count {
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: var(--blue-soft);
-  color: var(--blue);
-  font-size: 12px;
-}
-
-/* ===========================
-   File card
-=========================== */
-.fileCard {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 16px;
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-}
-
-.fileTop {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.fileIcon {
-  flex: none;
-  margin-top: 1px;
-  color: var(--blue);
-}
-
-.fileInfo {
-  flex: 1;
-  min-width: 0;
-}
-
-.fileCardTitle {
-  margin: 0;
+.uploadButton {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--blue), var(--flame));
+  color: #ffffff;
   font-size: 14px;
   font-weight: 600;
-  line-height: 1.4;
-  color: var(--text);
-  word-break: break-word;
-}
-
-.pages {
-  margin-top: 2px !important;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.fieldGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.field {
-  min-width: 0;
-}
-
-.fullRow {
-  grid-column: 1 / -1;
-}
-
-.amountBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  align-self: flex-start;
-  margin: 0;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: var(--green-dark);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.removeButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  align-self: flex-start;
-  min-height: 40px;
-  padding: 0 14px;
-  border: 1px solid #fecaca;
-  border-radius: 10px;
-  background: #ffffff;
-  color: var(--red);
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.removeButton:hover {
-  background: #fef2f2;
-}
-
-/* ===========================
-   Add more
-=========================== */
-.addMoreLabel {
-  margin: 0 !important;
-}
-
-.addMoreLabel strong {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: normal;
-  text-transform: none;
-  color: var(--blue);
-}
-
-/* ===========================
-   Buttons
-=========================== */
-.uploadButton,
-.calculateButton,
-.createOrderButton,
-.backButton {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 100%;
-  min-height: 52px;
-  border-radius: 12px;
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.uploadButton {
-  border: none;
-  background: var(--green);
-  color: #ffffff;
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
-}
-
-.uploadButton:hover:not(:disabled) {
-  background: var(--green-dark);
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.25);
 }
 
 .uploadButton:disabled {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: not-allowed;
-}
-
-.calculateButton {
-  border: none;
-  background: var(--blue);
-  color: #ffffff;
-}
-
-.calculateButton:hover {
-  background: var(--blue-dark);
-}
-
-.createOrderButton {
-  border: none;
-  background: var(--green);
-  color: #ffffff;
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
-}
-
-.createOrderButton:hover {
-  background: var(--green-dark);
-}
-
-.backButton {
-  min-height: 48px;
-  border: 1.5px solid var(--line);
-  background: #ffffff;
-  color: #64748b;
-  font-size: 15px;
-}
-
-.backButton:hover {
-  background: #f1f5f9;
-}
-
-.uploadButton:active:not(:disabled),
-.calculateButton:active,
-.createOrderButton:active,
-.backButton:active,
-.removeButton:active {
-  transform: scale(0.98);
-}
-
-.form button:focus-visible,
-.fileInput:focus-visible {
-  outline: 2px solid var(--blue);
-  outline-offset: 2px;
 }
 
 .spin {
@@ -521,91 +189,385 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===========================
-   Total + Payment
+   Uploaded section
 =========================== */
-.totalAmount {
-  margin: 0;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: var(--blue-soft);
-  border: 1px solid #bfdbfe;
-  color: var(--blue-dark);
-  font-size: 18px;
-  font-weight: 700;
-  text-align: center;
+.uploadedSection {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
 }
 
-.paymentSection {
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--blue-dark);
+  margin-bottom: 14px;
+}
+
+.count {
+  background: var(--blue);
+  color: #ffffff;
+  font-size: 12px;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+/* ===========================
+   File card
+=========================== */
+.fileCard {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 14px;
+  background: #ffffff;
+}
+
+.fileTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-right: 40px;
+}
+
+.fileIcon {
+  color: var(--flame);
+  flex-shrink: 0;
+}
+
+.fileInfo {
+  min-width: 0;
+}
+
+.fileCardTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.pages {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Remove (dustbin, top-right corner, red) */
+.removeButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: var(--red);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.removeButton:hover {
+  background: var(--red-bg);
+  transform: scale(1.08);
+}
+
+.removeButton:focus-visible {
+  outline: 2px solid rgba(220, 38, 38, 0.35);
+  outline-offset: 1px;
+}
+
+/* ===========================
+   Fields
+=========================== */
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
+  gap: 6px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue-dark);
+}
+
+.field input,
+.field select,
+.paymentSection select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field input:focus,
+.field select:focus,
+.paymentSection select:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+}
+
+.fullRow {
+  grid-column: 1 / -1;
+}
+
+/* Amount (green) */
+.amountBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ===========================
+   Add more / calculate
+=========================== */
+.addMoreLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+  margin: 6px 0 10px;
+}
+
+.calculateButton {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s ease;
+}
+
+.calculateButton:hover {
+  background: #eff6ff;
+}
+
+/* ===========================
+   Total
+=========================== */
+.totalAmount {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* ===========================
+   Payment
+=========================== */
+.paymentSection {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f8fafc;
 }
 
 .paymentHeading {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
+  color: var(--blue-dark);
+  margin-bottom: 10px;
 }
 
 .paymentText {
-  font-size: 13px;
-  color: #64748b;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 8px 0 14px;
+}
+
+.createOrderButton {
+  width: 100%;
+  margin-top: 14px;
+  padding: 13px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--blue), var(--flame));
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.25);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.createOrderButton:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
 }
 
 /* ===========================
-   Responsive
-   Small phones 320-360 | Phones 360-599 | Tablets 600-1024 | Laptops 1025+
+   Back
+=========================== */
+.backButton {
+  width: 100%;
+  margin-top: 22px;
+  padding: 10px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.backButton:hover {
+  color: var(--blue);
+}
+
+/* ===========================
+   Tablet (max 768px)
+=========================== */
+@media (max-width: 768px) {
+  .container {
+    padding: 30px 16px;
+  }
+
+  .form {
+    padding: 28px;
+  }
+}
+
+/* ===========================
+   Mobile (max 480px)
+=========================== */
+@media (max-width: 480px) {
+  .container {
+    padding: 20px 12px;
+  }
+
+  .form {
+    padding: 22px 18px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .topBar {
+    justify-content: stretch;
+  }
+
+  .statusButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .fileCard {
+    padding: 14px;
+  }
+
+  .removeButton {
+    top: 8px;
+    right: 8px;
+  }
+
+  .fileTop {
+    padding-right: 36px;
+  }
+
+  .field input,
+  .field select,
+  .paymentSection select {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+
+  .uploadButton,
+  .calculateButton,
+  .createOrderButton {
+    font-size: 13px;
+  }
+}
+
+/* ===========================
+   Small phones (max 360px)
 =========================== */
 @media (max-width: 360px) {
-  .container { padding: 14px 10px; }
-  .form { padding: 22px 14px 18px; gap: 14px; border-radius: 14px; }
-  .title { font-size: 19px; }
-  .fileCard { padding: 14px 12px; }
-  .fieldGrid { gap: 10px; }
-  .form input:not([type="file"]),
-  .form select { padding: 0 12px; min-height: 48px; }
-  .form select { padding-right: 36px; }
+  .form {
+    padding: 18px 14px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
 }
 
-@media (max-width: 599px) {
-  .container { align-items: flex-start; }
-  .title { font-size: 20px; }
-}
-
-@media (min-width: 600px) and (max-width: 1024px) {
-  .form { max-width: 620px; padding: 38px 34px 32px; gap: 18px; }
-  .fileCard { padding: 20px; }
-  .fieldGrid { grid-template-columns: 1fr 1fr 1fr; }
-  .fullRow { grid-column: auto; }
-}
-
-@media (min-width: 1025px) {
-  .container { align-items: flex-start; padding-top: 48px; }
-  .form { max-width: 600px; padding: 38px 34px 32px; gap: 18px; }
-  .fileCard { padding: 20px; }
-  .fieldGrid { grid-template-columns: 1fr 1fr 1fr; }
-  .fullRow { grid-column: auto; }
-}
-
-@media (max-height: 500px) and (orientation: landscape) {
-  .container { align-items: flex-start; }
-}
-
+/* ===========================
+   Reduced motion
+=========================== */
 @media (prefers-reduced-motion: reduce) {
-  .form input,
-  .form select,
-  .form button,
-  .spin { transition: none; animation: none; }
+  .spin,
+  .removeButton,
+  .createOrderButton,
+  .statusButton,
+  .calculateButton {
+    animation: none;
+    transition: none;
+  }
 }
