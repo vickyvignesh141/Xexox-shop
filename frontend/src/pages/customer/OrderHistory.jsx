@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -14,33 +15,33 @@ function OrderHistory() {
 
     const customerId = localStorage.getItem("xeroxCustomerId");
 
-   useEffect(() => {
-    const fetchOrders = async () => {
-        try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/orders/my-orders`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${customerToken}`,
-                    },
-                }
-            );
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await axios.get(
+                    `${import.meta.env.VITE_API_URL}/api/orders/my-orders`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${customerToken}`,
+                        },
+                    }
+                );
 
-            setOrders(response.data.orders);
-        } catch (error) {
-            toast.error(
-                error.response?.data?.message ||
-                "Failed to load orders"
-            );
+                setOrders(response.data.orders);
+            } catch (error) {
+                toast.error(
+                    error.response?.data?.message ||
+                    "Failed to load orders"
+                );
+            }
+        };
+
+        if (customerToken) {
+            fetchOrders();
+        } else {
+            navigate("/login");
         }
-    };
-
-    if (customerToken) {
-        fetchOrders();
-    } else {
-        navigate("/login");
-    }
-}, [customerToken, navigate]);
+    }, [customerToken, navigate]);
 
     const displayedOrders =
         view === "CURRENT"
@@ -50,6 +51,25 @@ function OrderHistory() {
     const handleSelectView = (selectedView) => {
         setView(selectedView);
         setDropdownOpen(false);
+    };
+
+
+    const handleViewFile = async (s3Key) => {
+        try {
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_URL}/api/files/view-url`,
+                {
+                    params: { s3Key },
+                    headers: {
+                        Authorization: `Bearer ${customerToken}`,
+                    },
+                }
+            );
+
+            window.open(response.data.url, "_blank", "noopener,noreferrer");
+        } catch (error) {
+            toast.error("Unable to open PDF");
+        }
     };
 
     return (
@@ -106,14 +126,16 @@ function OrderHistory() {
                                 </span>
                             </div>
                             <div className={styles.orderDetails}>
-                                <div className={styles.detailItem}>
-                                    <span className={styles.detailLabel}>
-                                        Payment Status
-                                    </span>
-                                    <span className={styles.detailValue}>
-                                        {order.paymentVerificationStatus}
-                                    </span>
-                                </div>
+                                {order.paymentMethod === "GPay" && (
+                                    <div className={styles.detailItem}>
+                                        <span className={styles.detailLabel}>
+                                            Payment Status
+                                        </span>
+                                        <span className={styles.detailValue}>
+                                            {order.paymentVerificationStatus}
+                                        </span>
+                                    </div>
+                                )}
                                 <div className={styles.detailItem}>
                                     <span className={styles.detailLabel}>
                                         Payment Method
@@ -131,13 +153,33 @@ function OrderHistory() {
                                     </span>
                                 </div>
                                 <div className={styles.detailItem}>
+                                    <span className={styles.detailLabel}>Files</span>
+
+                                    <div>
+                                        {order.files.map((file, index) => (
+                                            <div key={file.s3Key || index}>
+                                                <span>{file.filename}</span>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleViewFile(file.s3Key)}
+                                                    title="View PDF"
+                                                    aria-label={`View ${file.filename}`}
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className={styles.detailItem}>
                                     <span className={styles.detailLabel}>
                                         Date
                                     </span>
                                     <span className={styles.detailValue}>
                                         {new Date(
                                             order.createdAt
-                                        ).toLocaleDateString()}
+                                        ).toLocaleDateString("en-GB")}
                                     </span>
                                 </div>
                             </div>

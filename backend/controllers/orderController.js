@@ -352,39 +352,39 @@ const createOrder = async (req, res) => {
 // GET ORDER BY NUMBER
 // ======================================================
 
-const getOrderByNumber = async (req, res) => {
+// const getOrderByNumber = async (req, res) => {
 
-    try {
+//     try {
 
-        const { orderNumber } = req.params;
+//         const { orderNumber } = req.params;
         
-        const order = await Order.findOne({
-            orderNumber,
-            customerId: req.customerId
-        });
+//         const order = await Order.findOne({
+//             orderNumber,
+//             customerId: req.customerId
+//         });
 
-        if (!order) {
-            return res.status(404).json({
-                message: "Order not found"
-            });
-        }
+//         if (!order) {
+//             return res.status(404).json({
+//                 message: "Order not found"
+//             });
+//         }
 
-        return res.status(200).json({
-            order
-        });
+//         return res.status(200).json({
+//             order
+//         });
 
-    } catch (error) {
+//     } catch (error) {
 
-        console.error(
-            "Get order error:",
-            error
-        );
+//         console.error(
+//             "Get order error:",
+//             error
+//         );
 
-        return res.status(500).json({
-            message: "Internal server error"
-        });
-    }
-};
+//         return res.status(500).json({
+//             message: "Internal server error"
+//         });
+//     }
+// };
 
 
 // ======================================================
@@ -419,14 +419,51 @@ const getMyOrders = async (req, res) => {
     }
 };
 
+const getCustomerPdfUrl = async (req, res) => {
+    try {
+        const { s3Key } = req.query;
 
+        if (!s3Key) {
+            return res.status(400).json({ message: "S3 key is required" });
+        }
+
+        // Verify this PDF belongs to this customer's order
+        const order = await Order.findOne({
+            customerId: req.customerId,
+            "files.s3Key": s3Key,
+        });
+
+        if (!order) {
+            return res.status(404).json({ message: "File not found" });
+        }
+
+        const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+
+        const command = new GetObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET,
+            Key: s3Key,
+        });
+
+        const url = await getSignedUrl(s3, command, {
+            expiresIn: 3600,
+        });
+
+        return res.status(200).json({ url });
+    } catch (error) {
+        console.error("Customer PDF URL error:", error);
+        return res.status(500).json({
+            message: "Unable to generate PDF URL",
+        });
+    }
+};
 // ======================================================
 // EXPORT
 // ======================================================
 
 module.exports = {
     createOrder,
-    getOrderByNumber,
+    // getOrderByNumber,
     getMyOrders,
-    calculatePrice
+    calculatePrice,
+    getCustomerPdfUrl 
 };

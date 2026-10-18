@@ -92,11 +92,15 @@ const orderSchema = new mongoose.Schema(
         },
 
         paymentVerificationStatus: {
-            type: String,
-            required: true,
-            enum: ["PENDING", "VERIFIED", "REJECTED"],
-            default: "PENDING"
-        },
+    type: String,
+    required: function () {
+        return this.paymentMethod === "GPay";
+    },
+    enum: ["PENDING", "VERIFIED", "REJECTED"],
+    default: function () {
+        return this.paymentMethod === "GPay" ? "PENDING" : undefined;
+    }
+},
 
         orderStatus: {
             type: String,

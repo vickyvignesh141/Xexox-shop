@@ -11,7 +11,7 @@
     const ownerRoutes = require("./routes/ownerRoutes");
     const ownerAuthRoutes = require("./routes/ownerAuthRoutes");
     const uploadRoutes = require("./routes/uploadRoutes");
-
+    const fileRoutes = require("./routes/fileRoutes");
     const feedbackRoutes = require("./routes/feedbackRoutes");
 
     const app = express();
@@ -39,7 +39,7 @@
     app.use("/api/owner", ownerRoutes);
     app.use("/api/owner", ownerAuthRoutes);
     app.use("/api/upload", uploadRoutes);
-
+    app.use("/api/files", fileRoutes);
     app.use("/api/feedback", feedbackRoutes);
 
     // Error handling - MUST be last
