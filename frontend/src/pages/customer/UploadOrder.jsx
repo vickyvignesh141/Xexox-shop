@@ -9,6 +9,7 @@ import {
     Plus,
     Calculator,
     ArrowLeft,
+    Eye,
     Wallet,
     ArrowRight,
     Loader2,
@@ -103,6 +104,7 @@ function UploadOrder() {
 
                 uploadedResults.push({
                     ...response.data.file,
+                    originalFile: file,
                     copies: 1,
                     colorMode: "BW",
                     side: "SINGLE",
@@ -304,12 +306,23 @@ function UploadOrder() {
                         <div className={styles.selectedFilesBox}>
                             <h3 className={styles.smallHeading}>Files Selected</h3>
 
-                            {selectedFiles.map((file, index) => (
-                                <p key={index} className={styles.selectedName}>
-                                    <FileText size={16} />
-                                    <span>{file.name}</span>
-                                </p>
-                            ))}
+                           {selectedFiles.map((file, index) => (
+  <div key={index} className={styles.selectedName}>
+    <FileText size={16} />
+    <span>{file.name}</span>
+
+    <button
+      type="button"
+      title="Preview PDF"
+      onClick={() => {
+        const url = URL.createObjectURL(file);
+        window.open(url, "_blank", "noopener,noreferrer");
+      }}
+    >
+      <Eye size={18} />
+    </button>
+  </div>
+))}
                         </div>
                     )}
 
@@ -364,6 +377,44 @@ function UploadOrder() {
                                                 Pages: {file.pageCount}
                                             </p>
                                         </div>
+                                        <button
+                                            type="button"
+                                            title="View PDF"
+                                            aria-label="View PDF"
+                                            onClick={async () => {
+                                                if (file.originalFile) {
+                                                    const previewUrl = URL.createObjectURL(file.originalFile);
+                                                    window.open(previewUrl, "_blank", "noopener,noreferrer");
+                                                    return;
+                                                }
+                                                try {
+                                                    const token = localStorage.getItem("customerToken");
+                                                    const response = await axios.get(
+                                                        `${import.meta.env.VITE_API_URL}/api/files/view-url`,
+                                                        {
+                                                            params: { s3Key: file.s3Key },
+                                                            headers: {
+                                                                Authorization: `Bearer ${token}`,
+                                                            },
+                                                        }
+                                                    );
+
+                                                    window.open(
+                                                        response.data.url,
+                                                        "_blank",
+                                                        "noopener,noreferrer"
+                                                    );
+
+                                                } catch (error) {
+                                                    console.error("PDF preview error:", error.response?.data || error);
+                                                    toast.error(
+                                                        error.response?.data?.message || "Unable to preview PDF"
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            <Eye size={18} />
+                                        </button>
                                     </div>
 
                                     <div className={styles.fieldGrid}>
