@@ -13,16 +13,20 @@ import Payment from "./pages/customer/Payment";
 import OwnerLogin from "./pages/owner/OwnerLogin";
 import OwnerOrders from "./pages/owner/OwnerOrders";
 
+import Header from "./pages/common/header";
 import Feedback, { FeedbackButton } from "./pages/feedback/FeedBack"
 
 function App() {
   return (
     <BrowserRouter>
+
+      <Header />
+
       <Routes>
-<Route path="/" element={<ChooseRole />} />
-<Route path="/register" element={<CustomerRegister />} />
-<Route path="/login" element={<CustomerLogin/>}/>
-<Route path="/upload" element={<UploadOrder/>}/>
+        <Route path="/" element={<ChooseRole />} />
+        <Route path="/register" element={<CustomerRegister />} />
+        <Route path="/login" element={<CustomerLogin />} />
+        <Route path="/upload" element={<UploadOrder />} />
 
 
         <Route path="/tracking" element={<OrderTracking />} />
@@ -32,11 +36,11 @@ function App() {
 
         <Route path="/owner-login" element={<OwnerLogin />} />
 
-        
+
         <Route element={<ProtectedOwnerRoute />}>
           <Route path="/owner-orders" element={<OwnerOrders />} />
         </Route>
-        
+
         <Route path="/feedback" element={<Feedback />} />
 
       </Routes>

@@ -1,15 +1,19 @@
+
 .header {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0b2b5c 0%, #1b4a8b 100%);
+  min-height: 84px;
   padding: 0.9rem 2rem;
-  font-family: 'Inter', system-ui, sans-serif;
-  color: white;
   position: relative;
+  isolation: isolate;
+  background: linear-gradient(135deg, #0b2b5c 0%, #1b4a8b 100%);
+  font-family: "Inter", system-ui, sans-serif;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(11, 43, 92, 0.18);
 }
 
-/* ✅ the line that runs across the header */
+/* Decorative gold line */
 .header::before {
   content: "";
   position: absolute;
@@ -20,64 +24,174 @@
   background: linear-gradient(
     to right,
     transparent,
-    rgba(247, 201, 72, 0.6),
+    rgba(247, 201, 72, 0.65),
     transparent
   );
   transform: translateY(-50%);
-  z-index: 0;
+  z-index: -1;
 }
 
 .brand {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
+  padding: 0.25rem 1.2rem;
   position: relative;
   z-index: 1;
-  background: #0f3570;                    /* matches header bg to cover line */
-  padding: 0 1.2rem;                      /* creates the "gap" effect */
-  border-radius: 8px;
+  background: #10366f;
+  border: 1px solid rgba(247, 201, 72, 0.12);
+  border-radius: 12px;
+}
+
+.line {
+  width: 24px;
+  height: 2px;
+  background: #f7c948;
+  border-radius: 10px;
 }
 
 .logoIcon {
-  background: #f7c948;
-  color: #0b2b5c;
-  font-weight: 800;
-  font-size: 1.8rem;
-  width: 48px;
-  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(145deg, #ffda69, #f7c948);
+  color: #0b2b5c;
+  font-size: 1.8rem;
+  font-weight: 800;
   line-height: 1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .brandName {
+  margin: 0;
+  color: #fff;
   font-size: 1.7rem;
   font-weight: 700;
   letter-spacing: -0.5px;
-  color: white;
-  margin: 0;
+  line-height: 1.2;
   white-space: nowrap;
 }
 
 .brandName span {
-  font-weight: 300;
+  margin-left: 4px;
   color: #f7c948;
   font-size: 1.2rem;
-  margin-left: 4px;
+  font-weight: 300;
   vertical-align: middle;
 }
 
-@media (max-width: 480px) {
+/* Logout button */
+.logoutBtn {
+  position: absolute;
+  top: 50%;
+  right: 2rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid rgba(247, 201, 72, 0.55);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f7c948;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background: #f7c948;
+  color: #0b2b5c;
+  border-color: #f7c948;
+}
+
+.logoutBtn:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+.logoutBtn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .header {
+    min-height: 72px;
+    padding: 0.75rem 1rem;
+  }
+
+  .header::before {
+    left: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .brand {
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .line {
+    width: 12px;
+  }
+
+  .logoIcon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 1.5rem;
+  }
+
   .brandName {
     font-size: 1.3rem;
   }
+
+  .brandName span {
+    font-size: 1rem;
+  }
+
+  .logoutBtn {
+    right: 0.75rem;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 380px) {
+  .header {
+    justify-content: flex-start;
+    padding-right: 3.5rem;
+  }
+
+  .brand {
+    gap: 0.4rem;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .line {
+    display: none;
+  }
+
+  .brandName {
+    font-size: 1.15rem;
+  }
+
+  .brandName span {
+    font-size: 0.9rem;
+  }
+
   .logoIcon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    font-size: 1.3rem;
   }
 }

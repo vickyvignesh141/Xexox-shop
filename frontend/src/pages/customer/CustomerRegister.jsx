@@ -4,7 +4,6 @@ import { Toaster, toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Check } from "lucide-react";
 import styles from "./CustomerRegister.module.css";
-import Header from "../common/header";
 
 // Password rules shown under both password fields
 const getPasswordRules = (value) => [
@@ -92,7 +91,6 @@ function CustomerRegister() {
 
   return (
     <>
-      <Header />
 
       <div className={styles.container}>
         <Toaster position="top-right" richColors />

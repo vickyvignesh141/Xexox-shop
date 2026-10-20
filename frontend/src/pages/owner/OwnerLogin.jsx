@@ -4,7 +4,6 @@ import axios from "axios";
 import { Toaster, toast } from "sonner";
 import { Mail, Lock, LogIn, AlertCircle } from "lucide-react";
 import styles from "./Ownerlogin.module.css";
-import Header from "../common/header.jsx"; // Import the Header component
 
 function OwnerLogin() {
     const location = useLocation();
@@ -50,8 +49,7 @@ function OwnerLogin() {
 
     return (
         <>
-            {/* ✅ Header added here */}
-            <Header />
+           
             <div className={styles.container}>
                 <Toaster position="top-right" richColors />
                 <div className={styles.wrapper}>

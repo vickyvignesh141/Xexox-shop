@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import styles from "./Payment.module.css";
 import shopQR from "../../assets/QR.jpeg";
-import Header from "../common/header.jsx"; // Import the Header component
 
 
 function Payment() {
@@ -35,8 +34,6 @@ function Payment() {
     if (!pendingOrder) {
         return (
             <>
-                {/* ✅ Header added here */}
-                <Header />
                 <div className={styles.container}>
                     <div className={styles.form}>
 
@@ -168,8 +165,7 @@ function Payment() {
 
     return (
         <>
-            {/* ✅ Header added here */}
-            <Header />
+            
             <div className={styles.container}>
                 <Toaster position="top-right" richColors />
 
