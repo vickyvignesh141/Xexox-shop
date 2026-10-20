@@ -341,7 +341,9 @@ const filteredOrders = orders.filter((order) => {
                   <div>
                     <div className={styles.label}>Order Date</div>
                     <div className={styles.value}>
-                      {new Date(order.createdAt).toLocaleString()}
+                      {new Date(order.createdAt).toLocaleDateString("en-GB", {
+                        timeZone: "Asia/Kolkata",
+                      })}
                     </div>
                   </div>
                 </div>
