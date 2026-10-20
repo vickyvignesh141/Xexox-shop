@@ -201,40 +201,58 @@ function UploadOrder() {
     // -----------------------------------------
     // Continue based on payment type
     // -----------------------------------------
-    const handlePaymentContinue = () => {
-        const customerToken = localStorage.getItem("customerToken");
+ 
+const handlePaymentContinue = async () => {
+    const customerToken = localStorage.getItem("customerToken");
 
-        if (!customerToken) {
-            toast.error("Please login first", {
-                icon: <AlertTriangle size={18} />,
-            });
-            navigate("/login");
-            return;
-        }
+    if (!customerToken) {
+        toast.error("Please login first");
+        navigate("/login");
+        return;
+    }
 
-        if (files.length === 0) {
-            toast.warning("Please upload at least one PDF", {
-                icon: <AlertTriangle size={18} />,
-            });
-            return;
-        }
+    if (files.length === 0) {
+        toast.warning("Please upload at least one PDF");
+        return;
+    }
 
-        if (totalAmount <= 0) {
-            toast.warning("Please calculate the amount first", {
-                icon: <AlertTriangle size={18} />,
-            });
-            return;
-        }
+    if (!paymentType) {
+        toast.warning("Please select a payment type");
+        return;
+    }
 
-        if (!paymentType) {
-            toast.warning("Please select a payment type", {
-                icon: <AlertTriangle size={18} />,
-            });
-            return;
-        }
+    try {
+        const response = await axios.post(
+            `${import.meta.env.VITE_API_URL}/api/orders/calculate-price`,
+            {
+                files: files.map((file) => ({
+                    pageCount: file.pageCount,
+                    copies: file.copies,
+                    colorMode: file.colorMode,
+                    side: file.side,
+                })),
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${customerToken}`,
+                },
+            }
+        );
+
+        const calculatedFiles = response.data.files;
+
+        const updatedFiles = files.map((file, index) => ({
+            ...file,
+            amount: calculatedFiles[index].amount,
+        }));
+
+        const updatedTotal = updatedFiles.reduce(
+            (sum, file) => sum + Number(file.amount || 0),
+            0
+        );
 
         const orderData = {
-            files: files.map((file) => ({
+            files: updatedFiles.map((file) => ({
                 filename: file.originalFilename,
                 s3Key: file.s3Key,
                 fileSize: file.fileSize,
@@ -242,16 +260,21 @@ function UploadOrder() {
                 copies: file.copies,
                 colorMode: file.colorMode,
                 side: file.side,
+                amount: file.amount,
             })),
-            totalAmount,
+            totalAmount: updatedTotal,
             paymentType,
         };
 
-        // Save temporarily for Payment page
         localStorage.setItem("pendingOrder", JSON.stringify(orderData));
-
         navigate("/payment");
-    };
+    } catch (error) {
+        toast.error(
+            error.response?.data?.message || "Price calculation failed"
+        );
+    }
+};
+
 
     // -----------------------------------------
     // Remove uploaded file
@@ -513,9 +536,9 @@ function UploadOrder() {
                             {/* Grand Total */}
                             {totalAmount > 0 && (
                                 <>
-                                    <h2 className={styles.totalAmount}>
+                                    {/* <h2 className={styles.totalAmount}>
                                         Total Amount: ₹{totalAmount}
-                                    </h2>
+                                    </h2> */}
 
                                     {/* Payment Type */}
                                     <div className={styles.paymentSection}>
