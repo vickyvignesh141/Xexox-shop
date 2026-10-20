@@ -10,6 +10,7 @@ function OrderHistory() {
     const [orders, setOrders] = useState([]);
     const [view, setView] = useState("CURRENT");
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [deletingOrderId, setDeletingOrderId] = useState(null);
     const customerToken = localStorage.getItem("customerToken");
 
 
@@ -69,6 +70,70 @@ function OrderHistory() {
             window.open(response.data.url, "_blank", "noopener,noreferrer");
         } catch (error) {
             toast.error("Unable to open PDF");
+        }
+    };
+
+    const handleDeleteFile = async (orderId, s3Key) => {
+        if (!window.confirm("Delete this PDF?")) return;
+
+        try {
+            await axios.delete(
+                `${import.meta.env.VITE_API_URL}/api/orders/${orderId}/files`,
+                {
+                    data: { s3Key },
+                    headers: {
+                        Authorization: `Bearer ${customerToken}`,
+                    },
+                }
+            );
+
+            setOrders((prevOrders) =>
+                prevOrders.map((order) =>
+                    order._id === orderId
+                        ? {
+                            ...order,
+                            files: order.files.filter(
+                                (file) => file.s3Key !== s3Key
+                            ),
+                        }
+                        : order
+                )
+            );
+
+            toast.success("PDF deleted successfully");
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Failed to delete PDF"
+            );
+        }
+    };
+
+    const handleDeleteOrder = async (orderId) => {
+        if (!window.confirm("Delete the entire order and all its PDFs?")) return;
+
+        setDeletingOrderId(orderId);
+
+        try {
+            await axios.delete(
+                `${import.meta.env.VITE_API_URL}/api/orders/${orderId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${customerToken}`,
+                    },
+                }
+            );
+
+            setOrders((prevOrders) =>
+                prevOrders.filter((order) => order._id !== orderId)
+            );
+
+            toast.success("Order deleted successfully");
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Failed to delete order"
+            );
+        } finally {
+            setDeletingOrderId(null);
         }
     };
 
@@ -168,7 +233,17 @@ function OrderHistory() {
                                                 >
                                                     <Eye size={18} />
                                                 </button>
+                                                {order.orderStatus === "PENDING" && order.files.length > 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteFile(order._id, file.s3Key)}
+                                                    >
+                                                        Delete PDF
+                                                    </button>
+                                                )}
+
                                             </div>
+                                            
                                         ))}
                                     </div>
                                 </div>
@@ -183,6 +258,17 @@ function OrderHistory() {
                                     </span>
                                 </div>
                             </div>
+                            {order.orderStatus === "PENDING" && (
+    <button
+        type="button"
+        onClick={() => handleDeleteOrder(order._id)}
+        disabled={deletingOrderId === order._id}
+    >
+        {deletingOrderId === order._id
+            ? "Deleting..."
+            : "Delete Entire Order"}
+    </button>
+)}
                         </div>
                     ))
                 )}
