@@ -19,7 +19,6 @@ import {
     ClipboardList,
 } from "lucide-react";
 import styles from "./UploadOrder.module.css";
-import Header from "../common/header.jsx";
 
 function UploadOrder() {
     const navigate = useNavigate();
@@ -265,7 +264,7 @@ function UploadOrder() {
 
     return (
         <>
-            <Header />
+            
 
             <div className={styles.container}>
                 <Toaster position="top-right" richColors />
@@ -553,14 +552,14 @@ function UploadOrder() {
                     )}
 
                     {/* Back to Login */}
-                    <button
+                    {/* <button
                         type="button"
                         onClick={() => navigate("/login")}
                         className={styles.backButton}
                     >
                         <ArrowLeft size={16} />
                         Back to Login
-                    </button>
+                    </button> */}
                 </div>
             </div>
         </>

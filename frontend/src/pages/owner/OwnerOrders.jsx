@@ -18,7 +18,6 @@ import {
   FileCheck
 } from "lucide-react";
 import styles from "./OwnerOrders.module.css";
-import Header from "../common/header.jsx"; // Import the Header component
 
 
 function OwnerOrders() {
@@ -200,8 +199,7 @@ const filteredOrders = orders.filter((order) => {
 
   return (
      <>
-      {/* ✅ Header added here */}
-      <Header />
+     
     <div className={styles.container}>
       <Toaster position="top-right" richColors />
 
