@@ -3,7 +3,7 @@ const Customer = require("../models/Customer");
 const generateOrderNumber = require("../services/orderNumberService");
 const calculateFilePrice = require("../services/priceService");
 
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand,DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 const { PDFDocument } = require("pdf-lib");
 
@@ -456,6 +456,109 @@ const getCustomerPdfUrl = async (req, res) => {
         });
     }
 };
+
+
+const deletePendingOrderFile = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { s3Key } = req.body;
+
+        if (!s3Key) {
+            return res.status(400).json({
+                message: "S3 key is required"
+            });
+        }
+
+        const order = await Order.findOne({
+            _id: orderId,
+            customerId: req.customerId,
+            orderStatus: "PENDING",
+            "files.s3Key": s3Key
+        });
+
+        if (!order) {
+            return res.status(404).json({
+                message: "Pending order or PDF not found"
+            });
+        }
+
+        if (order.files.length <= 1) {
+            return res.status(400).json({
+                message: "Delete the entire order instead"
+            });
+        }
+
+        await s3.send(new DeleteObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET,
+            Key: s3Key
+        }));
+
+        order.files = order.files.filter(
+            file => file.s3Key !== s3Key
+        );
+
+        order.totalAmount = order.files.reduce(
+            (total, file) => total + file.amount,
+            0
+        );
+
+        await order.save();
+
+        return res.status(200).json({
+            message: "PDF deleted successfully"
+        });
+    } catch (error) {
+        console.error("Delete PDF error:", error);
+
+        return res.status(500).json({
+            message: "Unable to delete PDF"
+        });
+    }
+};
+
+const deletePendingOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findOne({
+            _id: orderId,
+            customerId: req.customerId,
+            orderStatus: "PENDING"
+        });
+
+        if (!order) {
+            return res.status(404).json({
+                message: "Pending order not found"
+            });
+        }
+
+        // Delete all PDFs from S3 first
+        for (const file of order.files) {
+            await s3.send(new DeleteObjectCommand({
+                Bucket: process.env.AWS_S3_BUCKET,
+                Key: file.s3Key
+            }));
+        }
+
+        // Delete order from MongoDB
+        await Order.deleteOne({
+            _id: order._id,
+            customerId: req.customerId,
+            orderStatus: "PENDING"
+        });
+
+        return res.status(200).json({
+            message: "Order and PDFs deleted successfully"
+        });
+    } catch (error) {
+        console.error("Delete order error:", error);
+
+        return res.status(500).json({
+            message: "Unable to delete order"
+        });
+    }
+};
+
 // ======================================================
 // EXPORT
 // ======================================================
@@ -465,5 +568,7 @@ module.exports = {
     // getOrderByNumber,
     getMyOrders,
     calculatePrice,
-    getCustomerPdfUrl 
+    getCustomerPdfUrl,
+    deletePendingOrder,
+    deletePendingOrderFile
 };
