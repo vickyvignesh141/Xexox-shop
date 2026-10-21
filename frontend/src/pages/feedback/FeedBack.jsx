@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -19,11 +19,26 @@ const MAX_DESCRIPTION_LENGTH = 500;
    Feedback form — render this on the /feedback route
 ============================================ */
 export default function FeedbackForm({}) {
+  const navigate = useNavigate(); 
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  
+
+
+  useEffect(() => {
+  if (!isSubmitted) return;
+
+  const timer = setTimeout(() => {
+    localStorage.removeItem("customerToken");
+    localStorage.removeItem("xeroxCustomerId");
+    navigate("/login", { replace: true });
+  }, 5000);
+
+  return () => clearTimeout(timer);
+}, [isSubmitted, navigate]);
 
   const validate = () => {
     const nextErrors = {};
@@ -63,14 +78,22 @@ export default function FeedbackForm({}) {
         setIsSubmitted(true);
 
     } catch (error) {
-        console.error("Feedback submit error:", error);
-        alert(
-            error.response?.data?.message ||
-            "Unable to send feedback"
-        );
-    } finally {
-        setIsSubmitting(false);
-    }
+    console.error("Feedback submit error:", error);
+
+    const status = error.response?.status;
+
+    const message =
+        status >= 500
+            ? "Server error. Please try again later."
+            : error.response?.data?.message ||
+              "Unable to send feedback. Please try again.";
+
+    toast.error(message, {
+        duration: 3000,
+    });
+} finally {
+    setIsSubmitting(false);
+}
 };
   const handleReset = () => {
     setEmail('');

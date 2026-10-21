@@ -6,6 +6,7 @@ import styles from "./header.module.css";
 
 const Header = () => {
   const navigate = useNavigate();
+  const isLoggedIn = Boolean(localStorage.getItem("customerToken"));
 
   const handleLogout = () => {
     localStorage.removeItem("customerToken");
@@ -28,6 +29,7 @@ const Header = () => {
         <span className={styles.line}></span>
       </div>
 
+      {isLoggedIn && (
       <button
         type="button"
         className={styles.logoutBtn}
@@ -37,6 +39,7 @@ const Header = () => {
       >
         <LogOut size={20} />
       </button>
+      )}
     </header>
   );
 };

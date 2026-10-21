@@ -30,10 +30,17 @@ function OrderHistory() {
 
                 setOrders(response.data.orders);
             } catch (error) {
-                toast.error(
-                    error.response?.data?.message ||
-                    "Failed to load orders"
-                );
+                const status = error.response?.status;
+
+                const message =
+                    status >= 500
+                        ? "Server error. Please try again later."
+                        : error.response?.data?.message ||
+                        "Registration failed. Please try again.";
+
+                toast.error(message, {
+                    duration: 3000,
+                });
             }
         };
 
@@ -102,9 +109,17 @@ function OrderHistory() {
 
             toast.success("PDF deleted successfully");
         } catch (error) {
-            toast.error(
-                error.response?.data?.message || "Failed to delete PDF"
-            );
+            const status = error.response?.status;
+
+            const message =
+                status >= 500
+                    ? "Server error. Please try again later."
+                    : error.response?.data?.message ||
+                    "Failed to delete PDF. Please try again.";
+
+            toast.error(message, {
+                duration: 3000,
+            });
         }
     };
 
@@ -129,9 +144,17 @@ function OrderHistory() {
 
             toast.success("Order deleted successfully");
         } catch (error) {
-            toast.error(
-                error.response?.data?.message || "Failed to delete order"
-            );
+            const status = error.response?.status;
+
+            const message =
+                status >= 500
+                    ? "Server error. Please try again later."
+                    : error.response?.data?.message ||
+                    "Failed to delete order. Please try again.";
+
+            toast.error(message, {
+                duration: 3000,
+            });
         } finally {
             setDeletingOrderId(null);
         }
@@ -243,7 +266,7 @@ function OrderHistory() {
                                                 )}
 
                                             </div>
-                                            
+
                                         ))}
                                     </div>
                                 </div>
@@ -259,16 +282,16 @@ function OrderHistory() {
                                 </div>
                             </div>
                             {order.orderStatus === "PENDING" && (
-    <button
-        type="button"
-        onClick={() => handleDeleteOrder(order._id)}
-        disabled={deletingOrderId === order._id}
-    >
-        {deletingOrderId === order._id
-            ? "Deleting..."
-            : "Delete Entire Order"}
-    </button>
-)}
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteOrder(order._id)}
+                                    disabled={deletingOrderId === order._id}
+                                >
+                                    {deletingOrderId === order._id
+                                        ? "Deleting..."
+                                        : "Delete Entire Order"}
+                                </button>
+                            )}
                         </div>
                     ))
                 )}

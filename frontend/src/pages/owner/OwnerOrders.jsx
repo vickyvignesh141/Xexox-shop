@@ -43,8 +43,9 @@ function OwnerOrders() {
 
     } catch (error) {
       console.error("Open PDF error:", error);
-      toast.error("Unable to open PDF");
-    }
+toast.error("Unable to open PDF. Please try again.", {
+  duration: 3000,
+});    }
   };
 
   const printPdf = async (s3Key) => {
@@ -70,8 +71,9 @@ function OwnerOrders() {
 
     } catch (error) {
       console.error("Print PDF error:", error);
-      toast.error("Unable to print PDF");
-    }
+toast.error("Unable to open PDF. Please try again.", {
+  duration: 3000,
+});    }
   };
 
   const fetchOrders = async () => {
@@ -89,77 +91,90 @@ function OwnerOrders() {
 
     } catch (error) {
       console.error("Fetch orders error:", error);
-      console.log("STATUS:", error.response?.status);
-      console.log("DATA:", error.response?.data);
 
-      toast.error(
-        error.response?.data?.message ||
-        "Failed to load orders"
-      );
+      const status = error.response?.status;
+
+      const message =
+        status >= 500
+          ? "Server error. Please try again later."
+          : error.response?.data?.message ||
+          "Failed to load orders. Please try again.";
+
+      toast.error(message);
     }
   };
 
-  useEffect(() => {
+useEffect(() => {
+  fetchOrders();
+}, []);
+
+const verifyPayment = async (orderNumber, status) => {
+  try {
+    await axios.patch(
+      `${import.meta.env.VITE_API_URL}/api/owner/orders/${orderNumber}/payment`,
+      {
+        status
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    toast.success(
+      `Payment ${status.toLowerCase()} successfully`
+    );
+
     fetchOrders();
-  }, []);
 
-  const verifyPayment = async (orderNumber, status) => {
-    try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/owner/orders/${orderNumber}/payment`,
-        {
-          status
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+  } catch (error) {
+    const status = error.response?.status;
+
+    const message =
+      status >= 500
+        ? "Server error. Please try again later."
+        : error.response?.data?.message ||
+        "Payment update failed. Please try again.";
+
+    toast.error(message);
+  }
+};
+
+const updateOrderStatus = async (orderNumber, status) => {
+  try {
+    await axios.patch(
+      `${import.meta.env.VITE_API_URL}/api/owner/orders/${orderNumber}/status`,
+      {
+        status
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      );
+      }
+    );
 
-      toast.success(
-        `Payment ${status.toLowerCase()} successfully`
-      );
+    toast.success(
+      `Order marked as ${status.toLowerCase()}`
+    );
 
-      fetchOrders();
+    fetchOrders();
 
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-        "Payment update failed"
-      );
-    }
-  };
+  } catch (error) {
+    const status = error.response?.status;
 
-  const updateOrderStatus = async (orderNumber, status) => {
-    try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/owner/orders/${orderNumber}/status`,
-        {
-          status
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+    const message =
+      status >= 500
+        ? "Server error. Please try again later."
+        : error.response?.data?.message ||
+        "Order status update failed. Please try again.";
 
-      toast.success(
-        `Order marked as ${status.toLowerCase()}`
-      );
+    toast.error(message);
+  }
+};
 
-      fetchOrders();
 
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-        "Order status update failed"
-      );
-    }
-  };
-
-  
 const filteredOrders = orders.filter((order) => {
   // Status filter
   if (
@@ -197,54 +212,54 @@ const filteredOrders = orders.filter((order) => {
 });
 
 
-  return (
-     <>
-     
+return (
+  <>
+
     <div className={styles.container}>
-      <Toaster position="top-right" richColors />
-
-      
-<h1 className={styles.title}>
-  <FileCheck size={28} className={styles.titleIcon} />
-  Owner Orders
-</h1>
+      <Toaster position="top-right" richColors duration={3000}/>
 
 
-<div className={styles.filters}>
-  <label className={styles.filterGroup}>
-    <span>Date</span>
-    <input
-      className={styles.filterInput}
-      type="date"
-      value={selectedDate}
-      onChange={(e) => setSelectedDate(e.target.value)}
-    />
-  </label>
+      <h1 className={styles.title}>
+        <FileCheck size={28} className={styles.titleIcon} />
+        Owner Orders
+      </h1>
 
-  <label className={styles.filterGroup}>
-    <span>Status</span>
-    <select
-      className={styles.filterInput}
-      value={statusFilter}
-      onChange={(e) => setStatusFilter(e.target.value)}
-    >
-      <option value="ALL">All</option>
-      <option value="COMPLETED">Completed</option>
-      <option value="NOT-COMPLETED">Not Completed</option>
-    </select>
-  </label>
 
-  <button
-    type="button"
-    className={styles.resetButton}
-    onClick={() => {
-      setSelectedDate("");
-      setStatusFilter("ALL");
-    }}
-  >
-    Reset Filters
-  </button>
-</div>
+      <div className={styles.filters}>
+        <label className={styles.filterGroup}>
+          <span>Date</span>
+          <input
+            className={styles.filterInput}
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+        </label>
+
+        <label className={styles.filterGroup}>
+          <span>Status</span>
+          <select
+            className={styles.filterInput}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="ALL">All</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="NOT-COMPLETED">Not Completed</option>
+          </select>
+        </label>
+
+        <button
+          type="button"
+          className={styles.resetButton}
+          onClick={() => {
+            setSelectedDate("");
+            setStatusFilter("ALL");
+          }}
+        >
+          Reset Filters
+        </button>
+      </div>
 
 
       {filteredOrders.length === 0 ? (
@@ -356,21 +371,21 @@ const filteredOrders = orders.filter((order) => {
                   </div>
                 </div>
 
-{order.customerComment?.trim() && (
-    <div className={styles.infoRow}>
-        <FileText size={18} className={styles.icon} />
+                {order.customerComment?.trim() && (
+                  <div className={styles.infoRow}>
+                    <FileText size={18} className={styles.icon} />
 
-        <div>
-            <div className={styles.label}>
-                Customer Comment
-            </div>
+                    <div>
+                      <div className={styles.label}>
+                        Customer Comment
+                      </div>
 
-            <div className={styles.value}>
-                {order.customerComment}
-            </div>
-        </div>
-    </div>
-)}
+                      <div className={styles.value}>
+                        {order.customerComment}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* <div className={styles.infoRow}>
                   <AlertCircle size={18} className={styles.icon} />
@@ -534,8 +549,8 @@ const filteredOrders = orders.filter((order) => {
       )}
 
     </div>
-     </>
-  );
+  </>
+);
 }
 
 export default OwnerOrders;
