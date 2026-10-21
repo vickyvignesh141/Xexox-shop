@@ -85,15 +85,25 @@ function CustomerRegister() {
       toast.success("Registration successful!");
       navigate("/upload");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Registration failed");
-    }
+  const status = error.response?.status;
+
+  const message =
+    status >= 500
+      ? "Server error. Please try again later."
+      : error.response?.data?.message ||
+        "Registration failed. Please try again.";
+
+  toast.error(message, {
+    duration: 3000,
+  });
+}
   };
 
   return (
     <>
 
       <div className={styles.container}>
-        <Toaster position="top-right" richColors />
+        <Toaster position="top-right" richColors  duration={3000} />
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <h1>Customer Registration</h1>

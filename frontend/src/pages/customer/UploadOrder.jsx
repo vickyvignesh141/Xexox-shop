@@ -8,7 +8,6 @@ import {
     Trash2,
     Plus,
     Calculator,
-    ArrowLeft,
     Eye,
     Wallet,
     ArrowRight,
@@ -120,10 +119,18 @@ function UploadOrder() {
                 icon: <CheckCircle2 size={18} />,
             });
         } catch (error) {
-            toast.error(
-                error.response?.data?.message || "Upload failed",
-                { icon: <AlertTriangle size={18} /> }
-            );
+            const status = error.response?.status;
+
+            const message =
+                status >= 500
+                    ? "Server error. Please try uploading again."
+                    : error.response?.data?.message ||
+                    "Upload failed. Please try again.";
+
+            toast.error(message, {
+                icon: <AlertTriangle size={18} />,
+                duration: 3000,
+            });
         } finally {
             setUploading(false);
         }
@@ -183,10 +190,18 @@ function UploadOrder() {
             // Reset payment selection
             setPaymentType("COD");
         } catch (error) {
-            toast.error(
-                error.response?.data?.message || "Price calculation failed",
-                { icon: <AlertTriangle size={18} /> }
-            );
+            const status = error.response?.status;
+
+            const message =
+                status >= 500
+                    ? "Server error. Please try calculating the price again."
+                    : error.response?.data?.message ||
+                    "Price calculation failed. Please try again.";
+
+            toast.error(message, {
+                icon: <AlertTriangle size={18} />,
+                duration: 3000,
+            });
         }
     };
 
@@ -201,79 +216,88 @@ function UploadOrder() {
     // -----------------------------------------
     // Continue based on payment type
     // -----------------------------------------
- 
-const handlePaymentContinue = async () => {
-    const customerToken = localStorage.getItem("customerToken");
 
-    if (!customerToken) {
-        toast.error("Please login first");
-        navigate("/login");
-        return;
-    }
+    const handlePaymentContinue = async () => {
+        const customerToken = localStorage.getItem("customerToken");
 
-    if (files.length === 0) {
-        toast.warning("Please upload at least one PDF");
-        return;
-    }
+        if (!customerToken) {
+            toast.error("Please login first");
+            navigate("/login");
+            return;
+        }
 
-    if (!paymentType) {
-        toast.warning("Please select a payment type");
-        return;
-    }
+        if (files.length === 0) {
+            toast.warning("Please upload at least one PDF");
+            return;
+        }
 
-    try {
-        const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/orders/calculate-price`,
-            {
-                files: files.map((file) => ({
+        if (!paymentType) {
+            toast.warning("Please select a payment type");
+            return;
+        }
+
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/orders/calculate-price`,
+                {
+                    files: files.map((file) => ({
+                        pageCount: file.pageCount,
+                        copies: file.copies,
+                        colorMode: file.colorMode,
+                        side: file.side,
+                    })),
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${customerToken}`,
+                    },
+                }
+            );
+
+            const calculatedFiles = response.data.files;
+
+            const updatedFiles = files.map((file, index) => ({
+                ...file,
+                amount: calculatedFiles[index].amount,
+            }));
+
+            const updatedTotal = updatedFiles.reduce(
+                (sum, file) => sum + Number(file.amount || 0),
+                0
+            );
+
+            const orderData = {
+                files: updatedFiles.map((file) => ({
+                    filename: file.originalFilename,
+                    s3Key: file.s3Key,
+                    fileSize: file.fileSize,
                     pageCount: file.pageCount,
                     copies: file.copies,
                     colorMode: file.colorMode,
                     side: file.side,
+                    amount: file.amount,
                 })),
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${customerToken}`,
-                },
-            }
-        );
+                totalAmount: updatedTotal,
+                paymentType,
+            };
 
-        const calculatedFiles = response.data.files;
+            localStorage.setItem("pendingOrder", JSON.stringify(orderData));
+            navigate("/payment");
+        } catch (error) {
+            const status = error.response?.status;
 
-        const updatedFiles = files.map((file, index) => ({
-            ...file,
-            amount: calculatedFiles[index].amount,
-        }));
+            const message =
+                status >= 500
+                    ? "Server error. Please try calculating the price again."
+                    : error.response?.data?.message ||
+                    "Price calculation failed. Please try again.";
 
-        const updatedTotal = updatedFiles.reduce(
-            (sum, file) => sum + Number(file.amount || 0),
-            0
-        );
-
-        const orderData = {
-            files: updatedFiles.map((file) => ({
-                filename: file.originalFilename,
-                s3Key: file.s3Key,
-                fileSize: file.fileSize,
-                pageCount: file.pageCount,
-                copies: file.copies,
-                colorMode: file.colorMode,
-                side: file.side,
-                amount: file.amount,
-            })),
-            totalAmount: updatedTotal,
-            paymentType,
-        };
-
-        localStorage.setItem("pendingOrder", JSON.stringify(orderData));
-        navigate("/payment");
-    } catch (error) {
-        toast.error(
-            error.response?.data?.message || "Price calculation failed"
-        );
-    }
-};
+            toast.error(message, {
+                icon: <AlertTriangle size={18} />,
+                duration: 3000,
+            });
+        }
+    };
 
 
     // -----------------------------------------
@@ -287,10 +311,10 @@ const handlePaymentContinue = async () => {
 
     return (
         <>
-            
+
 
             <div className={styles.container}>
-                <Toaster position="top-right" richColors />
+                <Toaster position="top-right" richColors duration={3000} />
 
                 {/* Order Status (outside the card, top-right) */}
                 <div className={styles.topBar}>
@@ -328,23 +352,23 @@ const handlePaymentContinue = async () => {
                         <div className={styles.selectedFilesBox}>
                             <h3 className={styles.smallHeading}>Files Selected</h3>
 
-                           {selectedFiles.map((file, index) => (
-  <div key={index} className={styles.selectedName}>
-    <FileText size={16} />
-    <span>{file.name}</span>
+                            {selectedFiles.map((file, index) => (
+                                <div key={index} className={styles.selectedName}>
+                                    <FileText size={16} />
+                                    <span>{file.name}</span>
 
-    <button
-      type="button"
-      title="Preview PDF"
-      onClick={() => {
-        const url = URL.createObjectURL(file);
-        window.open(url, "_blank", "noopener,noreferrer");
-      }}
-    >
-      <Eye size={18} />
-    </button>
-  </div>
-))}
+                                    <button
+                                        type="button"
+                                        title="Preview PDF"
+                                        onClick={() => {
+                                            const url = URL.createObjectURL(file);
+                                            window.open(url, "_blank", "noopener,noreferrer");
+                                        }}
+                                    >
+                                        <Eye size={18} />
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     )}
 
@@ -429,9 +453,18 @@ const handlePaymentContinue = async () => {
 
                                                 } catch (error) {
                                                     console.error("PDF preview error:", error.response?.data || error);
-                                                    toast.error(
-                                                        error.response?.data?.message || "Unable to preview PDF"
-                                                    );
+
+                                                    const status = error.response?.status;
+
+                                                    const message =
+                                                        status >= 500
+                                                            ? "Server error. Unable to preview PDF. Please try again."
+                                                            : error.response?.data?.message ||
+                                                            "Unable to preview PDF. Please try again.";
+
+                                                    toast.error(message, {
+                                                        duration: 3000,
+                                                    });
                                                 }
                                             }}
                                         >
@@ -536,9 +569,7 @@ const handlePaymentContinue = async () => {
                             {/* Grand Total */}
                             {totalAmount > 0 && (
                                 <>
-                                    {/* <h2 className={styles.totalAmount}>
-                                        Total Amount: ₹{totalAmount}
-                                    </h2> */}
+
 
                                     {/* Payment Type */}
                                     <div className={styles.paymentSection}>

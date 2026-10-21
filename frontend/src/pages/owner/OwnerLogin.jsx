@@ -39,19 +39,25 @@ function OwnerLogin() {
             navigate(destination, { replace: true });
             
         } catch (error) {
-            setError(
-                error.response?.data?.message || "Login failed"
-            );
-        } finally {
-            setLoading(false);
-        }
+    const status = error.response?.status;
+
+    const message =
+        status >= 500
+            ? "Server error. Please try again later."
+            : error.response?.data?.message ||
+              "Login failed. Please try again.";
+
+    setError(message);
+} finally {
+    setLoading(false);
+}
     };
 
     return (
         <>
            
             <div className={styles.container}>
-                <Toaster position="top-right" richColors />
+                <Toaster position="top-right" richColors  duration={3000}/>
                 <div className={styles.wrapper}>
                     <div className={styles.header}>
                         <div className={styles.headerIcon}>

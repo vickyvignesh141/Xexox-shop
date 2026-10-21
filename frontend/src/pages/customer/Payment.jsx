@@ -79,8 +79,8 @@ function Payment() {
                     files: pendingOrder.files,
                     paymentMethod: "COD",
                     customerComment: customerComment.trim()
-    ? customerComment.trim()
-    : undefined,    
+                        ? customerComment.trim()
+                        : undefined,
                 },
                 {
                     headers: {
@@ -102,10 +102,17 @@ function Payment() {
                 navigate("/");
             }, 3000);
         } catch (error) {
-            toast.error(
-                error.response?.data?.message ||
-                "Order creation failed"
-            );
+            const status = error.response?.status;
+
+            const message =
+                status >= 500
+                    ? "Server error. Please try again later."
+                    : error.response?.data?.message ||
+                    "Order creation failed. Please try again.";
+
+            toast.error(message, {
+                duration: 3000,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -134,8 +141,8 @@ function Payment() {
                     paymentMethod: "GPay",
                     transactionId: transactionId.trim(),
                     customerComment: customerComment.trim()
-    ? customerComment.trim()
-    : undefined,
+                        ? customerComment.trim()
+                        : undefined,
                 }
             );
 
@@ -153,10 +160,17 @@ function Payment() {
             }, 3000);
 
         } catch (error) {
-            toast.error(
-                error.response?.data?.message ||
-                "Order creation failed"
-            );
+            const status = error.response?.status;
+
+            const message =
+                status >= 500
+                    ? "Server error. Please try again later."
+                    : error.response?.data?.message ||
+                    "Order creation failed. Please try again.";
+
+            toast.error(message, {
+                duration: 3000,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -165,9 +179,9 @@ function Payment() {
 
     return (
         <>
-            
+
             <div className={styles.container}>
-                <Toaster position="top-right" richColors />
+                <Toaster position="top-right" richColors duration={3000} />
 
 
                 <div className={styles.form}>

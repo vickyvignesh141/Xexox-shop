@@ -43,9 +43,16 @@ function CustomerLogin() {
         navigate("/upload");
       }, 1000);
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Login failed. Please try again."
-      );
+      const status = error.response?.status;
+
+      const message =
+        status >= 500
+          ? "Server error. Please try again later."
+          : error.response?.data?.message || "Login failed. Please try again.";
+
+      toast.error(message, {
+        duration: 3000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +60,7 @@ function CustomerLogin() {
 
   return (
     <div className={styles.loginContainer}>
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-right" richColors duration={3000} />
 
       <h1 className={styles.h1}>WELCOME BACK</h1>
 
@@ -77,15 +84,15 @@ function CustomerLogin() {
           <label htmlFor="password">Password</label>
           <div className={styles.passwordWrapper}>
             <input
-  id="password"
-  name="password"
-  type={showPassword ? "text" : "password"}
-  autoComplete="current-password"
-  placeholder="Enter Your Password"
-  value={password}
-  onChange={(e) => setPassword(e.target.value)}
-  required
-/>
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="Enter Your Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
             <button
               type="button"
               className={styles.eyeButton}
