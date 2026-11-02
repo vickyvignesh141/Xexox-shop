@@ -35,7 +35,7 @@ function ChooseRole() {
                     <Printer size={30} />
                 </div>
 
-                <h1>Xexox Shop</h1>
+                <h1>Print Cafe</h1>
 
                 <p className={styles.subtitle}>
                     Welcome! Choose how you want to continue.

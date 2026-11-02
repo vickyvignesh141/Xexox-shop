@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Eye } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -243,30 +243,33 @@ function OrderHistory() {
                                 <div className={styles.detailItem}>
                                     <span className={styles.detailLabel}>Files</span>
 
-                                    <div>
+                                    <div className={styles.filesList}>
                                         {order.files.map((file, index) => (
-                                            <div key={file.s3Key || index}>
-                                                <span>{file.filename}</span>
+                                            <div key={file.s3Key || index} className={styles.fileRow}>
+                                                <span className={styles.fileName}>{file.filename}</span>
 
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleViewFile(file.s3Key)}
-                                                    title="View PDF"
-                                                    aria-label={`View ${file.filename}`}
-                                                >
-                                                    <Eye size={18} />
-                                                </button>
-                                                {order.orderStatus === "PENDING" && order.files.length > 1 && (
+                                                <div className={styles.fileActions}>
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleDeleteFile(order._id, file.s3Key)}
+                                                        className={styles.iconBtn}
+                                                        onClick={() => handleViewFile(file.s3Key)}
+                                                        title="View PDF"
+                                                        aria-label={`View ${file.filename}`}
                                                     >
-                                                        Delete PDF
+                                                        <Eye size={18} />
                                                     </button>
-                                                )}
 
+                                                    {order.orderStatus === "PENDING" && order.files.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            className={styles.deleteFileBtn}
+                                                            onClick={() => handleDeleteFile(order._id, file.s3Key)}
+                                                        >
+                                                            Delete PDF
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
-
                                         ))}
                                     </div>
                                 </div>
@@ -282,15 +285,19 @@ function OrderHistory() {
                                 </div>
                             </div>
                             {order.orderStatus === "PENDING" && (
-                                <button
-                                    type="button"
-                                    onClick={() => handleDeleteOrder(order._id)}
-                                    disabled={deletingOrderId === order._id}
-                                >
-                                    {deletingOrderId === order._id
-                                        ? "Deleting..."
-                                        : "Delete Entire Order"}
-                                </button>
+                                <div className={styles.orderFooter}>
+                                    <button
+                                        type="button"
+                                        className={styles.deleteOrderBtn}
+                                        onClick={() => handleDeleteOrder(order._id)}
+                                        disabled={deletingOrderId === order._id}
+                                    >
+                                        <Trash2 size={16} />
+                                        {deletingOrderId === order._id
+                                            ? "Deleting..."
+                                            : "Delete Entire Order"}
+                                    </button>
+                                </div>
                             )}
                         </div>
                     ))

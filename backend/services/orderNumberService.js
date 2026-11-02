@@ -1,19 +1,17 @@
+
 const Counter = require("../models/Counter");
 
 const generateOrderNumber = async () => {
-
-    const today = new Date().toLocaleDateString("en-CA", {
-        timeZone: "Asia/Kolkata"
-    });
     const counter = await Counter.findOneAndUpdate(
-        { name: `order-${today}` },
+        { name: "global-order" },
         { $inc: { sequence: 1 } },
-        { new: true, upsert: true }
+        {
+            returnDocument: "after",
+            upsert: true
+        }
     );
 
-    const orderNumber = `X${String(counter.sequence).padStart(4, "0")}`;
-
-    return orderNumber;
+    return `X${String(counter.sequence).padStart(4, "0")}`;
 };
 
 module.exports = generateOrderNumber;
