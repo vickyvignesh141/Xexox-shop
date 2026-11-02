@@ -14,15 +14,34 @@
 
   width: 100%;
   max-width: 380px;
-  margin: 60px auto;
+
+  /* Center horizontally + vertically */
+  margin: 0 auto;
+
   padding: 44px 36px;
+
   background: #ffffff;
-  border: 1px solid var(--border);
-  border-top: 4px solid var(--blue);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(29, 78, 216, 0.08);
+
+  /* Blue border around complete login box */
+  border: 2px solid #1d4ed8;
+
+  border-radius: 14px;
+
+  box-shadow: 0 10px 30px rgba(29, 78, 216, 0.12);
+
   font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--text);
+
+  /* Important for mobile/tablet */
+  box-sizing: border-box;
+}
+.loginPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 /* ===========================
@@ -59,7 +78,7 @@
 .formGroup input {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid var(--border);
+  border: 2px solid #1d4ed8;
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;

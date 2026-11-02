@@ -16,11 +16,19 @@ import {
     CheckCircle2,
     AlertTriangle,
     ClipboardList,
+    X,
+    Info,
+    FileCheck2,
+    Ruler,
+    Palette,
+    Copy,
+    Layers,
 } from "lucide-react";
 import styles from "./UploadOrder.module.css";
 
 function UploadOrder() {
     const navigate = useNavigate();
+    const [showInstructions, setShowInstructions] = useState(true);
 
     // Selected local files waiting to be uploaded
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -47,8 +55,8 @@ function UploadOrder() {
             return;
         }
 
-        if (selectedFiles.length + files.length >= 2) {
-            toast.warning("Maximum 2 files are allowed", {
+        if (selectedFiles.length + files.length >= 5) {
+            toast.warning("Maximum 5 files are allowed", {
                 icon: <AlertTriangle size={18} />,
             });
             e.target.value = "";
@@ -315,6 +323,113 @@ function UploadOrder() {
 
             <div className={styles.container}>
                 <Toaster position="top-right" richColors duration={3000} />
+                {showInstructions && (
+                    <div className={styles.instructionOverlay}>
+                        <div
+                            className={styles.instructionModal}
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="upload-instructions-title"
+                        >
+                            {/* Header */}
+                            <div className={styles.instructionHeader}>
+                                <div className={styles.instructionTitleWrapper}>
+                                    <div className={styles.instructionIcon}>
+                                        <Info size={22} />
+                                    </div>
+
+                                    <div>
+                                        <h2 id="upload-instructions-title">
+                                            File Upload Instructions
+                                        </h2>
+                                        <p>Please check these details before uploading.</p>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className={styles.instructionClose}
+                                    onClick={() => setShowInstructions(false)}
+                                    aria-label="Close instructions"
+                                    title="Close"
+                                >
+                                    <X size={22} />
+                                </button>
+                            </div>
+
+                            {/* Instructions */}
+                            <div className={styles.instructionBody}>
+
+                                <div className={styles.instructionItem}>
+                                    <FileCheck2 size={18} />
+                                    <span>
+                                        <strong>Supported format:</strong> PDF only
+                                    </span>
+                                </div>
+
+                                <div className={styles.instructionItem}>
+                                    <Layers size={18} />
+                                    <span>
+                                        <strong>Maximum file size:</strong> 2 MB per file
+                                    </span>
+                                </div>
+
+                                <div className={styles.instructionItem}>
+                                    <Copy size={18} />
+                                    <span>
+                                        <strong>Files per order:</strong> Up to 5 files
+                                    </span>
+                                </div>
+
+                                <div className={styles.instructionItem}>
+                                    <FileText size={18} />
+                                    <span>
+                                        Enter all your <strong>printing requirements</strong> in
+                                        the Description box.
+                                    </span>
+                                </div>
+
+                                <div className={styles.instructionItem}>
+                                    <Ruler size={18} />
+                                    <span>
+                                        Please mention details such as{" "}
+                                        <strong>
+                                            paper size, colour/B&W, number of copies,
+                                            single/double-side, and binding.
+                                        </strong>
+                                    </span>
+                                </div>
+
+                                {/* Important warning */}
+                                <div className={styles.instructionWarning}>
+                                    <div className={styles.warningIcon}>
+                                        <AlertTriangle size={20} />
+                                    </div>
+
+                                    <div>
+                                        <strong>Important</strong>
+                                        <p>
+                                            Please check your uploaded files and requirements
+                                            carefully before placing the order. If there are any
+                                            mistakes or incorrect details from your side, changes
+                                            may not be accepted after the order is processed.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Continue button */}
+                            <button
+                                type="button"
+                                className={styles.instructionContinue}
+                                onClick={() => setShowInstructions(false)}
+                            >
+                                <CheckCircle2 size={18} />
+                                I Understand
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Order Status (outside the card, top-right) */}
                 <div className={styles.topBar}>
@@ -538,7 +653,7 @@ function UploadOrder() {
                             ))}
 
                             {/* Add More */}
-                            {files.length > 0 && files.length < 2 && (
+                            {files.length > 0 && files.length < 5 && (
                                 <>
                                     <label className={styles.addMoreLabel}>
                                         <strong>

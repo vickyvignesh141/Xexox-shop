@@ -178,9 +178,9 @@ const createOrder = async (req, res) => {
             });
         }
 
-        if (files.length > 2) {
+        if (files.length > 5) {
             return res.status(400).json({
-                message: "Maximum 2 files are allowed per order"
+                message: "Maximum 5 files are allowed per order"
             });
         }
 

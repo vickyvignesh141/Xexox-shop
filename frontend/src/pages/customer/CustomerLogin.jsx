@@ -59,6 +59,7 @@ function CustomerLogin() {
   };
 
   return (
+    <div className={styles.loginPage}>
     <div className={styles.loginContainer}>
       <Toaster position="top-right" richColors duration={3000} />
 
@@ -135,6 +136,7 @@ function CustomerLogin() {
           Register
         </button>
       </p>
+    </div>
     </div>
   );
 }
