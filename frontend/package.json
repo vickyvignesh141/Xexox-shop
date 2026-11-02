@@ -21,6 +21,7 @@
     "sonner": "^2.0.8"
   },
   "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
     "@capacitor/cli": "^7.6.9",
     "@eslint/js": "^10.0.1",
     "@types/react": "^19.2.18",

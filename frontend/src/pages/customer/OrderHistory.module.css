@@ -176,6 +176,142 @@
   margin: 0;
 }
 
+
+/* Files list */
+.filesList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fileName {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  word-break: break-all;
+}
+
+.fileActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Eye (view PDF) button - blue */
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid #c7d7fb;
+  background: #e8f0fe;
+  color: #1a56db;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.iconBtn:hover {
+  background: #1a56db;
+  border-color: #1a56db;
+  color: #ffffff;
+}
+
+.iconBtn:active {
+  transform: scale(0.96);
+}
+
+/* Delete PDF button - soft red */
+.deleteFileBtn {
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: #c62828;
+  background: #fdecec;
+  border: 1px solid #f5c6c6;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.deleteFileBtn:hover {
+  background: #c62828;
+  border-color: #c62828;
+  color: #ffffff;
+}
+
+/* Delete entire order - solid red */
+.orderFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.deleteOrderBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background: #d32f2f;
+  border: 1px solid #d32f2f;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteOrderBtn:hover:not(:disabled) {
+  background: #a61f1f;
+  border-color: #a61f1f;
+}
+
+.deleteOrderBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.iconBtn:focus-visible,
+.deleteFileBtn:focus-visible,
+.deleteOrderBtn:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .fileRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .orderFooter {
+    justify-content: stretch;
+  }
+
+  .deleteOrderBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Tablet */
 @media (max-width: 768px) {
   .container {
