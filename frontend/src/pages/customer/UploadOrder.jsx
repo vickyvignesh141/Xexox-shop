@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
@@ -32,6 +32,11 @@ function UploadOrder() {
 
     // Selected local files waiting to be uploaded
     const [selectedFiles, setSelectedFiles] = useState([]);
+    // Track which selected PDF is being replaced
+    const [replacingIndex, setReplacingIndex] = useState(null);
+
+    // Hidden input used for replacing a selected PDF
+    const replaceInputRef = useRef(null);
 
     // Uploaded files with print settings
     const [files, setFiles] = useState([]);
@@ -43,29 +48,73 @@ function UploadOrder() {
     // -----------------------------------------
     // Select PDF
     // -----------------------------------------
+    // -----------------------------------------
+    // Select or Replace PDF
+    // -----------------------------------------
     const handleFileSelect = (e) => {
         const selectedFile = e.target.files[0];
 
         if (!selectedFile) return;
 
+        // Validate PDF
         if (selectedFile.type !== "application/pdf") {
             toast.error("Please select a PDF file", {
                 icon: <AlertTriangle size={18} />,
             });
+
+            e.target.value = "";
+            setReplacingIndex(null);
             return;
         }
 
-        if (selectedFiles.length + files.length >= 5) {
-            toast.warning("Maximum 5 files are allowed", {
-                icon: <AlertTriangle size={18} />,
-            });
+        // If replacing an existing selected file
+        if (replacingIndex !== null) {
+            setSelectedFiles((prev) =>
+                prev.map((file, index) =>
+                    index === replacingIndex ? selectedFile : file
+                )
+            );
+
+            toast.success("PDF replaced successfully!");
+
+            setReplacingIndex(null);
             e.target.value = "";
             return;
         }
 
+        // Maximum 5 files
+        if (selectedFiles.length + files.length >= 5) {
+            toast.warning("Maximum 5 files are allowed", {
+                icon: <AlertTriangle size={18} />,
+            });
+
+            e.target.value = "";
+            return;
+        }
+
+        // Add new PDF
         setSelectedFiles((prev) => [...prev, selectedFile]);
 
         e.target.value = "";
+    };
+
+    // -----------------------------------------
+    // Open File Explorer to replace PDF
+    // -----------------------------------------
+    const handleReplaceClick = (index) => {
+        setReplacingIndex(index);
+        replaceInputRef.current?.click();
+    };
+
+    // -----------------------------------------
+    // Remove selected PDF before S3 upload
+    // -----------------------------------------
+    const removeSelectedFile = (index) => {
+        setSelectedFiles((prev) =>
+            prev.filter((_, i) => i !== index)
+        );
+
+        toast.success("Selected PDF removed");
     };
 
     // -----------------------------------------
@@ -457,10 +506,20 @@ function UploadOrder() {
                         <input
                             type="file"
                             accept=".pdf,application/pdf"
+                            onClick={() => setReplacingIndex(null)}
                             onChange={handleFileSelect}
                             className={styles.fileInput}
                         />
                     )}
+
+                    {/* Hidden input for replacing selected PDF */}
+                    <input
+                        ref={replaceInputRef}
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handleFileSelect}
+                        style={{ display: "none" }}
+                    />
 
                     {/* Selected files */}
                     {selectedFiles.length > 0 && (
@@ -470,17 +529,39 @@ function UploadOrder() {
                             {selectedFiles.map((file, index) => (
                                 <div key={index} className={styles.selectedName}>
                                     <FileText size={16} />
-                                    <span>{file.name}</span>
 
+                                    {/* Click filename to replace PDF */}
+                                    <button
+                                        type="button"
+                                        className={styles.selectedFileName}
+                                        title="Click to change PDF"
+                                        onClick={() => handleReplaceClick(index)}
+                                    >
+                                        {file.name}
+                                    </button>
+
+                                    {/* Preview PDF */}
                                     <button
                                         type="button"
                                         title="Preview PDF"
+                                        aria-label="Preview PDF"
                                         onClick={() => {
                                             const url = URL.createObjectURL(file);
                                             window.open(url, "_blank", "noopener,noreferrer");
                                         }}
                                     >
                                         <Eye size={18} />
+                                    </button>
+
+                                    {/* Delete selected PDF */}
+                                    <button
+                                        type="button"
+                                        className={styles.selectedRemoveButton}
+                                        title="Remove PDF"
+                                        aria-label="Remove PDF"
+                                        onClick={() => removeSelectedFile(index)}
+                                    >
+                                        <Trash2 size={18} />
                                     </button>
                                 </div>
                             ))}

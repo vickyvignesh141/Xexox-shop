@@ -60,83 +60,85 @@ function CustomerLogin() {
 
   return (
     <div className={styles.loginPage}>
-    <div className={styles.loginContainer}>
-      <Toaster position="top-right" richColors duration={3000} />
+      <div className={styles.loginContainer}>
+        <Toaster position="top-right" richColors duration={3000} />
 
-      <h1 className={styles.h1}>WELCOME BACK</h1>
+        <h1 className={styles.h1}>WELCOME BACK</h1>
 
-      <form onSubmit={handleLogin} autoComplete="on">
-        <div className={styles.formGroup}>
-          <label htmlFor="phone">Phone Number</label>
-          <input
-            id="phone"
-            name="username"
-            type="tel"
-            inputMode="numeric"
-            autoComplete="username"
-            placeholder="Enter Your Phone Number"
-            value={mobile}
-            onChange={(e) => setMobile(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="password">Password</label>
-          <div className={styles.passwordWrapper}>
+        <form onSubmit={handleLogin} autoComplete="on">
+          <div className={styles.formGroup}>
+            <label htmlFor="phone">Phone Number</label>
             <input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
-              placeholder="Enter Your Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="phone"
+              name="username"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="username"
+              placeholder="Enter Your Phone Number"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
               required
             />
-            <button
-              type="button"
-              className={styles.eyeButton}
-              onClick={() => setShowPassword((prev) => !prev)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-              title={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          className={styles.loginButton}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 size={18} className={styles.spin} />
-              LOGGING IN...
-            </>
-          ) : (
-            "LOGIN"
-          )}
-        </button>
-      </form>
+          <div className={styles.formGroup}>
+            <label htmlFor="password">Password</label>
+            <div className={styles.passwordWrapper}>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                placeholder="Enter Your Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value.slice(0, 6))}
+                maxLength={6}
+                minLength={6}
+                required
+              />
+              <button
+                type="button"
+                className={styles.eyeButton}
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
 
-      <p className={styles.footerText}>
-        Welcome back! Please login to continue.
-      </p>
+          <button
+            type="submit"
+            className={styles.loginButton}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 size={18} className={styles.spin} />
+                LOGGING IN...
+              </>
+            ) : (
+              "LOGIN"
+            )}
+          </button>
+        </form>
 
-      <p className={styles.registerRow}>
-        No account?{" "}
-        <button
-          type="button"
-          onClick={() => navigate("/register")}
-          className={styles.registerButton}
-        >
-          Register
-        </button>
-      </p>
-    </div>
+        <p className={styles.footerText}>
+          Welcome back! Please login to continue.
+        </p>
+
+        <p className={styles.registerRow}>
+          No account?{" "}
+          <button
+            type="button"
+            onClick={() => navigate("/register")}
+            className={styles.registerButton}
+          >
+            Register
+          </button>
+        </p>
+      </div>
     </div>
   );
 }
