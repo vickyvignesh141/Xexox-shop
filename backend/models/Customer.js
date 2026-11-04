@@ -76,6 +76,53 @@ const customerSchema = new mongoose.Schema({
         minlength: 6,
         maxlength: 12,
     },
+
+    // ================================
+// FORGOT PASSWORD - OTP
+// ================================
+
+resetOtpHash: {
+    type: String,
+    select: false
+},
+
+resetOtpExpiresAt: {
+    type: Date,
+    select: false
+},
+
+resetOtpResendCount: {
+    type: Number,
+    default: 0,
+    select: false
+},
+
+resetOtpBlockedUntil: {
+    type: Date,
+    select: false
+},
+
+resetOtpAttempts: {
+    type: Number,
+    default: 0,
+    select: false
+},
+
+resetOtpVerifiedAt: {
+    type: Date,
+    select: false
+},
+
+// Temporary authorization after OTP verification
+resetPasswordTokenHash: {
+    type: String,
+    select: false
+},
+
+resetPasswordTokenExpiresAt: {
+    type: Date,
+    select: false
+}
 },
     {
         collection: "customers",

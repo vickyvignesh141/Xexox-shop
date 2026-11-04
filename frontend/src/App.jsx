@@ -8,6 +8,7 @@ import UploadOrder from "./pages/customer/UploadOrder";
 import OrderTracking from "./pages/customer/OrderTracking";
 import OrderHistory from "./pages/customer/OrderHistory";
 import Payment from "./pages/customer/Payment";
+import ForgotPassword from "./pages/forgetpassword/ForgotPassword";
 
 
 import OwnerLogin from "./pages/owner/OwnerLogin";
@@ -32,6 +33,10 @@ function App() {
         <Route path="/tracking" element={<OrderTracking />} />
         <Route path="/orderhistory" element={<OrderHistory />} />
         <Route path="/payment" element={<Payment />} />
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
 
 
         <Route path="/owner-login" element={<OwnerLogin />} />
