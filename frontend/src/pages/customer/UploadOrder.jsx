@@ -21,6 +21,7 @@ import {
     FileCheck2,
     Ruler,
     Palette,
+    PackageCheck,
     Copy,
     Layers,
 } from "lucide-react";
@@ -28,7 +29,7 @@ import styles from "./UploadOrder.module.css";
 
 function UploadOrder() {
     const navigate = useNavigate();
-    const [showInstructions, setShowInstructions] = useState(true);
+    const [showInstructions, setShowInstructions] = useState(!sessionStorage.getItem("uploadInstructionsSeen"));
 
     // Selected local files waiting to be uploaded
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -131,6 +132,14 @@ function UploadOrder() {
             return;
         }
 
+        if (files.length  + selectedFiles.length >= 5) {
+        toast.warning(
+            "Maximum file limit reached. Please create another order to upload remaining files.",
+            { duration: 5000 }
+        );
+        return;
+    }
+
         if (selectedFiles.length === 0) {
             toast.warning("Please select a PDF", {
                 icon: <AlertTriangle size={18} />,
@@ -216,14 +225,25 @@ function UploadOrder() {
             });
             return;
         }
+        if (
+            files.some(
+                (file) =>
+                    file.copies === "" ||
+                    !Number.isInteger(Number(file.copies)) ||
+                    Number(file.copies) < 1
+            )
+        ) {
+            toast.warning("Please enter at least 1 copy for every PDF");
+            return;
+        }
 
         try {
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}/api/orders/calculate-price`,
                 {
                     files: files.map((file) => ({
-                        pageCount: file.pageCount,
-                        copies: file.copies,
+                        pageCount:  Number(file.pageCount),
+                        copies: Number(file.copies),
                         colorMode: file.colorMode,
                         side: file.side,
                     })),
@@ -298,8 +318,8 @@ function UploadOrder() {
                 `${import.meta.env.VITE_API_URL}/api/orders/calculate-price`,
                 {
                     files: files.map((file) => ({
-                        pageCount: file.pageCount,
-                        copies: file.copies,
+                        pageCount: Number(file.pageCount),
+                        copies: Number(file.copies),
                         colorMode: file.colorMode,
                         side: file.side,
                     })),
@@ -391,19 +411,10 @@ function UploadOrder() {
                                         <h2 id="upload-instructions-title">
                                             File Upload Instructions
                                         </h2>
-                                        <p>Please check these details before uploading.</p>
                                     </div>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    className={styles.instructionClose}
-                                    onClick={() => setShowInstructions(false)}
-                                    aria-label="Close instructions"
-                                    title="Close"
-                                >
-                                    <X size={22} />
-                                </button>
+
                             </div>
 
                             {/* Instructions */}
@@ -435,6 +446,15 @@ function UploadOrder() {
                                     <span>
                                         Enter all your <strong>printing requirements</strong> in
                                         the Description box.
+                                    </span>
+
+
+                                </div>
+                                <div className={styles.instructionItem}>
+                                    <PackageCheck size={18} />
+                                    <span>
+                                        Check your order status after <strong>30 minutes</strong>.
+                                        Collect your prints from the Xerox shop once <strong>Completed</strong>.
                                     </span>
                                 </div>
 
@@ -471,8 +491,10 @@ function UploadOrder() {
                             <button
                                 type="button"
                                 className={styles.instructionContinue}
-                                onClick={() => setShowInstructions(false)}
-                            >
+                                onClick={() => {
+                                    sessionStorage.setItem("uploadInstructionsSeen", "true");
+                                    setShowInstructions(false);
+                                }}                            >
                                 <CheckCircle2 size={18} />
                                 I Understand
                             </button>
@@ -543,6 +565,7 @@ function UploadOrder() {
                                     {/* Preview PDF */}
                                     <button
                                         type="button"
+                                        className={styles.previewButton}
                                         title="Preview PDF"
                                         aria-label="Preview PDF"
                                         onClick={() => {
@@ -595,32 +618,17 @@ function UploadOrder() {
                                 <span className={styles.count}>{files.length}</span>
                             </h2>
 
+
                             {files.map((file, index) => (
                                 <div key={index} className={styles.fileCard}>
-                                    {/* Remove (top-right corner) */}
-                                    <button
-                                        type="button"
-                                        onClick={() => removeFile(index)}
-                                        className={styles.removeButton}
-                                        aria-label="Remove file"
-                                        title="Remove"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
 
-                                    <div className={styles.fileTop}>
-                                        <FileText size={20} className={styles.fileIcon} />
+                                    {/* Preview and Delete buttons - same alignment */}
+                                    <div className={styles.fileActions}>
 
-                                        <div className={styles.fileInfo}>
-                                            <h3 className={styles.fileCardTitle}>
-                                                {file.originalFilename}
-                                            </h3>
-                                            <p className={styles.pages}>
-                                                Pages: {file.pageCount}
-                                            </p>
-                                        </div>
+                                        {/* Preview PDF */}
                                         <button
                                             type="button"
+                                            className={styles.previewButton}
                                             title="View PDF"
                                             aria-label="View PDF"
                                             onClick={async () => {
@@ -629,8 +637,10 @@ function UploadOrder() {
                                                     window.open(previewUrl, "_blank", "noopener,noreferrer");
                                                     return;
                                                 }
+
                                                 try {
                                                     const token = localStorage.getItem("customerToken");
+
                                                     const response = await axios.get(
                                                         `${import.meta.env.VITE_API_URL}/api/files/view-url`,
                                                         {
@@ -648,7 +658,10 @@ function UploadOrder() {
                                                     );
 
                                                 } catch (error) {
-                                                    console.error("PDF preview error:", error.response?.data || error);
+                                                    console.error(
+                                                        "PDF preview error:",
+                                                        error.response?.data || error
+                                                    );
 
                                                     const status = error.response?.status;
 
@@ -666,9 +679,37 @@ function UploadOrder() {
                                         >
                                             <Eye size={18} />
                                         </button>
+
+                                        {/* Delete PDF */}
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFile(index)}
+                                            className={styles.removeButton}
+                                            aria-label="Remove file"
+                                            title="Remove"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+
+                                    </div>
+
+                                    {/* File information */}
+                                    <div className={styles.fileTop}>
+                                        <FileText size={20} className={styles.fileIcon} />
+
+                                        <div className={styles.fileInfo}>
+                                            <h3 className={styles.fileCardTitle}>
+                                                {file.originalFilename}
+                                            </h3>
+
+                                            <p className={styles.pages}>
+                                                Pages: {file.pageCount}
+                                            </p>
+                                        </div>
                                     </div>
 
                                     <div className={styles.fieldGrid}>
+
                                         {/* Copies */}
                                         <div className={styles.field}>
                                             <label>Copies</label>
@@ -677,11 +718,7 @@ function UploadOrder() {
                                                 min="1"
                                                 value={file.copies}
                                                 onChange={(e) =>
-                                                    updateFile(
-                                                        index,
-                                                        "copies",
-                                                        Number(e.target.value)
-                                                    )
+                                                    updateFile(index, "copies", e.target.value)
                                                 }
                                             />
                                         </div>
@@ -692,11 +729,7 @@ function UploadOrder() {
                                             <select
                                                 value={file.colorMode}
                                                 onChange={(e) =>
-                                                    updateFile(
-                                                        index,
-                                                        "colorMode",
-                                                        e.target.value
-                                                    )
+                                                    updateFile(index, "colorMode", e.target.value)
                                                 }
                                             >
                                                 <option value="BW">Black & White</option>
@@ -710,28 +743,27 @@ function UploadOrder() {
                                             <select
                                                 value={file.side}
                                                 onChange={(e) =>
-                                                    updateFile(
-                                                        index,
-                                                        "side",
-                                                        e.target.value
-                                                    )
+                                                    updateFile(index, "side", e.target.value)
                                                 }
                                             >
                                                 <option value="SINGLE">Single Side</option>
                                                 <option value="DOUBLE">Double Side</option>
                                             </select>
                                         </div>
+
                                     </div>
 
-                                    {/* Amount (green) */}
+                                    {/* Amount */}
                                     {file.amount > 0 && (
                                         <h3 className={styles.amountBadge}>
                                             <IndianRupee size={14} />
                                             Amount: ₹{file.amount}
                                         </h3>
                                     )}
+
                                 </div>
                             ))}
+
 
                             {/* Add More */}
                             {files.length > 0 && files.length < 5 && (

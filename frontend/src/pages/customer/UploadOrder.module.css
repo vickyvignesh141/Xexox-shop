@@ -265,30 +265,28 @@
 
 /* Remove (dustbin, top-right corner, red) */
 .removeButton {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  border-radius: 8px;
-  color: var(--red);
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
+    position: static;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--red);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .removeButton:hover {
-  background: var(--red-bg);
-  transform: scale(1.08);
+    background: var(--red-bg);
+    transform: scale(1.05);
 }
 
 .removeButton:focus-visible {
-  outline: 2px solid rgba(220, 38, 38, 0.35);
-  outline-offset: 1px;
+    outline: 2px solid rgba(220, 38, 38, 0.35);
+    outline-offset: 1px;
 }
 
 /* ===========================
@@ -522,14 +520,19 @@
     padding: 14px;
   }
 
-  .removeButton {
+ .fileActions {
     top: 8px;
     right: 8px;
-  }
+    gap: 6px;
+}
 
   .fileTop {
-    padding-right: 36px;
-  }
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-right: 90px;
+}
 
   .field input,
   .field select,
@@ -904,6 +907,53 @@
   outline-offset: 2px;
 }
 
+.fileActions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fileActions button {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.fileActions .removeButton {
+    position: static;
+    border: none;
+    background: transparent;
+    color: #dc2626;
+}
+
+.fileActions .previewButton {
+    border: 1px solid #2563eb;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.fileTop {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-right: 90px;
+}
+
+@media (max-width: 480px) {
+    .fileActions {
+        top: 8px;
+        right: 8px;
+        gap: 6px;
+    }
+}
+
 /* Animations */
 
 @keyframes instructionFadeIn {
@@ -993,3 +1043,38 @@
 .selectedName .selectedRemoveButton:hover {
   background: var(--red-bg);
 }
+
+
+/* PDF Preview Eye Button */
+.previewButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+.previewButton:hover {
+    background: #2563eb;
+    color: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+}
+
+.previewButton:active {
+    transform: scale(0.95);
+}
+
+.previewButton:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 3px;
+}
+
+
