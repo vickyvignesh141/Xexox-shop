@@ -132,7 +132,7 @@ function UploadOrder() {
             return;
         }
 
-        if (files.length  + selectedFiles.length >= 5) {
+        if (files.length  + selectedFiles.length >5) {
         toast.warning(
             "Maximum file limit reached. Please create another order to upload remaining files.",
             { duration: 5000 }
@@ -766,7 +766,7 @@ function UploadOrder() {
 
 
                             {/* Add More */}
-                            {files.length > 0 && files.length < 5 && (
+                            {files.length > 0 && files.length <= 5 && (
                                 <>
                                     <label className={styles.addMoreLabel}>
                                         <strong>
