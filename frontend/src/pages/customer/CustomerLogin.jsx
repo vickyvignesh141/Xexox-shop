@@ -127,7 +127,7 @@ function CustomerLogin() {
         {/* <button
     type="button"
     className={styles.forgotPasswordButton}
-    onClick={() => navigate("/forgot_password")}
+    onClick={() => navigate("/forgot-password")}
   >
     Forgot Password
   </button> */}
