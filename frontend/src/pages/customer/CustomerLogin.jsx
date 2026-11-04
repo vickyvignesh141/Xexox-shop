@@ -122,7 +122,15 @@ function CustomerLogin() {
               "LOGIN"
             )}
           </button>
+          
         </form>
+        {/* <button
+    type="button"
+    className={styles.forgotPasswordButton}
+    onClick={() => navigate("/forgot_password")}
+  >
+    Forgot Password
+  </button> */}
 
         <p className={styles.footerText}>
           Welcome back! Please login to continue.

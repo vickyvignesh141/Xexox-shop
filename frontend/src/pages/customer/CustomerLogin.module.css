@@ -282,6 +282,29 @@
   }
 }
 
+.forgotPasswordRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+  margin-bottom: 4px;
+}
+
+.forgotPasswordButton {
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: #f97316;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.forgotPasswordButton:hover {
+  color: #ea580c;
+  text-decoration: underline;
+}
+
 /* ===========================
    Small phones (max 360px)
 =========================== */
