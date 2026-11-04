@@ -163,6 +163,13 @@ function OrderHistory() {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
+                <button
+                    type="button"
+                    className={styles.backBtn}
+                    onClick={() => navigate(-1)}
+                >
+                    ← Back
+                </button>
                 <h1>Order History</h1>
                 <div className={styles.dropdownWrapper}>
                     <button
@@ -209,7 +216,16 @@ function OrderHistory() {
                         <div key={order._id} className={styles.orderCard}>
                             <div className={styles.orderHeader}>
                                 <h2>Order : {order.orderNumber}</h2>
-                                <span className={styles.orderStatus}>
+                                <span
+                                    className={`${styles.orderStatus} ${order.orderStatus === "PENDING"
+                                        ? styles.pending
+                                        : order.orderStatus === "COMPLETED"
+                                            ? styles.completed
+                                            : order.orderStatus === "NOT COMPLETED"
+                                                ? styles.notCompleted
+                                                : ""
+                                        }`}
+                                >
                                     {order.orderStatus}
                                 </span>
                             </div>

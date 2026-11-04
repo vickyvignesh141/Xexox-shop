@@ -296,6 +296,66 @@
   outline-offset: 2px;
 }
 
+
+/* Common order status */
+.orderStatus {
+  display: inline-block;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+/* Pending - Yellow */
+.pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffe69c;
+}
+
+/* Completed - Green */
+.completed {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border: 1px solid #a3cfbb;
+}
+
+/* Not Completed - Red */
+.notCompleted {
+  background-color: #f8d7da;
+  color: #842029;
+  border: 1px solid #f1aeb5;
+}
+
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  margin-bottom: 20px;
+  background: #ffffff;
+  color: #1a4380;
+  border: 1px solid #1a4380;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background: #1a4380;
+  color: #ffffff;
+}
+
+.backBtn:focus-visible {
+  outline: 2px solid #1a4380;
+  outline-offset: 3px;
+}
 @media (max-width: 480px) {
   .fileRow {
     flex-direction: column;

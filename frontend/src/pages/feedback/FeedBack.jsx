@@ -8,6 +8,7 @@ import {
   Check,
   Loader2,
   AlertCircle,
+  ArrowLeft,
 } from 'lucide-react';
 import styles from './feedback.module.css';
 
@@ -18,27 +19,27 @@ const MAX_DESCRIPTION_LENGTH = 500;
 /* ============================================
    Feedback form — render this on the /feedback route
 ============================================ */
-export default function FeedbackForm({}) {
-  const navigate = useNavigate(); 
+export default function FeedbackForm({ }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  
+
 
 
   useEffect(() => {
-  if (!isSubmitted) return;
+    if (!isSubmitted) return;
 
-  const timer = setTimeout(() => {
-    localStorage.removeItem("customerToken");
-    localStorage.removeItem("xeroxCustomerId");
-    navigate("/login", { replace: true });
-  }, 5000);
+    const timer = setTimeout(() => {
+      localStorage.removeItem("customerToken");
+      localStorage.removeItem("xeroxCustomerId");
+      navigate("/login", { replace: true });
+    }, 5000);
 
-  return () => clearTimeout(timer);
-}, [isSubmitted, navigate]);
+    return () => clearTimeout(timer);
+  }, [isSubmitted, navigate]);
 
   const validate = () => {
     const nextErrors = {};
@@ -67,34 +68,34 @@ export default function FeedbackForm({}) {
     setIsSubmitting(true);
 
     try {
-        await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/feedback`,
-            {
-                email: email.trim(),
-                description: description.trim()
-            }
-        );
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/feedback`,
+        {
+          email: email.trim(),
+          description: description.trim()
+        }
+      );
 
-        setIsSubmitted(true);
+      setIsSubmitted(true);
 
     } catch (error) {
-    console.error("Feedback submit error:", error);
+      console.error("Feedback submit error:", error);
 
-    const status = error.response?.status;
+      const status = error.response?.status;
 
-    const message =
+      const message =
         status >= 500
-            ? "Server error. Please try again later."
-            : error.response?.data?.message ||
-              "Unable to send feedback. Please try again.";
+          ? "Server error. Please try again later."
+          : error.response?.data?.message ||
+          "Unable to send feedback. Please try again.";
 
-    toast.error(message, {
+      toast.error(message, {
         duration: 3000,
-    });
-} finally {
-    setIsSubmitting(false);
-}
-};
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   const handleReset = () => {
     setEmail('');
     setDescription('');
@@ -103,97 +104,107 @@ export default function FeedbackForm({}) {
   };
 
   return (
-     <>
-    <div className={styles.container}>
-      {isSubmitted ? (
-        <div className={styles.form}>
-          <div className={styles.successState}>
-            <div className={styles.successIcon}>
-              <Check size={30} strokeWidth={2.5} />
-            </div>
-            <h2 className={styles.successTitle}>Thanks for the note</h2>
-            <p className={styles.successText}>
-              Your feedback is on its way to the team. We'll reach out at{' '}
-              <strong>{email || 'your email'}</strong> if we need anything else.
-            </p>
-            {/* <button type="button" className={styles.resetLink} onClick={handleReset}>
+    <>
+      <div className={styles.container}>
+        {isSubmitted ? (
+          <div className={styles.form}>
+            <div className={styles.successState}>
+              <div className={styles.successIcon}>
+                <Check size={30} strokeWidth={2.5} />
+              </div>
+              <h2 className={styles.successTitle}>Thanks for the note</h2>
+              <p className={styles.successText}>
+                Your feedback is on its way to the team. We'll reach out at{' '}
+                <strong>{email || 'your email'}</strong> if we need anything else.
+              </p>
+              {/* <button type="button" className={styles.resetLink} onClick={handleReset}>
               Send more feedback
             </button> */}
+            </div>
           </div>
-        </div>
-      ) : (
-        <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <h1>
-            <MessageSquare size={22} />
-            Built by PathFinders
-          </h1>
-          <p className={styles.subtitle}>Built by the team — tell us what's working.</p>
+        ) : (
+          <form className={styles.form} onSubmit={handleSubmit} noValidate>
 
-          <div className={styles.field}>
-            <label htmlFor="feedback-email" className={styles.fieldLabel}>
-              Email
-            </label>
-            <input
-              id="feedback-email"
-              type="email"
-              placeholder="Your email"
-              className={errors.email ? styles.inputError : ''}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? 'feedback-email-error' : undefined}
-            />
-            {errors.email && (
-              <span id="feedback-email-error" className={styles.errorText}>
-                <AlertCircle size={14} />
-                {errors.email}
-              </span>
-            )}
-          </div>
+            <button
+              type="button"
+              className={styles.backButton}
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft size={18} />
+              Back
+            </button>
 
-          <div className={styles.field}>
-            <label htmlFor="feedback-description" className={styles.fieldLabel}>
-              Feedback
-            </label>
-            <textarea
-              id="feedback-description"
-              placeholder="Share your feedback..."
-              className={errors.description ? styles.inputError : ''}
-              value={description}
-              maxLength={MAX_DESCRIPTION_LENGTH}
-              onChange={(e) => setDescription(e.target.value)}
-              aria-invalid={Boolean(errors.description)}
-              aria-describedby={errors.description ? 'feedback-description-error' : undefined}
-            />
-            {errors.description ? (
-              <span id="feedback-description-error" className={styles.errorText}>
-                <AlertCircle size={14} />
-                {errors.description}
-              </span>
-            ) : (
-              <span className={styles.charCount}>
-                {description.length}/{MAX_DESCRIPTION_LENGTH}
-              </span>
-            )}
-          </div>
+            <h1>
+              <MessageSquare size={22} />
+              Built by PathFinders
+            </h1>
+            <p className={styles.subtitle}>Built by the team — tell us what's working.</p>
 
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 size={18} className={styles.spin} />
-                Sending…
-              </>
-            ) : (
-              <>
-                <Send size={18} />
-                Send feedback
-              </>
-            )}
-          </button>
-        </form>
-      )}
-    </div>
-     </>
+            <div className={styles.field}>
+              <label htmlFor="feedback-email" className={styles.fieldLabel}>
+                Email
+              </label>
+              <input
+                id="feedback-email"
+                type="email"
+                placeholder="Your email"
+                className={errors.email ? styles.inputError : ''}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'feedback-email-error' : undefined}
+              />
+              {errors.email && (
+                <span id="feedback-email-error" className={styles.errorText}>
+                  <AlertCircle size={14} />
+                  {errors.email}
+                </span>
+              )}
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="feedback-description" className={styles.fieldLabel}>
+                Feedback
+              </label>
+              <textarea
+                id="feedback-description"
+                placeholder="Share your feedback..."
+                className={errors.description ? styles.inputError : ''}
+                value={description}
+                maxLength={MAX_DESCRIPTION_LENGTH}
+                onChange={(e) => setDescription(e.target.value)}
+                aria-invalid={Boolean(errors.description)}
+                aria-describedby={errors.description ? 'feedback-description-error' : undefined}
+              />
+              {errors.description ? (
+                <span id="feedback-description-error" className={styles.errorText}>
+                  <AlertCircle size={14} />
+                  {errors.description}
+                </span>
+              ) : (
+                <span className={styles.charCount}>
+                  {description.length}/{MAX_DESCRIPTION_LENGTH}
+                </span>
+              )}
+            </div>
+
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={18} className={styles.spin} />
+                  Sending…
+                </>
+              ) : (
+                <>
+                  <Send size={18} />
+                  Send feedback
+                </>
+              )}
+            </button>
+          </form>
+        )}
+      </div>
+    </>
   );
 }
 

@@ -187,6 +187,14 @@ function Payment() {
                 <div className={styles.form}>
 
                     <h1 className={styles.visuallyHidden}>Payment</h1>
+                    <button
+                        type="button"
+                        className={styles.topBackButton}
+                        onClick={() => navigate("/upload")}
+                    >
+                        <ArrowLeft size={18} />
+                        Back
+                    </button>
 
 
                     {/* Steps (visual only) */}

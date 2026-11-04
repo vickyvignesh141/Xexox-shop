@@ -314,6 +314,8 @@
   outline-offset: 2px;
 }
 
+
+
 /* ===========================
    Responsive
    Small phones 320-360 | Phones 360-599 | Tablets 600-1024 | Laptops 1025+
@@ -353,4 +355,34 @@
   .form button,
   .feedbackButton,
   .spin { transition: none; animation: none; }
+}
+
+
+/* Small Back button - Top Left Corner */
+.form button.backButton {
+  width: fit-content !important;
+  min-height: 32px !important;
+  align-self: flex-start;
+  margin-top: 0 !important;
+  padding: 5px 10px !important;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: none;
+  border-radius: 7px;
+  box-shadow: none !important;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.form button.backButton svg {
+  width: 14px;
+  height: 14px;
+  color: white;
 }
