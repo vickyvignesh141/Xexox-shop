@@ -9,7 +9,7 @@ import styles from "./CustomerRegister.module.css";
 const getPasswordRules = (value) => [
   { label: "One capital letter", ok: /[A-Z]/.test(value) },
   { label: "One special character", ok: /[^A-Za-z0-9]/.test(value) },
-  { label: "Exactly 6 characters", ok: value.length === 6 },
+  { label: "6-12 characters", ok: value.length >= 6 && value.length <= 12 },
 ];
 
 function PasswordRules({ value }) {
@@ -60,9 +60,9 @@ function CustomerRegister() {
       return;
     }
 
-    if (!/^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{1,6}$/.test(form.password)) {
+    if (!/^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{6,12}$/.test(form.password)) {
       toast.error(
-        "Password must be max 6 characters with one capital letter and one special character"
+        "Password must be 6-12 characters with one capital letter and one special character"
       );
       return;
     }
@@ -85,25 +85,25 @@ function CustomerRegister() {
       toast.success("Registration successful!");
       navigate("/upload");
     } catch (error) {
-  const status = error.response?.status;
+      const status = error.response?.status;
 
-  const message =
-    status >= 500
-      ? "Server error. Please try again later."
-      : error.response?.data?.message ||
-        "Registration failed. Please try again.";
+      const message =
+        status >= 500
+          ? "Server error. Please try again later."
+          : error.response?.data?.message ||
+          "Registration failed. Please try again.";
 
-  toast.error(message, {
-    duration: 3000,
-  });
-}
+      toast.error(message, {
+        duration: 3000,
+      });
+    }
   };
 
   return (
     <>
 
       <div className={styles.container}>
-        <Toaster position="top-right" richColors  duration={3000} />
+        <Toaster position="top-right" richColors duration={3000} />
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <h1>Customer Registration</h1>
@@ -186,7 +186,8 @@ function CustomerRegister() {
               placeholder="Password"
               value={form.password}
               onChange={handleChange}
-              maxLength={6}
+              minLength={6}
+              maxLength={12}
               autoComplete="new-password"
               required
             />
@@ -209,7 +210,8 @@ function CustomerRegister() {
               placeholder="Confirm Password"
               value={form.confirmPassword}
               onChange={handleChange}
-              maxLength={6}
+              minLength={6}
+              maxLength={12}
               autoComplete="new-password"
               required
             />
