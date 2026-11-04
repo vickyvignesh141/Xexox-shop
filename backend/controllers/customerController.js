@@ -4,7 +4,7 @@ const Customer = require("../models/Customer")
 
 
 const createCustomer = async (req, res) => {
-    
+
     try {
         const {
             mobile,
@@ -28,11 +28,11 @@ const createCustomer = async (req, res) => {
         // Validate password on the backend too
         if (
             typeof password !== "string" ||
-            !/^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{1,6}$/.test(password)
+            !/^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{6,12}$/.test(password)
         ) {
             return res.status(400).json({
                 message:
-                    "Password must be max 6 characters with one capital letter and one special character",
+                    "Password must be 6-12 characters with one capital letter and one special character",
             });
         }
 

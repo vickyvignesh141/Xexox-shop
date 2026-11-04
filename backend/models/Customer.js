@@ -73,8 +73,8 @@ const customerSchema = new mongoose.Schema({
         type: String,
         required: true,
         select: false,
-        minlength: 3,
-        maxlength: 6,
+        minlength: 6,
+        maxlength: 12,
     },
 },
     {

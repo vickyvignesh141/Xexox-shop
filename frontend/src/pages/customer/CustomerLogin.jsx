@@ -91,8 +91,8 @@ function CustomerLogin() {
                 autoComplete="current-password"
                 placeholder="Enter Your Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value.slice(0, 6))}
-                maxLength={6}
+                onChange={(e) => setPassword(e.target.value.slice(0, 12))}
+                maxLength={12}
                 minLength={6}
                 required
               />
