@@ -76,7 +76,12 @@ function CustomerLogin() {
               autoComplete="username"
               placeholder="Enter Your Phone Number"
               value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
+              onChange={(e) =>
+                setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))
+              }
+              maxLength={10}
+              minLength={10}
+              pattern="[0-9]{10}"
               required
             />
           </div>
@@ -122,7 +127,7 @@ function CustomerLogin() {
               "LOGIN"
             )}
           </button>
-          
+
         </form>
         {/* <button
     type="button"
