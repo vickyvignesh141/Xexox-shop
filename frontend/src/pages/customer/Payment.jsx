@@ -97,9 +97,11 @@ function Payment() {
             );
 
             localStorage.removeItem("pendingOrder");
+            localStorage.removeItem("customerToken");
+            localStorage.removeItem("xeroxCustomerId");
 
             setTimeout(() => {
-                navigate("/");
+                navigate("/login");
             }, 3000);
         } catch (error) {
             const status = error.response?.status;
@@ -154,9 +156,11 @@ function Payment() {
             );
 
             localStorage.removeItem("pendingOrder");
+            localStorage.removeItem("customerToken");
+            localStorage.removeItem("xeroxCustomerId");
 
             setTimeout(() => {
-                navigate("/");
+                navigate("/login");
             }, 3000);
 
         } catch (error) {
@@ -386,7 +390,7 @@ function Payment() {
                         </div>
                     )}
 
-                    <div className={styles.commentSection}>
+                    {/* <div className={styles.commentSection}>
                         <label
                             htmlFor="customerComment"
                             className={styles.fieldLabel}
@@ -402,17 +406,10 @@ function Payment() {
                             rows={4}
                             className={styles.commentBox}
                         />
-                    </div>
+                    </div> */}
 
 
-                    {/* <button
-                    type="button"
-                    onClick={() =>
-                        navigate("/upload")
-                    }
-                >
-                    Back to Upload
-                </button> */}
+                   
 
                 </div>
 

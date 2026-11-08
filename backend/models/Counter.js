@@ -1,11 +1,16 @@
+
 const mongoose = require("mongoose");
 
 const counterSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: true,
-            unique: true
+            required: true
+        },
+
+        dateKey: {
+            type: String,
+            required: true
         },
 
         sequence: {
@@ -17,6 +22,12 @@ const counterSchema = new mongoose.Schema(
         collection: "counters",
         versionKey: false
     }
+);
+
+// Unique combination of name + dateKey
+counterSchema.index(
+    { name: 1, dateKey: 1 },
+    { unique: true }
 );
 
 module.exports = mongoose.model("Counter", counterSchema);

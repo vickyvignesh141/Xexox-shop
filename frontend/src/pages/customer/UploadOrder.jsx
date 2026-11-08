@@ -132,13 +132,13 @@ function UploadOrder() {
             return;
         }
 
-        if (files.length  + selectedFiles.length >5) {
-        toast.warning(
-            "Maximum file limit reached. Please create another order to upload remaining files.",
-            { duration: 5000 }
-        );
-        return;
-    }
+        if (files.length + selectedFiles.length > 5) {
+            toast.warning(
+                "Maximum file limit reached. Please create another order to upload remaining files.",
+                { duration: 5000 }
+            );
+            return;
+        }
 
         if (selectedFiles.length === 0) {
             toast.warning("Please select a PDF", {
@@ -170,9 +170,10 @@ function UploadOrder() {
                     ...response.data.file,
                     originalFile: file,
                     copies: 1,
+                    paperSize: "A4",
                     colorMode: "BW",
                     side: "SINGLE",
-                    // Backend calculated amount
+                    note: "",
                     amount: 0,
                 });
             }
@@ -207,11 +208,24 @@ function UploadOrder() {
     // -----------------------------------------
     const updateFile = (index, field, value) => {
         setFiles((prev) =>
-            prev.map((file, i) =>
-                i === index
-                    ? { ...file, [field]: value, amount: 0 }
-                    : file
-            )
+            prev.map((file, i) => {
+                if (i !== index) return file;
+
+                const updatedFile = {
+                    ...file,
+                    [field]: value,
+                    amount: 0,
+                };
+
+                if (
+                    field === "paperSize" &&
+                    ["A3", "VEC Paper"].includes(value)
+                ) {
+                    updatedFile.side = "SINGLE";
+                }
+
+                return updatedFile;
+            })
         );
     };
 
@@ -242,10 +256,11 @@ function UploadOrder() {
                 `${import.meta.env.VITE_API_URL}/api/orders/calculate-price`,
                 {
                     files: files.map((file) => ({
-                        pageCount:  Number(file.pageCount),
+                        pageCount: Number(file.pageCount),
                         copies: Number(file.copies),
                         colorMode: file.colorMode,
                         side: file.side,
+                        paperSize: file.paperSize,
                     })),
                 },
                 {
@@ -313,6 +328,18 @@ function UploadOrder() {
             return;
         }
 
+        if (
+            files.some(
+                (file) =>
+                    file.copies === "" ||
+                    !Number.isInteger(Number(file.copies)) ||
+                    Number(file.copies) < 1
+            )
+        ) {
+            toast.warning("Please enter at least 1 copy for every PDF");
+            return;
+        }
+
         try {
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}/api/orders/calculate-price`,
@@ -322,6 +349,7 @@ function UploadOrder() {
                         copies: Number(file.copies),
                         colorMode: file.colorMode,
                         side: file.side,
+                        paperSize: file.paperSize,
                     })),
                 },
                 {
@@ -349,9 +377,11 @@ function UploadOrder() {
                     s3Key: file.s3Key,
                     fileSize: file.fileSize,
                     pageCount: file.pageCount,
-                    copies: file.copies,
+                    copies: Number(file.copies),
                     colorMode: file.colorMode,
                     side: file.side,
+                    paperSize: file.paperSize,
+                    note: file.note || "",
                     amount: file.amount,
                 })),
                 totalAmount: updatedTotal,
@@ -409,7 +439,7 @@ function UploadOrder() {
 
                                     <div>
                                         <h2 id="upload-instructions-title">
-                                            File Upload Instructions
+                                             Instructions
                                         </h2>
                                     </div>
                                 </div>
@@ -444,28 +474,25 @@ function UploadOrder() {
                                 <div className={styles.instructionItem}>
                                     <FileText size={18} />
                                     <span>
-                                        Enter all your <strong>printing requirements</strong> in
-                                        the Description box.
-                                    </span>
-
-
-                                </div>
-                                <div className={styles.instructionItem}>
-                                    <PackageCheck size={18} />
-                                    <span>
-                                        Check your order status after <strong>30 minutes</strong>.
-                                        Collect your prints from the Xerox shop once <strong>Completed</strong>.
+                                        Select <strong>paper size, colour, number of copies,
+                                            and print side</strong> separately for each PDF.
                                     </span>
                                 </div>
 
                                 <div className={styles.instructionItem}>
                                     <Ruler size={18} />
                                     <span>
-                                        Please mention details such as{" "}
-                                        <strong>
-                                            paper size, colour/B&W, number of copies,
-                                            single/double-side, and binding.
-                                        </strong>
+                                        Use the optional <strong>Note</strong> field for
+                                        binding or any special printing requirements.
+                                    </span>
+                                </div>
+
+                                <div className={styles.instructionItem}>
+                                    <PackageCheck size={18} />
+                                    <span>
+                                        Check your order status after <strong>30 minutes</strong>.
+                                        Collect your prints from the Xerox shop once
+                                        <strong> Completed</strong>.
                                     </span>
                                 </div>
 
@@ -478,15 +505,16 @@ function UploadOrder() {
                                     <div>
                                         <strong>Important</strong>
                                         <p>
-                                            Please check your uploaded files and requirements
-                                            carefully before placing the order. If there are any
-                                            mistakes or incorrect details from your side, changes
-                                            may not be accepted after the order is processed.
+                                            Please check your uploaded files and printing
+                                            requirements carefully before placing the order.
+                                            If there are any mistakes or incorrect details
+                                            from your side, changes may not be accepted
+                                            after the order is processed.
                                         </p>
                                     </div>
                                 </div>
-                            </div>
 
+                            </div>
                             {/* Continue button */}
                             <button
                                 type="button"
@@ -723,6 +751,21 @@ function UploadOrder() {
                                             />
                                         </div>
 
+                                        {/* Paper Size */}
+                                        <div className={styles.field}>
+                                            <label>Paper Size</label>
+                                            <select
+                                                value={file.paperSize}
+                                                onChange={(e) =>
+                                                    updateFile(index, "paperSize", e.target.value)
+                                                }
+                                            >
+                                                <option value="A4">A4</option>
+                                                <option value="A3">A3</option>
+                                                <option value="VEC Paper">VEC Paper</option>
+                                            </select>
+                                        </div>
+
                                         {/* Color */}
                                         <div className={styles.field}>
                                             <label>Color</label>
@@ -747,8 +790,24 @@ function UploadOrder() {
                                                 }
                                             >
                                                 <option value="SINGLE">Single Side</option>
-                                                <option value="DOUBLE">Double Side</option>
+
+                                                {file.paperSize === "A4" && (
+                                                    <option value="DOUBLE">Double Side</option>
+                                                )}
                                             </select>
+                                        </div>
+                                        {/* File Note */}
+                                        <div className={`${styles.field} ${styles.fullRow}`}>
+                                            <label>Note (Optional)</label>
+                                            <textarea
+                                                value={file.note || ""}
+                                                maxLength={500}
+                                                placeholder="Enter requirements for this PDF..."
+                                                onChange={(e) =>
+                                                    updateFile(index, "note", e.target.value)
+                                                }
+                                            />
+                                            <small>{(file.note || "").length}/500 characters</small>
                                         </div>
 
                                     </div>
