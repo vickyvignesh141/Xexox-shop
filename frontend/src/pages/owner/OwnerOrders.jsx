@@ -119,9 +119,15 @@ function OwnerOrders() {
     }
   };
 
-  useEffect(() => {
+ useEffect(() => {
+  fetchOrders();
+
+  const interval = setInterval(() => {
     fetchOrders();
-  }, []);
+  }, 5000);
+
+  return () => clearInterval(interval);
+}, []);
 
   const verifyPayment = async (orderNumber, status) => {
     try {
