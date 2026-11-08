@@ -73,7 +73,7 @@ const updateOrderStatus = async (req, res) => {
         const { orderNumber } = req.params;
         const { status } = req.body || {};
 
-        if (!["COMPLETED", "NOT_COMPLETED"].includes(status)) {
+        if (!["COMPLETED", "NOT-COMPLETED"].includes(status)) {
             return res.status(400).json({
                 message: "Invalid order status"
             });

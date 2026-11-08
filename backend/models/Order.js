@@ -67,6 +67,17 @@ const orderSchema = new mongoose.Schema(
                     type: Number,
                     required: true,
                     min: 0
+                },
+                paperSize: {
+                    type: String,
+                    enum: ["A3", "A4", "VEC Paper"],
+                    required: true
+                },
+
+                note: {
+                    type: String,
+                    trim: true,
+                    default: ""
                 }
             }
         ],
@@ -92,20 +103,20 @@ const orderSchema = new mongoose.Schema(
         },
 
         paymentVerificationStatus: {
-    type: String,
-    required: function () {
-        return this.paymentMethod === "GPay";
-    },
-    enum: ["PENDING", "VERIFIED", "REJECTED"],
-    default: function () {
-        return this.paymentMethod === "GPay" ? "PENDING" : undefined;
-    }
-},
+            type: String,
+            required: function () {
+                return this.paymentMethod === "GPay";
+            },
+            enum: ["PENDING", "VERIFIED", "REJECTED"],
+            default: function () {
+                return this.paymentMethod === "GPay" ? "PENDING" : undefined;
+            }
+        },
 
         orderStatus: {
             type: String,
             required: true,
-            enum: ["PENDING", "COMPLETED", "NOT_COMPLETED"],
+            enum: ["PENDING", "COMPLETED", "NOT-COMPLETED"],
             default: "PENDING"
         },
         customerComment: {

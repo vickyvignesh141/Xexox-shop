@@ -2,79 +2,95 @@ import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
 import {
-  FileText,
-  User,
-  Phone,
-  Building2,
-  MapPin,
-  CreditCard,
-  Calendar,
-  DollarSign,
-  Eye,
   Printer,
   CheckCircle,
   XCircle,
   AlertCircle,
-  FileCheck
+  FileCheck,
 } from "lucide-react";
 import styles from "./OwnerOrders.module.css";
 
+// A note up to this length sits in the 6th box of the row.
+// A longer note moves to its own full-width row so the boxes stay aligned.
+const NOTE_INLINE_MAX = 30;
+
+const STATUS_LABELS = {
+  PENDING: "Pending",
+  COMPLETED: "Completed",
+  "NOT-COMPLETED": "Not completed",
+};
+
+// PENDING -> styles.pending, NOT-COMPLETED -> styles.notcompleted
+const statusClass = (status) =>
+  styles[(status || "").toLowerCase().replace(/[^a-z]/g, "")];
+
+function Field({ label, value, wide }) {
+  return (
+    <div className={`${styles.field} ${wide ? styles.wide : ""}`}>
+      <span className={styles.fieldLabel}>{label}</span>
+      <span className={styles.fieldValue}>{value || "—"}</span>
+    </div>
+  );
+}
+
+function InfoRow({ label, stacked, children }) {
+  return (
+    <div className={`${styles.infoRow} ${stacked ? styles.infoRowStacked : ""}`}>
+      <span className={styles.infoLabel}>{label}</span>
+      <div className={styles.infoValue}>{children}</div>
+    </div>
+  );
+}
+
+function Spec({ label, value }) {
+  return (
+    <div className={styles.box}>
+      <span className={styles.boxLabel}>{label}</span>
+      <span className={styles.boxValue}>{value}</span>
+    </div>
+  );
+}
 
 function OwnerOrders() {
   const [orders, setOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [selectedDate, setSelectedDate] = useState("");
+  const [printedFiles, setPrintedFiles] = useState([]);
 
   const token = localStorage.getItem("ownerToken");
 
-  const openPdf = async (s3Key) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/owner/pdf-url`,
-        {
-          params: { s3Key },
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      window.open(response.data.url, "_blank");
-
-    } catch (error) {
-      console.error("Open PDF error:", error);
-toast.error("Unable to open PDF. Please try again.", {
-  duration: 3000,
-});    }
-  };
-
-  const printPdf = async (s3Key) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/owner/pdf-url`,
-        {
-          params: { s3Key },
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      const printWindow = window.open(response.data.url, "_blank");
-
-      if (printWindow) {
-        printWindow.onload = () => {
-          printWindow.focus();
-          printWindow.print();
-        };
+ const printPdf = async (s3Key) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/owner/pdf-url`,
+      {
+        params: { s3Key },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
+    );
 
-    } catch (error) {
-      console.error("Print PDF error:", error);
-toast.error("Unable to open PDF. Please try again.", {
-  duration: 3000,
-});    }
-  };
+    // Mark this file as clicked
+    setPrintedFiles((prev) =>
+      prev.includes(s3Key) ? prev : [...prev, s3Key]
+    );
+
+    const printWindow = window.open(response.data.url, "_blank");
+
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+      };
+    }
+  } catch (error) {
+    console.error("Print PDF error:", error);
+    toast.error("Unable to open PDF. Please try again.", {
+      duration: 3000,
+    });
+  }
+};
 
   const fetchOrders = async () => {
     try {
@@ -82,13 +98,12 @@ toast.error("Unable to open PDF. Please try again.", {
         `${import.meta.env.VITE_API_URL}/api/owner/orders`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       setOrders(response.data.orders);
-
     } catch (error) {
       console.error("Fetch orders error:", error);
 
@@ -98,132 +113,109 @@ toast.error("Unable to open PDF. Please try again.", {
         status >= 500
           ? "Server error. Please try again later."
           : error.response?.data?.message ||
-          "Failed to load orders. Please try again.";
+            "Failed to load orders. Please try again.";
 
       toast.error(message);
     }
   };
 
-useEffect(() => {
-  fetchOrders();
-}, []);
-
-const verifyPayment = async (orderNumber, status) => {
-  try {
-    await axios.patch(
-      `${import.meta.env.VITE_API_URL}/api/owner/orders/${orderNumber}/payment`,
-      {
-        status
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
-    toast.success(
-      `Payment ${status.toLowerCase()} successfully`
-    );
-
+  useEffect(() => {
     fetchOrders();
+  }, []);
 
-  } catch (error) {
-    const status = error.response?.status;
-
-    const message =
-      status >= 500
-        ? "Server error. Please try again later."
-        : error.response?.data?.message ||
-        "Payment update failed. Please try again.";
-
-    toast.error(message);
-  }
-};
-
-const updateOrderStatus = async (orderNumber, status) => {
-  try {
-    await axios.patch(
-      `${import.meta.env.VITE_API_URL}/api/owner/orders/${orderNumber}/status`,
-      {
-        status
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
+  const verifyPayment = async (orderNumber, status) => {
+    try {
+      await axios.patch(
+        `${import.meta.env.VITE_API_URL}/api/owner/orders/${orderNumber}/payment`,
+        { status },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      }
-    );
+      );
 
-    toast.success(
-      `Order marked as ${status.toLowerCase()}`
-    );
+      toast.success(`Payment ${status.toLowerCase()} successfully`);
 
-    fetchOrders();
+      fetchOrders();
+    } catch (error) {
+      const status = error.response?.status;
 
-  } catch (error) {
-    const status = error.response?.status;
+      const message =
+        status >= 500
+          ? "Server error. Please try again later."
+          : error.response?.data?.message ||
+            "Payment update failed. Please try again.";
 
-    const message =
-      status >= 500
-        ? "Server error. Please try again later."
-        : error.response?.data?.message ||
-        "Order status update failed. Please try again.";
+      toast.error(message);
+    }
+  };
 
-    toast.error(message);
-  }
-};
+  const updateOrderStatus = async (orderNumber, status) => {
+    try {
+      await axios.patch(
+        `${import.meta.env.VITE_API_URL}/api/owner/orders/${orderNumber}/status`,
+        { status },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      toast.success(`Order marked as ${status.toLowerCase()}`);
 
-const filteredOrders = orders.filter((order) => {
-  // Status filter
-  if (
-    statusFilter === "COMPLETED" &&
-    order.orderStatus !== "COMPLETED"
-  ) {
-    return false;
-  }
+      fetchOrders();
+    } catch (error) {
+      const status = error.response?.status;
 
-  if (
-    statusFilter === "NOT-COMPLETED" &&
-    order.orderStatus !== "NOT-COMPLETED"
-  ) {
-    return false;
-  }
+      const message =
+        status >= 500
+          ? "Server error. Please try again later."
+          : error.response?.data?.message ||
+            "Order status update failed. Please try again.";
 
-  if (
-    statusFilter === "ALL" &&
-    order.orderStatus === "COMPLETED"
-  ) {
-    return false;
-  }
+      toast.error(message);
+    }
+  };
 
-  // Date filter
-  if (selectedDate) {
-    const orderDate = new Date(order.createdAt)
-      .toLocaleDateString("en-CA");
-
-    if (orderDate !== selectedDate) {
+  const filteredOrders = orders.filter((order) => {
+    // Status filter
+    if (statusFilter === "COMPLETED" && order.orderStatus !== "COMPLETED") {
       return false;
     }
-  }
 
-  return true;
-});
+    if (
+      statusFilter === "NOT-COMPLETED" &&
+      order.orderStatus !== "NOT-COMPLETED"
+    ) {
+      return false;
+    }
 
+    if (statusFilter === "ALL" && order.orderStatus === "COMPLETED") {
+      return false;
+    }
 
-return (
-  <>
+    // Date filter
+    if (selectedDate) {
+      const orderDate = new Date(order.createdAt).toLocaleDateString("en-CA");
 
+      if (orderDate !== selectedDate) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  return (
     <div className={styles.container}>
-      <Toaster position="top-right" richColors duration={3000}/>
-
+      <Toaster position="top-right" richColors duration={3000} />
 
       <h1 className={styles.title}>
         <FileCheck size={28} className={styles.titleIcon} />
         Owner Orders
       </h1>
-
 
       <div className={styles.filters}>
         <label className={styles.filterGroup}>
@@ -243,7 +235,7 @@ return (
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="ALL">All</option>
+            <option value="ALL">Active</option>
             <option value="COMPLETED">Completed</option>
             <option value="NOT-COMPLETED">Not Completed</option>
           </select>
@@ -261,7 +253,6 @@ return (
         </button>
       </div>
 
-
       {filteredOrders.length === 0 ? (
         <div className={styles.emptyState}>
           <AlertCircle size={48} />
@@ -269,288 +260,193 @@ return (
         </div>
       ) : (
         filteredOrders.map((order) => (
-          <div
-            key={order._id}
-            className={styles.orderCard}
-          >
-
-            <div className={styles.orderHeader}>
-              <h2 className={styles.orderTitle}>
-                Order: {order.orderNumber}
-              </h2>
-              <span className={`${styles.statusBadge} ${styles[`status_${order.orderStatus}`]}`}>
-                {order.orderStatus}
+          <article key={order._id} className={styles.orderCard}>
+            {/* HEADER */}
+            <header className={styles.orderHeader}>
+              <h2 className={styles.orderTitle}>Order {order.orderNumber}</h2>
+              <span className={`${styles.pill} ${statusClass(order.orderStatus)}`}>
+                {STATUS_LABELS[order.orderStatus] || order.orderStatus}
               </span>
-            </div>
+            </header>
 
-            <div className={styles.mainGrid}>
-              {/* LEFT SECTION: CUSTOMER DETAILS */}
-              <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>
-                  <User size={16} />
-                  Customer Details
-                </h3>
-
-                <div className={styles.infoRow}>
-                  <User size={18} className={styles.icon} />
-                  <div>
-                    <div className={styles.label}>Name</div>
-                    <div className={styles.value}>{order.customerId?.name}</div>
-                  </div>
-                </div>
-
-                <div className={styles.infoRow}>
-                  <Phone size={18} className={styles.icon} />
-                  <div>
-                    <div className={styles.label}>Mobile</div>
-                    <div className={styles.value}>{order.customerId?.mobile}</div>
-                  </div>
-                </div>
-
-                <div className={styles.infoRow}>
-                  <Building2 size={18} className={styles.icon} />
-                  <div>
-                    <div className={styles.label}>Department</div>
-                    <div className={styles.value}>{order.customerId?.department}</div>
-                  </div>
-                </div>
-
-                <div className={styles.infoRow}>
-                  <MapPin size={18} className={styles.icon} />
-                  <div>
-                    <div className={styles.label}>Section</div>
-                    <div className={styles.value}>{order.customerId?.section}</div>
-                  </div>
-                </div>
-
-                {order.paymentMethod === "GPay" && order.transactionId && (
-                  <div className={styles.infoRow}>
-                    <CreditCard size={18} className={styles.icon} />
-                    <div>
-                      <div className={styles.label}>Transaction ID</div>
-                      <div className={styles.value}>{order.transactionId}</div>
-                    </div>
-                  </div>
-                )}
-
-                <div className={styles.infoRow}>
-                  <CreditCard size={18} className={styles.icon} />
-                  <div>
-                    <div className={styles.label}>Payment Method</div>
-                    <div className={styles.value}>
-                      {order.paymentMethod === "COD" ? "Cash on Delivery" : "GPay"}
-                    </div>
-                  </div>
+            {/* CUSTOMER DETAILS + ORDER INFO */}
+            <section className={styles.summary}>
+              <div className={styles.panel}>
+                <h3 className={styles.panelTitle}>Customer details</h3>
+                <div className={styles.fields}>
+                  <Field label="Name" value={order.customerId?.name} />
+                  <Field label="Mobile" value={order.customerId?.mobile} />
+                  <Field
+                    label="Department"
+                    value={order.customerId?.department}
+                    wide
+                  />
+                  <Field label="Section" value={order.customerId?.section} />
+                  <Field
+                    label="Payment method"
+                    value={
+                      order.paymentMethod === "COD" ? "Cash on Delivery" : "GPay"
+                    }
+                  />
+                  {order.paymentMethod === "GPay" && order.transactionId && (
+                    <Field
+                      label="Transaction ID"
+                      value={order.transactionId}
+                      wide
+                    />
+                  )}
                 </div>
               </div>
 
-              {/* RIGHT SECTION: ORDER INFO */}
-              <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>
-                  <Calendar size={16} />
-                  Order Info
-                </h3>
+              <div className={styles.panel}>
+                <h3 className={styles.panelTitle}>Order info</h3>
 
-                <div className={styles.infoRow}>
-                  <Calendar size={18} className={styles.icon} />
-                  <div>
-                    <div className={styles.label}>Order Date</div>
-                    <div className={styles.value}>
-                      {new Date(order.createdAt).toLocaleDateString("en-GB", {
-                        timeZone: "Asia/Kolkata",
-                      })}
-                    </div>
-                  </div>
-                </div>
+                <InfoRow label="Order date">
+                  {new Date(order.createdAt).toLocaleDateString("en-GB", {
+                    timeZone: "Asia/Kolkata",
+                  })}
+                </InfoRow>
 
-                <div className={styles.infoRow}>
-                  <DollarSign size={18} className={styles.icon} />
-                  <div>
-                    <div className={styles.label}>Total Amount</div>
-                    <div className={styles.value}>₹{order.totalAmount}</div>
-                  </div>
-                </div>
+                <InfoRow label="Total amount">
+                  <span className={styles.amount}>₹{order.totalAmount}</span>
+                </InfoRow>
 
                 {order.customerComment?.trim() && (
-                  <div className={styles.infoRow}>
-                    <FileText size={18} className={styles.icon} />
-
-                    <div>
-                      <div className={styles.label}>
-                        Customer Comment
-                      </div>
-
-                      <div className={styles.value}>
-                        {order.customerComment}
-                      </div>
-                    </div>
-                  </div>
+                  <InfoRow label="Customer comment" stacked>
+                    <div className={styles.comment}>{order.customerComment}</div>
+                  </InfoRow>
                 )}
 
-                {/* <div className={styles.infoRow}>
-                  <AlertCircle size={18} className={styles.icon} />
-                  <div>
-                    <div className={styles.label}>Payment Status</div>
-                    <div className={`${styles.value} ${styles[`paymentStatus_${order.paymentVerificationStatus}`]}`}>
-                      {order.paymentVerificationStatus}
-                    </div>
-                  </div>
-                </div> */}
-
-                <div className={styles.infoRow}>
-                  <FileCheck size={18} className={styles.icon} />
-                  <div>
-                    <div className={styles.label}>Order Status</div>
-                    <div className={`${styles.value} ${styles[`orderStatus_${order.orderStatus}`]}`}>
-                      {order.orderStatus}
-                    </div>
-                  </div>
-                </div>
+                <InfoRow label="Order status">
+                  <span
+                    className={`${styles.pill} ${statusClass(order.orderStatus)}`}
+                  >
+                    {STATUS_LABELS[order.orderStatus] || order.orderStatus}
+                  </span>
+                </InfoRow>
               </div>
-            </div>
+            </section>
 
-            {/* FILES SECTION */}
-            <div className={styles.filesSection}>
-              <h3 className={styles.sectionTitle}>
-                <FileText size={16} />
-                Files
+            {/* FILES */}
+            <section className={styles.filesSection}>
+              <h3 className={styles.filesTitle}>
+                Files <span className={styles.count}>{order.files.length}</span>
               </h3>
 
-              {order.files.map((file, index) => (
-                <div
-                  key={index}
-                  className={styles.fileCard}
-                >
+              {order.files.map((file, index) => {
+                const note = file.note?.trim();
+                const longNote =
+                  note && (note.length > NOTE_INLINE_MAX || note.includes("\n"));
 
-                  <div className={styles.fileName}>
-                    <FileText size={16} />
-                    {file.filename}
-                  </div>
+                return (
+                  <div key={index} className={styles.fileCard}>
+                    <div className={styles.fileHead}>
+                      <h4 className={styles.fileName}>{file.filename}</h4>
 
-                  <div className={styles.fileSpecs}>
-                    <div className={styles.spec}>
-                      <span className={styles.specLabel}>Pages</span>
-                      <span className={styles.specValue}>{file.pageCount}</span>
+                      {order.orderStatus !== "COMPLETED" && (
+  <button
+    type="button"
+    className={styles.printButton}
+    onClick={() => printPdf(file.s3Key)}
+  >
+    <Printer size={16} />
+    Print PDF
+  </button>
+)}
+                       {printedFiles.includes(file.s3Key) && (
+    <CheckCircle size={18} className={styles.printedTick} />
+  )}
                     </div>
-                    <div className={styles.spec}>
-                      <span className={styles.specLabel}>Copies</span>
-                      <span className={styles.specValue}>{file.copies}</span>
-                    </div>
-                    <div className={styles.spec}>
-                      <span className={styles.specLabel}>Print</span>
-                      <span className={styles.specValue}>
-                        {file.colorMode === "BW" ? "B&W" : "Color"}
-                      </span>
-                    </div>
-                    <div className={styles.spec}>
-                      <span className={styles.specLabel}>Side</span>
-                      <span className={styles.specValue}>
-                        {file.side === "SINGLE" ? "Single" : "Double"}
-                      </span>
-                    </div>
-                  </div>
 
-                  <div className={styles.fileButtons}>
-                    {/* <button
-                      className={`${styles.button} ${styles.viewButton}`}
-                      onClick={() => openPdf(file.s3Key)}
+                    {/* THE 6 BOXES */}
+                    <div
+                      className={`${styles.boxes} ${
+                        longNote ? styles.boxesLong : ""
+                      }`}
                     >
-                      <Eye size={16} />
-                      View PDF
-                    </button> */}
+                      <Spec label="Pages" value={file.pageCount} />
+                      <Spec label="Copies" value={file.copies} />
+                      <Spec
+                        label="Print"
+                        value={file.colorMode === "BW" ? "B&W" : "Color"}
+                      />
+                      <Spec
+                        label="Side"
+                        value={file.side === "SINGLE" ? "Single" : "Double"}
+                      />
+                      <Spec label="Paper size" value={file.paperSize || "A4"} />
 
-                    <button
-                      className={`${styles.button} ${styles.printButton}`}
-                      onClick={() => printPdf(file.s3Key)}
-                    >
-                      <Printer size={16} />
-                      Print PDF
-                    </button>
+                      <div className={`${styles.box} ${styles.noteBox}`}>
+                        <span className={styles.boxLabel}>Customer note</span>
+                        {note ? (
+                          <span className={styles.noteText}>{note}</span>
+                        ) : (
+                          <span className={styles.noteEmpty}>No note</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-
-                </div>
-              ))}
-            </div>
+                );
+              })}
+            </section>
 
             {/* PAYMENT VERIFICATION BUTTONS */}
             {order.paymentMethod === "GPay" &&
               order.paymentVerificationStatus === "PENDING" && (
-                <div className={styles.buttonGroup}>
-
+                <div className={styles.actions}>
                   <button
-                    className={`${styles.button} ${styles.verifyButton}`}
-                    onClick={() =>
-                      verifyPayment(
-                        order.orderNumber,
-                        "VERIFIED"
-                      )
-                    }
-                  >
-                    <CheckCircle size={16} />
-                    Verify Payment
-                  </button>
-
-                  <button
-                    className={`${styles.button} ${styles.rejectButton}`}
-                    onClick={() =>
-                      verifyPayment(
-                        order.orderNumber,
-                        "REJECTED"
-                      )
-                    }
+                    type="button"
+                    className={`${styles.button} ${styles.reject}`}
+                    onClick={() => verifyPayment(order.orderNumber, "REJECTED")}
                   >
                     <XCircle size={16} />
-                    Reject Payment
+                    Reject payment
                   </button>
 
-                </div>
-              )
-            }
-
-            {/* ORDER STATUS BUTTONS */}
-            {order.orderStatus === "PENDING" &&
-              (
-                order.paymentMethod === "COD" ||
-                order.paymentVerificationStatus === "VERIFIED"
-              ) && (
-                <div className={styles.buttonGroup}>
-
                   <button
-                    className={`${styles.button} ${styles.completeButton}`}
-                    onClick={() =>
-                      updateOrderStatus(
-                        order.orderNumber,
-                        "COMPLETED"
-                      )
-                    }
+                    type="button"
+                    className={`${styles.button} ${styles.success}`}
+                    onClick={() => verifyPayment(order.orderNumber, "VERIFIED")}
                   >
                     <CheckCircle size={16} />
-                    Mark Completed
+                    Verify payment
                   </button>
-
-                  <button
-                    className={`${styles.button} ${styles.notCompleteButton}`}
-                    onClick={() =>
-                      updateOrderStatus(
-                        order.orderNumber,
-                        "NOT-COMPLETED"
-                      )
-                    }
-                  >
-                    <AlertCircle size={16} />
-                    Mark Not Completed
-                  </button>
-
                 </div>
               )}
 
-          </div>
+            {/* ORDER STATUS BUTTONS */}
+            {order.orderStatus === "PENDING" &&
+              (order.paymentMethod === "COD" ||
+                order.paymentVerificationStatus === "VERIFIED") && (
+                <div className={styles.actions}>
+                  <button
+                    type="button"
+                    className={`${styles.button} ${styles.warn}`}
+                    onClick={() =>
+                      updateOrderStatus(order.orderNumber, "NOT-COMPLETED")
+                    }
+                  >
+                    <AlertCircle size={16} />
+                    Mark not completed
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`${styles.button} ${styles.success}`}
+                    onClick={() =>
+                      updateOrderStatus(order.orderNumber, "COMPLETED")
+                    }
+                  >
+                    <CheckCircle size={16} />
+                    Mark completed
+                  </button>
+                </div>
+              )}
+          </article>
         ))
       )}
-
     </div>
-  </>
-);
+  );
 }
 
 export default OwnerOrders;

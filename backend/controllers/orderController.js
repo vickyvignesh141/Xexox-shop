@@ -3,7 +3,7 @@ const Customer = require("../models/Customer");
 const generateOrderNumber = require("../services/orderNumberService");
 const calculateFilePrice = require("../services/priceService");
 
-const { S3Client, GetObjectCommand,DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 const { PDFDocument } = require("pdf-lib");
 
@@ -41,22 +41,29 @@ const calculatePrice = async (req, res) => {
                 pageCount,
                 copies,
                 colorMode,
-                side
+                side,
+                paperSize
             } = file;
 
             if (
-                !Number.isInteger(pageCount) ||
-                pageCount < 1 ||
-
-                !Number.isInteger(copies) ||
-                copies < 1 ||
-
+                !Number.isInteger(pageCount) || pageCount < 1 ||
+                !Number.isInteger(copies) || copies < 1 ||
                 !["BW", "COLOR"].includes(colorMode) ||
-
-                !["SINGLE", "DOUBLE"].includes(side)
+                !["SINGLE", "DOUBLE"].includes(side) ||
+                !["A3", "A4", "VEC Paper"].includes(paperSize)
             ) {
                 return res.status(400).json({
-                    message: "Invalid price details"
+                    message: "Invalid price details or paper size"
+                });
+            }
+
+            // A3 and VEC Paper do not support double-sided printing
+            if (
+                ["A3", "VEC Paper"].includes(paperSize) &&
+                side === "DOUBLE"
+            ) {
+                return res.status(400).json({
+                    message: `Double-sided printing is not available for ${paperSize}`
                 });
             }
 
@@ -64,7 +71,8 @@ const calculatePrice = async (req, res) => {
                 pageCount,
                 copies,
                 colorMode,
-                side
+                side,
+                paperSize
             );
 
             calculatedFiles.push({
@@ -81,13 +89,10 @@ const calculatePrice = async (req, res) => {
 
     } catch (error) {
 
-        console.error(
-            "Calculate price error:",
-            error
-        );
+        console.error("Calculate price error:", error);
 
-        return res.status(500).json({
-            message: "Internal server error"
+        return res.status(400).json({
+            message: error.message || "Unable to calculate price"
         });
     }
 };
@@ -248,6 +253,7 @@ const createOrder = async (req, res) => {
         }
 
 
+
         // --------------------------------
         // Calculate total amount
         // --------------------------------
@@ -256,20 +262,55 @@ const createOrder = async (req, res) => {
 
         const updatedFiles = files.map((file) => {
 
+            const {
+                paperSize,
+                note,
+                pageCount,
+                copies,
+                colorMode,
+                side
+            } = file;
+
+            // Validate paper size
+            if (!["A3", "A4", "VEC Paper"].includes(paperSize)) {
+                throw new Error("Invalid or missing paper size");
+            }
+
+            // Validate printing restrictions
+            if (
+                ["A3", "VEC Paper"].includes(paperSize) &&
+                side === "DOUBLE"
+            ) {
+                throw new Error(
+                    `Double-sided printing is not available for ${paperSize}`
+                );
+            }
+
+            // Calculate individual PDF price
             const amount = calculateFilePrice(
-                file.pageCount,
-                file.copies,
-                file.colorMode,
-                file.side
+                pageCount,
+                copies,
+                colorMode,
+                side,
+                paperSize
             );
 
             totalAmount += amount;
 
+            const cleanNote = typeof note === "string" ? note.trim() : "";
+
+            if (cleanNote.length > 500) {
+                throw new Error("File note cannot exceed 500 characters");
+            }
+
             return {
                 ...file,
+                paperSize,
+                note: typeof note === "string" ? note.trim() : "",
                 amount
             };
         });
+
 
 
         // --------------------------------
@@ -341,6 +382,28 @@ const createOrder = async (req, res) => {
         }
 
 
+        // Paper size validation errors
+        // Client-side validation errors
+        const clientErrors = [
+            "Invalid or missing paper size",
+            "Invalid paper size",
+            "Invalid color mode",
+            "Invalid print side",
+            "Invalid page count or copies",
+            "File note cannot exceed 500 characters"
+        ];
+
+        if (
+            clientErrors.includes(error.message) ||
+            error.message?.includes("not available")
+        ) {
+            return res.status(400).json({
+                message: error.message
+            });
+        }
+
+
+
         return res.status(500).json({
             message: "Internal server error"
         });
@@ -357,7 +420,7 @@ const createOrder = async (req, res) => {
 //     try {
 
 //         const { orderNumber } = req.params;
-        
+
 //         const order = await Order.findOne({
 //             orderNumber,
 //             customerId: req.customerId
