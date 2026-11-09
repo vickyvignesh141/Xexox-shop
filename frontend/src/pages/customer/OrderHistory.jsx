@@ -221,7 +221,7 @@ function OrderHistory() {
                                         ? styles.pending
                                         : order.orderStatus === "COMPLETED"
                                             ? styles.completed
-                                            : order.orderStatus === "NOT COMPLETED"
+                                            : order.orderStatus === "NOT-COMPLETED"
                                                 ? styles.notCompleted
                                                 : ""
                                         }`}
@@ -275,7 +275,7 @@ function OrderHistory() {
                                                         <Eye size={18} />
                                                     </button>
 
-                                                    {order.orderStatus === "PENDING" && order.files.length > 1 && (
+                                                    {/* {order.orderStatus === "PENDING" && order.files.length > 1 && (
                                                         <button
                                                             type="button"
                                                             className={styles.deleteFileBtn}
@@ -283,7 +283,7 @@ function OrderHistory() {
                                                         >
                                                             Delete PDF
                                                         </button>
-                                                    )}
+                                                    )} */}
                                                 </div>
                                             </div>
                                         ))}
@@ -300,7 +300,7 @@ function OrderHistory() {
                                     </span>
                                 </div>
                             </div>
-                            {order.orderStatus === "PENDING" && (
+                            {/* {order.orderStatus === "PENDING" && (
                                 <div className={styles.orderFooter}>
                                     <button
                                         type="button"
@@ -314,7 +314,7 @@ function OrderHistory() {
                                             : "Delete Entire Order"}
                                     </button>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     ))
                 )}

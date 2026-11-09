@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedOwnerRoute from "./components/ProtectedOwnerRoute";
 import ChooseRole from "./pages/common/ChooseRole";
+import NotFound from "./pages/common/Notfound";
 
 import CustomerLogin from "./pages/customer/CustomerLogin";
 import CustomerRegister from "./pages/customer/CustomerRegister";
@@ -27,6 +28,8 @@ function App() {
         <Route path="/" element={<ChooseRole />} />
         <Route path="/register" element={<CustomerRegister />} />
         <Route path="/login" element={<CustomerLogin />} />
+        <Route path="*" element={<NotFound />} />
+        
         <Route path="/upload" element={<UploadOrder />} />
 
 
