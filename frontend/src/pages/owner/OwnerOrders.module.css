@@ -430,6 +430,13 @@
   flex-shrink: 0;
 }
 
+.printedCheck {
+  color: #16a34a;
+  font-size: 22px;
+  font-weight: 700;
+  margin-left: 8px;
+}
+
 
 .expiredFile {
     color: #dc2626;
