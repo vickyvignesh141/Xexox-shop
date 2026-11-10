@@ -269,6 +269,11 @@ function Payment() {
                                     You can pay cash when you
                                     collect your order.
                                 </li>
+                                <li>
+                                    <em>4</em>
+                                    Check your order status after 30 minutes. Collect your prints once the status changes to Completed.
+                                </li>
+
                             </ul>
 
                             <div className={styles.actionBar}>
@@ -409,7 +414,7 @@ function Payment() {
                     </div> */}
 
 
-                   
+
 
                 </div>
 

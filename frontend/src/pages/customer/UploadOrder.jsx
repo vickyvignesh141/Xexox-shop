@@ -695,11 +695,7 @@ function UploadOrder() {
                                                         }
                                                     );
 
-                                                    window.open(
-                                                        response.data.url,
-                                                        "_blank",
-                                                        "noopener,noreferrer"
-                                                    );
+                                                    window.open(response.data.url, "_blank");
 
                                                 } catch (error) {
 
