@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 import { Toaster, toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +30,8 @@ function CustomerRegister() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const registrationLock = useRef(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -55,49 +57,61 @@ function CustomerRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (registrationLock.current) return;
+
     if (!/^[6-9]\d{9}$/.test(form.mobile)) {
-      toast.error("Enter a valid 10-digit mobile number");
-      return;
+        toast.error("Enter a valid 10-digit mobile number");
+        return;
     }
 
     if (!/^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{6,12}$/.test(form.password)) {
-      toast.error(
-        "Password must be 6-12 characters with one capital letter and one special character"
-      );
-      return;
+        toast.error(
+            "Password must be 6-12 characters with one capital letter and one special character"
+        );
+        return;
     }
 
     if (form.password !== form.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
+        toast.error("Passwords do not match");
+        return;
     }
+
+    // Lock immediately after validation
+    registrationLock.current = true;
+    setIsRegistering(true);
 
     try {
-      const { confirmPassword, ...registrationData } = form;
+        const { confirmPassword, ...registrationData } = form;
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/customers`,
-        registrationData
-      );
+        const response = await axios.post(
+            `${import.meta.env.VITE_API_URL}/api/customers`,
+            registrationData
+        );
 
-      localStorage.setItem("xeroxCustomerId", response.data.customer._id);
+        localStorage.setItem(
+            "xeroxCustomerId",
+            response.data.customer._id
+        );
 
-      toast.success("Registration successful!");
-      navigate("/upload");
+        toast.success("Registration successful!");
+        navigate("/");
+
     } catch (error) {
-      const status = error.response?.status;
+        const status = error.response?.status;
 
-      const message =
-        status >= 500
-          ? "Server error. Please try again later."
-          : error.response?.data?.message ||
-          "Registration failed. Please try again.";
+        const message =
+            status >= 500
+                ? "Server error. Please try again later."
+                : error.response?.data?.message ||
+                "Registration failed. Please try again.";
 
-      toast.error(message, {
-        duration: 3000,
-      });
+        toast.error(message, { duration: 3000 });
+
+    } finally {
+        registrationLock.current = false;
+        setIsRegistering(false);
     }
-  };
+};
 
   return (
     <>
@@ -230,8 +244,9 @@ function CustomerRegister() {
           </div>
           <PasswordRules value={form.confirmPassword} />
 
-          <button type="submit">Register</button>
-
+          <button type="submit" disabled={isRegistering}>
+            {isRegistering ? "Registering..." : "Register"}
+          </button>
           <p className={styles.signInText}>
             Already have an account?{" "}
             <button

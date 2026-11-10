@@ -430,6 +430,12 @@
   flex-shrink: 0;
 }
 
+
+.expiredFile {
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 600;
+}
 /* ===========================
    Action buttons
 =========================== */

@@ -1,12 +1,8 @@
 const Order = require("../models/Order");
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand, HeadObjectCommand } = require("@aws-sdk/client-s3");
 
 const s3 = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    }
+    region: process.env.AWS_REGION
 });
 
 // Verify or reject payment
@@ -89,13 +85,13 @@ const updateOrderStatus = async (req, res) => {
 
         // Payment must be verified before Xerox can be completed
         if (
-    order.paymentMethod === "GPay" &&
-    order.paymentVerificationStatus !== "VERIFIED"
-) {
-    return res.status(400).json({
-        message: "GPay payment must be verified before updating Xerox status"
-    });
-}
+            order.paymentMethod === "GPay" &&
+            order.paymentVerificationStatus !== "VERIFIED"
+        ) {
+            return res.status(400).json({
+                message: "GPay payment must be verified before updating Xerox status"
+            });
+        }
 
         if (order.orderStatus !== "PENDING") {
             return res.status(400).json({
@@ -152,6 +148,37 @@ const getPdfUrl = async (req, res) => {
             return res.status(400).json({
                 message: "S3 key is required"
             });
+        }
+
+        const order = await Order.findOne({
+            "files.s3Key": s3Key
+        });
+
+        if (!order) {
+            return res.status(404).json({
+                message: "File not found"
+            });
+        }
+
+        try {
+            await s3.send(new HeadObjectCommand({
+                Bucket: process.env.AWS_S3_BUCKET,
+                Key: s3Key
+            }));
+        } catch (error) {
+            if (
+                error.name === "NotFound" ||
+                error.name === "NoSuchKey" ||
+                error.$metadata?.httpStatusCode === 404
+            ) {
+                return res.status(410).json({
+                    available: false,
+                    code: "FILE_EXPIRED",
+                    message: "This PDF has expired. Files are available for 3 days."
+                });
+            }
+
+            throw error;
         }
 
         const command = new GetObjectCommand({

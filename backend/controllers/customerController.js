@@ -234,7 +234,19 @@ const forgotPassword = async (req, res) => {
 
         await customer.save();
 
-        await sendResetOtpEmail(normalizedEmail, otp);
+        try {
+            await sendResetOtpEmail(normalizedEmail, otp);
+        } catch (emailError) {
+            console.error("OTP email sending failed:", emailError);
+
+            customer.resetOtpHash = undefined;
+            customer.resetOtpExpiresAt = undefined;
+            customer.resetOtpAttempts = 0;
+
+            await customer.save();
+
+            throw emailError;
+        }
 
         return res.status(200).json({
             message: "If your email is registered, you will receive an OTP."
@@ -298,6 +310,7 @@ const verifyResetOtp = async (req, res) => {
         if (customer.resetOtpAttempts >= 5) {
             customer.resetOtpHash = undefined;
             customer.resetOtpExpiresAt = undefined;
+            customer.resetOtpAttempts = 0;
 
             await customer.save();
 
@@ -484,7 +497,7 @@ module.exports = {
     loginCustomer,
     forgotPassword,
     verifyResetOtp,
-     resetPassword
+    resetPassword
 
     // getCustomerByMobile,
 };
