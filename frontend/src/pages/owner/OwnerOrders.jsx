@@ -361,14 +361,20 @@ function OwnerOrders() {
                       {expiredFiles.includes(file.s3Key) ? (
                         <span className={styles.expiredFile}>PDF Expired</span>
                       ) : order.orderStatus !== "COMPLETED" ? (
-                        <button
-                          type="button"
-                          className={styles.printButton}
-                          onClick={() => printPdf(file.s3Key)}
-                        >
-                          <Printer size={16} />
-                          Print PDF
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            className={styles.printButton}
+                            onClick={() => printPdf(file.s3Key)}
+                          >
+                            <Printer size={16} />
+                            Print PDF
+                          </button>
+
+                          {printedFiles.includes(file.s3Key) && (
+                            <span className={styles.printedCheck}>✓</span>
+                          )}
+                        </>
                       ) : null}
                     </div>
 
