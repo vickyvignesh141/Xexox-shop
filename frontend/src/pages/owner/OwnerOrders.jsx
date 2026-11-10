@@ -56,41 +56,50 @@ function OwnerOrders() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [selectedDate, setSelectedDate] = useState("");
   const [printedFiles, setPrintedFiles] = useState([]);
+  const [expiredFiles, setExpiredFiles] = useState([]);
 
   const token = localStorage.getItem("ownerToken");
 
- const printPdf = async (s3Key) => {
-  try {
-    const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/owner/pdf-url`,
-      {
-        params: { s3Key },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  const printPdf = async (s3Key) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/owner/pdf-url`,
+        {
+          params: { s3Key },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Mark this file as clicked
+      setPrintedFiles((prev) =>
+        prev.includes(s3Key) ? prev : [...prev, s3Key]
+      );
+
+      const printWindow = window.open(response.data.url, "_blank");
+
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.focus();
+          printWindow.print();
+        };
       }
-    );
+    } catch (error) {
+      const status = error.response?.status;
+      const code = error.response?.data?.code;
 
-    // Mark this file as clicked
-    setPrintedFiles((prev) =>
-      prev.includes(s3Key) ? prev : [...prev, s3Key]
-    );
+      if (status === 410 || code === "FILE_EXPIRED") {
+        setExpiredFiles((prev) =>
+          prev.includes(s3Key) ? prev : [...prev, s3Key]
+        );
 
-    const printWindow = window.open(response.data.url, "_blank");
-
-    if (printWindow) {
-      printWindow.onload = () => {
-        printWindow.focus();
-        printWindow.print();
-      };
+        toast.error("This PDF has expired.");
+      } else {
+        toast.error("Unable to open PDF. Please try again.");
+      }
     }
-  } catch (error) {
-    console.error("Print PDF error:", error);
-    toast.error("Unable to open PDF. Please try again.", {
-      duration: 3000,
-    });
-  }
-};
+  };
 
   const fetchOrders = async () => {
     try {
@@ -113,21 +122,21 @@ function OwnerOrders() {
         status >= 500
           ? "Server error. Please try again later."
           : error.response?.data?.message ||
-            "Failed to load orders. Please try again.";
+          "Failed to load orders. Please try again.";
 
       toast.error(message);
     }
   };
 
- useEffect(() => {
-  fetchOrders();
-
-  const interval = setInterval(() => {
+  useEffect(() => {
     fetchOrders();
-  }, 5000);
 
-  return () => clearInterval(interval);
-}, []);
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const verifyPayment = async (orderNumber, status) => {
     try {
@@ -151,7 +160,7 @@ function OwnerOrders() {
         status >= 500
           ? "Server error. Please try again later."
           : error.response?.data?.message ||
-            "Payment update failed. Please try again.";
+          "Payment update failed. Please try again.";
 
       toast.error(message);
     }
@@ -179,7 +188,7 @@ function OwnerOrders() {
         status >= 500
           ? "Server error. Please try again later."
           : error.response?.data?.message ||
-            "Order status update failed. Please try again.";
+          "Order status update failed. Please try again.";
 
       toast.error(message);
     }
@@ -349,26 +358,24 @@ function OwnerOrders() {
                     <div className={styles.fileHead}>
                       <h4 className={styles.fileName}>{file.filename}</h4>
 
-                      {order.orderStatus !== "COMPLETED" && (
-  <button
-    type="button"
-    className={styles.printButton}
-    onClick={() => printPdf(file.s3Key)}
-  >
-    <Printer size={16} />
-    Print PDF
-  </button>
-)}
-                       {printedFiles.includes(file.s3Key) && (
-    <CheckCircle size={18} className={styles.printedTick} />
-  )}
+                      {expiredFiles.includes(file.s3Key) ? (
+                        <span className={styles.expiredFile}>PDF Expired</span>
+                      ) : order.orderStatus !== "COMPLETED" ? (
+                        <button
+                          type="button"
+                          className={styles.printButton}
+                          onClick={() => printPdf(file.s3Key)}
+                        >
+                          <Printer size={16} />
+                          Print PDF
+                        </button>
+                      ) : null}
                     </div>
 
                     {/* THE 6 BOXES */}
                     <div
-                      className={`${styles.boxes} ${
-                        longNote ? styles.boxesLong : ""
-                      }`}
+                      className={`${styles.boxes} ${longNote ? styles.boxesLong : ""
+                        }`}
                     >
                       <Spec label="Pages" value={file.pageCount} />
                       <Spec label="Copies" value={file.copies} />

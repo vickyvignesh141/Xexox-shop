@@ -1,13 +1,9 @@
 const Order = require("../models/Order");
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand, HeadObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const s3 = new S3Client({
     region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
 });
 
 const getFileViewUrl = async (req, res) => {
@@ -36,6 +32,30 @@ const getFileViewUrl = async (req, res) => {
             if (!order) {
                 return res.status(403).json({ message: "Access denied" });
             }
+        }
+
+        // Check whether PDF still exists in S3
+        try {
+            await s3.send(new HeadObjectCommand({
+                Bucket: process.env.AWS_S3_BUCKET,
+                Key: s3Key
+            }));
+        } catch (error) {
+            if (
+                error.name === "NotFound" ||
+                error.name === "NoSuchKey" ||
+                error.$metadata?.httpStatusCode === 404
+            ) {
+                return res.status(410).json({
+                    available: false,
+                    code: "FILE_EXPIRED",
+                    message: "This PDF has expired. Files are available for 3 days."
+                });
+
+
+            }
+
+            throw error;
         }
 
         const command = new GetObjectCommand({

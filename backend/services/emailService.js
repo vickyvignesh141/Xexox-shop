@@ -6,10 +6,7 @@ const {
 
 const sesClient = new SESv2Client({
     region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    }
+
 });
 
 const sendResetOtpEmail = async (email, otp) => {
@@ -61,6 +58,7 @@ const sendResetOtpEmail = async (email, otp) => {
     });
 
 try {
+    console.log("OTP EMAIL FUNCTION CALLED:", email);
     const result = await sesClient.send(command);
 
     console.log("OTP EMAIL SENT:", result.MessageId);

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
@@ -29,7 +29,9 @@ import styles from "./UploadOrder.module.css";
 
 function UploadOrder() {
     const navigate = useNavigate();
+    const uploadButtonRef = useRef(null);
     const [showInstructions, setShowInstructions] = useState(!sessionStorage.getItem("uploadInstructionsSeen"));
+    const uploadLock = useRef(false);
 
     // Selected local files waiting to be uploaded
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -45,6 +47,16 @@ function UploadOrder() {
     const [uploading, setUploading] = useState(false);
 
     const [paymentType, setPaymentType] = useState("COD");
+
+
+    useEffect(() => {
+        if (selectedFiles.length > 0) {
+            uploadButtonRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
+        }
+    }, [selectedFiles]);
 
     // -----------------------------------------
     // Select PDF
@@ -122,6 +134,7 @@ function UploadOrder() {
     // Upload selected PDF
     // -----------------------------------------
     const handleUpload = async () => {
+        if (uploadLock.current) return;
         const customerToken = localStorage.getItem("customerToken");
 
         if (!customerToken) {
@@ -148,6 +161,7 @@ function UploadOrder() {
         }
 
         try {
+            uploadLock.current = true;
             setUploading(true);
 
             const uploadedResults = [];
@@ -199,6 +213,7 @@ function UploadOrder() {
                 duration: 3000,
             });
         } finally {
+            uploadLock.current = false;
             setUploading(false);
         }
     };
@@ -439,7 +454,7 @@ function UploadOrder() {
 
                                     <div>
                                         <h2 id="upload-instructions-title">
-                                             Instructions
+                                            Instructions
                                         </h2>
                                     </div>
                                 </div>
@@ -620,6 +635,7 @@ function UploadOrder() {
                     )}
 
                     <button
+                        ref={uploadButtonRef}
                         type="button"
                         onClick={handleUpload}
                         disabled={uploading}
@@ -686,6 +702,14 @@ function UploadOrder() {
                                                     );
 
                                                 } catch (error) {
+
+                                                    if (
+                                                        error.response?.status === 410 ||
+                                                        error.response?.data?.code === "FILE_EXPIRED"
+                                                    ) {
+                                                        toast.error("This PDF has expired. Please upload it again.");
+                                                        return;
+                                                    }
                                                     console.error(
                                                         "PDF preview error:",
                                                         error.response?.data || error

@@ -10,8 +10,12 @@ const orderSchema = new mongoose.Schema(
 
         orderNumber: {
             type: String,
-            required: true,
-            unique: true
+            required: true
+        },
+
+        orderDateKey: {
+            type: String,
+            required: true
         },
 
         files: [
@@ -130,6 +134,11 @@ const orderSchema = new mongoose.Schema(
         timestamps: true,
         versionKey: false
     }
+);
+
+orderSchema.index(
+    { orderDateKey: 1, orderNumber: 1 },
+    { unique: true }
 );
 
 module.exports = mongoose.model("Order", orderSchema);

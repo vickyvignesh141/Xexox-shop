@@ -12,6 +12,7 @@ function OrderHistory() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [deletingOrderId, setDeletingOrderId] = useState(null);
     const customerToken = localStorage.getItem("customerToken");
+    const [expiredFiles, setExpiredFiles] = useState(new Set());
 
 
     const customerId = localStorage.getItem("xeroxCustomerId");
@@ -74,9 +75,31 @@ function OrderHistory() {
                 }
             );
 
-            window.open(response.data.url, "_blank", "noopener,noreferrer");
+            if (!response.data.url) {
+                throw new Error("PDF_URL_MISSING");
+            }
+
+            window.open(
+                response.data.url,
+                "_blank",
+                "noopener,noreferrer"
+            );
+
         } catch (error) {
-            toast.error("Unable to open PDF");
+            const status = error.response?.status;
+            const code = error.response?.data?.code;
+
+            if (status === 410 || code === "FILE_EXPIRED") {
+                setExpiredFiles((prev) => new Set([...prev, s3Key]));
+
+                toast.error("This PDF has unavailable.");
+
+            } else {
+                toast.error(
+                    error.response?.data?.message ||
+                    "Unable to open PDF. Please try again."
+                );
+            }
         }
     };
 
@@ -265,15 +288,21 @@ function OrderHistory() {
                                                 <span className={styles.fileName}>{file.filename}</span>
 
                                                 <div className={styles.fileActions}>
-                                                    <button
-                                                        type="button"
-                                                        className={styles.iconBtn}
-                                                        onClick={() => handleViewFile(file.s3Key)}
-                                                        title="View PDF"
-                                                        aria-label={`View ${file.filename}`}
-                                                    >
-                                                        <Eye size={18} />
-                                                    </button>
+                                                    {expiredFiles.has(file.s3Key) ? (
+                                                        <span className={styles.expiredFile}>
+                                                            PDF Expired
+                                                        </span>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            className={styles.iconBtn}
+                                                            onClick={() => handleViewFile(file.s3Key)}
+                                                            title="View PDF"
+                                                            aria-label={`View ${file.filename}`}
+                                                        >
+                                                            <Eye size={18} />
+                                                        </button>
+                                                    )}
 
                                                     {/* {order.orderStatus === "PENDING" && order.files.length > 1 && (
                                                         <button

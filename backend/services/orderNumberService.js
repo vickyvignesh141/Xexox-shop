@@ -23,7 +23,9 @@ const generateOrderNumber = async () => {
         }
     );
 
-    return `X${String(counter.sequence).padStart(4, "0")}`;
-};
+return {
+    orderNumber: `X${String(counter.sequence).padStart(3, "0")}`,
+    orderDateKey: dateKey
+};};
 
 module.exports = generateOrderNumber;

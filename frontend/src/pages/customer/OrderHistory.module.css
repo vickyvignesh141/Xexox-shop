@@ -347,6 +347,13 @@
   transition: all 0.2s ease;
 }
 
+.expiredFile {
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 .backBtn:hover {
   background: #1a4380;
   color: #ffffff;
