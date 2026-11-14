@@ -12,9 +12,9 @@ router.use((req, res, next) => {
 });
 
 
-router.patch("/orders/:orderNumber/payment",ownerAuth,verifyPayment);
+router.patch("/orders/:year/:sequence/payment",ownerAuth,verifyPayment);
 
-router.patch("/orders/:orderNumber/status",ownerAuth,updateOrderStatus);
+router.patch("/orders/:year/:sequence/status", ownerAuth, updateOrderStatus);
 
 router.get("/orders", ownerAuth, getAllOrders);
 
