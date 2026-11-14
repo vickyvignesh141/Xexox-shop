@@ -8,7 +8,7 @@ const s3 = new S3Client({
 // Verify or reject payment
 const verifyPayment = async (req, res) => {
     try {
-        const orderNumber = `V${req.params.year}/${req.params.sequence}`;
+        const orderNumber = `${req.params.year}/${req.params.sequence}`;
         const { status } = req.body || {};
 
         if (!["VERIFIED", "REJECTED"].includes(status)) {
@@ -63,7 +63,7 @@ const updateOrderStatus = async (req, res) => {
     try {
         console.log("STATUS BODY:", req.body);
 
-        const orderNumber = `V${req.params.year}/${req.params.sequence}`;
+        const orderNumber = `${req.params.year}/${req.params.sequence}`;
         const { status } = req.body || {};
 
         if (!["COMPLETED", "NOT-COMPLETED"].includes(status)) {
