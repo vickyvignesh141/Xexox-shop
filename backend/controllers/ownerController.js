@@ -8,9 +8,7 @@ const s3 = new S3Client({
 // Verify or reject payment
 const verifyPayment = async (req, res) => {
     try {
-        console.log("BODY:", req.body);
-        console.log("CONTENT TYPE:", req.headers["content-type"]);
-        const { orderNumber } = req.params;
+        const orderNumber = `V${req.params.year}/${req.params.sequence}`;
         const { status } = req.body || {};
 
         if (!["VERIFIED", "REJECTED"].includes(status)) {
@@ -35,12 +33,10 @@ const verifyPayment = async (req, res) => {
 
         order.paymentVerificationStatus = status;
 
-        // Only verified payment can move to Xerox processing
         if (status === "VERIFIED") {
             order.orderStatus = "PENDING";
         }
 
-        // Rejected payment cannot be processed
         if (status === "REJECTED") {
             order.orderStatus = "NOT_COMPLETED";
         }
@@ -66,7 +62,8 @@ const verifyPayment = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
     try {
         console.log("STATUS BODY:", req.body);
-        const { orderNumber } = req.params;
+
+        const orderNumber = `V${req.params.year}/${req.params.sequence}`;
         const { status } = req.body || {};
 
         if (!["COMPLETED", "NOT-COMPLETED"].includes(status)) {
@@ -83,7 +80,6 @@ const updateOrderStatus = async (req, res) => {
             });
         }
 
-        // Payment must be verified before Xerox can be completed
         if (
             order.paymentMethod === "GPay" &&
             order.paymentVerificationStatus !== "VERIFIED"
