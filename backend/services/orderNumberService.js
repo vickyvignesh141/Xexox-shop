@@ -2,17 +2,16 @@
 const Counter = require("../models/Counter");
 
 const generateOrderNumber = async () => {
-    const dateKey = new Intl.DateTimeFormat("en-CA", {
+
+    const year = new Intl.DateTimeFormat("en", {
         timeZone: "Asia/Kolkata",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
+        year: "2-digit"
     }).format(new Date());
 
     const counter = await Counter.findOneAndUpdate(
         {
             name: "global-order",
-            dateKey
+            dateKey: year
         },
         {
             $inc: { sequence: 1 }
@@ -23,9 +22,10 @@ const generateOrderNumber = async () => {
         }
     );
 
-return {
-    orderNumber: `X${String(counter.sequence).padStart(3, "0")}`,
-    orderDateKey: dateKey
-};};
+    return {
+        orderNumber: `V${year}/${String(counter.sequence).padStart(5, "0")}`,
+        orderDateKey: year
+    };
+};
 
 module.exports = generateOrderNumber;

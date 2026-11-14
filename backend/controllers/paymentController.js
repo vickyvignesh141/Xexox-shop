@@ -46,16 +46,16 @@ const createPaymentOrder = async (req, res) => {
         // 3. Check duplicate transaction ID
         // --------------------------------
         if (paymentMethod === "GPay") {
-    const existingOrder = await Order.findOne({
-        transactionId: transactionId.trim()
-    });
+            const existingOrder = await Order.findOne({
+                transactionId: transactionId.trim()
+            });
 
-    if (existingOrder) {
-        return res.status(409).json({
-            message: "Transaction ID already used"
-        });
-    }
-}
+            if (existingOrder) {
+                return res.status(409).json({
+                    message: "Transaction ID already used"
+                });
+            }
+        }
 
         // --------------------------------
         // 4. Validate and calculate each file
@@ -109,22 +109,22 @@ const createPaymentOrder = async (req, res) => {
         // --------------------------------
         // 5. Generate order number
         // --------------------------------
-        const orderNumber = await generateOrderNumber();
-
+        const { orderNumber, orderDateKey } = await generateOrderNumber();
         // --------------------------------
         // 6. Create order
         // --------------------------------
         const order = new Order({
-    customerId,
-    orderNumber,
-    files: processedFiles,
-    totalAmount,
-    paymentMethod,
-    transactionId:
-        paymentMethod === "GPay"
-            ? transactionId.trim()
-            : null
-});
+            customerId,
+            orderNumber,
+            orderDateKey,
+            files: processedFiles,
+            totalAmount,
+            paymentMethod,
+            transactionId:
+                paymentMethod === "GPay"
+                    ? transactionId.trim()
+                    : null
+        });
 
         await order.save();
 
