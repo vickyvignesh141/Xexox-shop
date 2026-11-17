@@ -460,7 +460,9 @@ const getMyOrders = async (req, res) => {
             customerId: req.customerId
         }).sort({
             createdAt: -1
-        });
+            
+        })
+         .limit(50);
 
         return res.status(200).json({
             orders

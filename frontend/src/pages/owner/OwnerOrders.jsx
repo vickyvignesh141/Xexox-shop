@@ -132,8 +132,10 @@ function OwnerOrders() {
     fetchOrders();
 
     const interval = setInterval(() => {
+      if (!document.hidden) {
       fetchOrders();
-    }, 5000);
+      }
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);

@@ -140,5 +140,6 @@ orderSchema.index(
     { orderDateKey: 1, orderNumber: 1 },
     { unique: true }
 );
+orderSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("Order", orderSchema);
