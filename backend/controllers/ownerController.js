@@ -120,7 +120,8 @@ const getAllOrders = async (req, res) => {
                 "customerId",
                 "name mobile department year section email"
             )
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .limit(50);
 
         return res.status(200).json({
             orders
